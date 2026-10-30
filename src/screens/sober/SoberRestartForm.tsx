@@ -13,7 +13,7 @@ import { useNotice } from '../../components/NoticeProvider';
 import { QueryState } from '../../components/QueryState';
 import { Text } from '../../components/Text';
 import { saveSoberRestart } from '../../db/sober';
-import { dateTimeDraft, isDate, parseDateTime } from '../../domain/date';
+import { dateTimeDraft, isDate, localDate, parseDateTime } from '../../domain/date';
 import { SOBER_MEMO_MAX_LENGTH } from '../../domain/limits';
 import { validateSoberRestart } from '../../domain/sober';
 import { soberQueries, useRecordMutation } from '../../queries';
@@ -42,7 +42,7 @@ export function SoberRestartForm({
   const sober = useQuery({ ...soberQueries.byId(db, soberId), enabled: validParams });
   const records = useQuery({
     ...soberQueries.restarts(db, soberId),
-    enabled: validParams && editing && !!sober.data,
+    enabled: validParams && !!sober.data,
   });
   const record = records.data?.find((item) => item.id === restartId && item.sober_id === soberId);
   const [draft, setDraft] = useState(() => {
@@ -109,7 +109,9 @@ export function SoberRestartForm({
     !validParams ||
     !sober.data ||
     sober.error ||
-    (editing && (!record || !loaded || records.error))
+    records.isPending ||
+    records.error ||
+    (editing && (!record || !loaded))
   )
     return (
       <BottomSheetPage
@@ -120,7 +122,7 @@ export function SoberRestartForm({
         onClosed={onClosed}
       >
         {validParams && <QueryState query={sober} />}
-        {validParams && editing && !!sober.data && <QueryState query={records} />}
+        {validParams && !!sober.data && <QueryState query={records} />}
         {(!validParams || (!sober.isPending && !sober.error && !sober.data)) && (
           <Text className="text-center text-base">{t('sober.checkItemDate')}</Text>
         )}
@@ -177,6 +179,11 @@ export function SoberRestartForm({
           compactCalendar
           draft={draft}
           minTime={item.initial_started_at}
+          soberRecords={{
+            dates: (records.data ?? []).map((entry) => localDate(entry.restarted_at)),
+            iconKey: item.icon_key,
+            iconColor: item.icon_color,
+          }}
           disabled={busy}
           onChange={(value) => {
             if (saving.current || busy) return;

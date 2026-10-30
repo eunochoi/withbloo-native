@@ -543,6 +543,36 @@ test('date picker owns its min/future range and highlights selection without sha
   assert(!nodes(today).some((node) => node.props.className?.includes('bg-theme-accent')));
 });
 
+test('date picker marks available restart dates with the configured sober icon', () => {
+  const { DatePickerCalendar } = load('src/screens/calendar/DatePickerCalendar.tsx');
+  const tree = DatePickerCalendar({
+    month: day.month,
+    today: day.today,
+    selected: '2026-10-05',
+    minDate: '2026-10-03',
+    soberRecords: {
+      dates: ['2026-10-02', '2026-10-05', '2026-10-06'],
+      iconKey: 'smoking',
+      iconColor: 'blue',
+    },
+    onMonthChange: () => {},
+    onSelect: () => {},
+  });
+  assert.equal(cell(tree, '2026-10-02').props.children, undefined);
+  const selected = cell(tree, '2026-10-05');
+  assert(
+    nodes(selected).some(
+      (node) =>
+        node.type === 'SoberIcon' &&
+        node.props.name === 'smoking' &&
+        node.props.colorKey === 'blue',
+    ),
+  );
+  assert(nodes(selected).some((node) => node.props.className?.includes('bg-theme-accent')));
+  assert(nodes(cell(tree, '2026-10-06')).some((node) => node.type === 'SoberIcon'));
+  assert.equal(cell(tree, '2026-10-04').props.children, undefined);
+});
+
 test('date picker highlights today and weekend selections in regular and compact layouts', () => {
   const { DatePickerCalendar } = load('src/screens/calendar/DatePickerCalendar.tsx');
   for (const compact of [false, true]) {

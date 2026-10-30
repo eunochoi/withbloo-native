@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { useState } from 'react';
 import { TextInput, View } from 'react-native';
 import type { dateTimeDraft } from '../domain/date';
+import type { Sober } from '../db/types';
 import { useCurrentMinute } from '../hooks/useCurrentMinute';
 import { DatePickerCalendar } from '../screens/calendar/DatePickerCalendar';
 import { useAppTheme } from '../theme/AppThemeProvider';
@@ -22,6 +23,7 @@ export function DateTimeFields({
   collapsible = false,
   compactCalendar = false,
   disabled = false,
+  soberRecords,
   onChange,
 }: {
   draft: ReturnType<typeof dateTimeDraft>;
@@ -29,6 +31,11 @@ export function DateTimeFields({
   collapsible?: boolean;
   compactCalendar?: boolean;
   disabled?: boolean;
+  soberRecords?: {
+    dates: readonly string[];
+    iconKey: Sober['icon_key'];
+    iconColor: Sober['icon_color'];
+  };
   onChange: (draft: ReturnType<typeof dateTimeDraft>) => void;
 }) {
   const { t, formatLocale } = useI18n();
@@ -56,6 +63,7 @@ export function DateTimeFields({
         <View className="gap-5" pointerEvents={disabled ? 'none' : 'auto'}>
           <DatePickerCalendar
             compact={compactCalendar}
+            soberRecords={soberRecords}
             month={month}
             selected={draft.date}
             today={today}

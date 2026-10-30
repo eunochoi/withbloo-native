@@ -192,6 +192,15 @@ test('create uses the selected local date, an expanded shared field and one subm
   assert.equal(form({ soberId: 1 }).render().props.backRoute, '/sober/1');
 });
 
+test('create and edit pass existing restart dates to the calendar', () => {
+  for (const props of [{ soberId: 1 }, { soberId: 1, restartId: 2 }]) {
+    const ui = form(props);
+    const marker = ui.fields().props.soberRecords;
+    assert.equal(marker.dates[0], dates.localDate(ui.records.data[0].restarted_at));
+    assert.equal(ui.queries.find((query) => query.kind === 'records').enabled, true);
+  }
+});
+
 test('edit loads owned record once, and background refetch does not overwrite unsaved changes', () => {
   const ui = form({ soberId: 1, restartId: 2 });
   assert.deepEqual(

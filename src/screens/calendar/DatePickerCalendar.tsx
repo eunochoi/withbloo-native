@@ -2,6 +2,8 @@ import { useI18n } from '../../i18n/react';
 import { useMemo } from 'react';
 import { View } from 'react-native';
 import { AppIcon } from '../../components/AppIcon';
+import { SoberIcon } from '../../components/SoberIcon';
+import type { Sober } from '../../db/types';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 import { calendarDays } from '../../domain/calendar';
 import { useMonthSwipe } from '../../hooks/useMonthSwipe';
@@ -17,6 +19,7 @@ export function DatePickerCalendar({
   minDate,
   compact = false,
   diaryDates,
+  soberRecords,
   onMonthChange,
   onSelect,
 }: {
@@ -26,6 +29,11 @@ export function DatePickerCalendar({
   minDate?: string;
   compact?: boolean;
   diaryDates?: readonly string[];
+  soberRecords?: {
+    dates: readonly string[];
+    iconKey: Sober['icon_key'];
+    iconColor: Sober['icon_color'];
+  };
   onMonthChange: (month: string) => void;
   onSelect: (date: string) => void;
 }) {
@@ -33,6 +41,7 @@ export function DatePickerCalendar({
 
   const { colors, iconSizes } = useAppTheme();
   const recorded = useMemo(() => new Set(diaryDates), [diaryDates]);
+  const restarted = useMemo(() => new Set(soberRecords?.dates), [soberRecords?.dates]);
   const days = useMemo(() => calendarDays(month), [month]);
   const navigation = useCalendarNavigation(month, onMonthChange, minDate, today);
   const swipe = useMonthSwipe(navigation.changeMonth);
@@ -46,6 +55,7 @@ export function DatePickerCalendar({
         {days.map((date) => {
           const unavailable = !navigation.isDateAvailable(date);
           const hasDiary = date.slice(0, 7) === month && !unavailable && recorded.has(date);
+          const hasRestart = date.slice(0, 7) === month && !unavailable && restarted.has(date);
           const isSelected = date === selected && date.slice(0, 7) === month && !unavailable;
           return (
             <CalendarDay
@@ -54,7 +64,13 @@ export function DatePickerCalendar({
               month={month}
               today={today}
               selected={selected}
-              label={hasDiary ? t('calendar.dateHasDiary', { value: date }) : undefined}
+              label={
+                hasDiary
+                  ? t('calendar.dateHasDiary', { value: date })
+                  : hasRestart
+                    ? `${date}, ${t('sober.restartDay')}`
+                    : undefined
+              }
               showTodayIndicator={false}
               showSelectedIndicator={false}
               disabled={unavailable}
@@ -64,15 +80,23 @@ export function DatePickerCalendar({
               contentClassName={isSelected ? 'rounded-full bg-theme-accent' : undefined}
               textClassName={isSelected ? 'text-theme-surface' : undefined}
             >
-              {hasDiary ? (
+              {hasDiary || (hasRestart && soberRecords) ? (
                 <View
                   className={`w-3/5 aspect-square items-center justify-center ${isSelected ? 'rounded-full bg-theme-accent' : ''}`}
                 >
-                  <AppIcon
-                    name="diary"
-                    size={iconSizes.lg}
-                    color={isSelected ? colors.surface : colors.accent}
-                  />
+                  {hasDiary ? (
+                    <AppIcon
+                      name="diary"
+                      size={iconSizes.lg}
+                      color={isSelected ? colors.surface : colors.accent}
+                    />
+                  ) : soberRecords ? (
+                    <SoberIcon
+                      name={soberRecords.iconKey}
+                      colorKey={soberRecords.iconColor}
+                      size={iconSizes.lg}
+                    />
+                  ) : null}
                 </View>
               ) : undefined}
             </CalendarDay>
