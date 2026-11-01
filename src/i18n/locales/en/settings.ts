@@ -18,8 +18,8 @@ export const settingsEn = {
   autoBackup: 'Auto backup',
   autoBackupPolicy:
     'Checks 1 second after saving a record or 30 seconds after opening or returning to the app. Backs up daily, keeping the last 3 successful dates. Backups may be delayed when the app is unused.',
-  autoBackupAndroid: 'Device · bloolog',
-  autoBackupICloud: 'iCloud Drive · BlooLog',
+  autoBackupAndroid: 'Device · withBloo',
+  autoBackupICloud: 'iCloud Drive · withBloo',
   autoBackupOn: 'Auto backup is on',
   autoBackupOff: 'Auto backup is off',
   autoBackupEnable: 'Enable automatic backup',

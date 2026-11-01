@@ -14,7 +14,11 @@ public final class BlooCloudModule: Module {
     let identity = try NSKeyedArchiver.archivedData(
       withRootObject: token, requiringSecureCoding: false)
     let fingerprint = SHA256.hash(data: identity).map { String(format: "%02x", $0) }.joined()
-    let directory = root.appendingPathComponent("Documents/bloolog", isDirectory: true)
+    let directory = root.appendingPathComponent("Documents/withBloo", isDirectory: true)
+    let legacy = root.appendingPathComponent("Documents/bloolog", isDirectory: true)
+    if manager.fileExists(atPath: legacy.path) && !manager.fileExists(atPath: directory.path) {
+      try manager.moveItem(at: legacy, to: directory)
+    }
     try manager.createDirectory(at: directory, withIntermediateDirectories: true)
     return (directory, fingerprint)
   }
@@ -25,7 +29,7 @@ public final class BlooCloudModule: Module {
     }
     guard
       name.range(
-        of: "^bloolog-[a-f0-9]{16}-[0-9-]{10}-[0-9]+-[a-f0-9]{16}\\.bloo$",
+        of: "^(bloolog|withBloo)-[a-f0-9]{16}-[0-9-]{10}-[0-9]+-[a-f0-9]{16}\\.bloo$",
         options: .regularExpression) != nil
     else {
       throw Exception(name: "BlooCloudName", description: "BLOO_INVALID")

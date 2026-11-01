@@ -123,7 +123,7 @@ test('single encrypted backup share reads the active language for each export an
       assert.equal(share.options.dialogTitle, title);
       assert.equal(share.options.mimeType, 'application/octet-stream');
       assert.equal(share.options.UTI, 'com.took.bloo');
-      assert.match(share.uri, /^file:\/\/cache\/bloolog-\d+-[a-z0-9]+\.bloo$/);
+      assert.match(share.uri, /^file:\/\/cache\/withBloo-\d+-[a-z0-9]+\.bloo$/);
     }
   } finally {
     i18n.locale = initial;

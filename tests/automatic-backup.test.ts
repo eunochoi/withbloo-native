@@ -94,6 +94,7 @@ function harness(platform: 'android' | 'ios' = 'android', secureStoreAvailable =
                       remove,
                     }
                   : {
+                      folder: async (uri: string) => uri,
                       names: async () => [...files],
                       publish: async (source: string, _folder: string, name: string) =>
                         publish(source, name),

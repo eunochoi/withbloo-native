@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name = 'BlooCloud'
   s.version = '1.0.0'
-  s.summary = 'BlooLog iCloud backup storage'
+  s.summary = 'withBloo iCloud backup storage'
   s.description = s.summary
   s.license = { :type => 'MIT' }
   s.author = 'TOOK'

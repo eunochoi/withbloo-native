@@ -141,6 +141,8 @@ async function finishRetention(config: AutoConfig) {
 async function performBackup(db: SQLiteDatabase, config: AutoConfig, force: boolean) {
   if (!config.identity) {
     if (!local) throw new Error('BLOO_NATIVE_REQUIRED');
+    config.directory = await local.folder(config.directory);
+    await saveConfig(config);
     const names = await local.names(config.directory);
     if (config.lastName && !names.includes(config.lastName)) config.lastDay = undefined;
     for (const name of names) {
@@ -190,7 +192,7 @@ async function performBackup(db: SQLiteDatabase, config: AutoConfig, force: bool
   let output: File | undefined;
   try {
     output = await createEncryptedBackup(db, credential);
-    const name = `bloolog-${config.device}-${day}-${Date.now()}-${bytesToHex(await backupCipher.random(8))}.bloo`;
+    const name = `withBloo-${config.device}-${day}-${Date.now()}-${bytesToHex(await backupCipher.random(8))}.bloo`;
     const created = new Date().toISOString();
     if (config.identity) {
       // Persist the pending name before publishing: a process kill cannot lose upload tracking.
@@ -348,7 +350,7 @@ export function cleanBackupCache() {
       } catch {
         /* Retry next launch. */
       }
-    } else if (/^bloolog-\d+-[a-z0-9]+\.bloo$/.test(file.name)) {
+    } else if (/^(?:bloolog|withBloo)-\d+-[a-z0-9]+\.bloo$/.test(file.name)) {
       const timestamp = Number(file.name.split('-')[1]);
       if (Date.now() - timestamp > 24 * 60 * 60 * 1000) {
         try {

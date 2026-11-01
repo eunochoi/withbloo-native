@@ -49,7 +49,7 @@ export async function createEncryptedBackup(
   const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const staging = new Directory(Paths.cache, `bloo-stage-${id}`);
   const archive = new File(staging, 'records.zip');
-  const output = new File(Paths.cache, `bloolog-${id}.bloo`);
+  const output = new File(Paths.cache, `withBloo-${id}.bloo`);
   staging.create();
   try {
     const snapshot = async () => {
@@ -191,8 +191,8 @@ export async function chooseBackup(): Promise<string[] | null> {
     // Validate the extension AND magic below; never accept images or renamed ZIPs.
     type:
       Platform.OS === 'ios'
-        ? 'application/x-bloolog-backup'
-        : ['application/x-bloolog-backup', 'application/octet-stream'],
+        ? 'application/x-withbloo-backup'
+        : ['application/x-withbloo-backup', 'application/x-bloolog-backup', 'application/octet-stream'],
     copyToCacheDirectory: Platform.OS === 'ios',
     multiple: false,
   });
@@ -262,7 +262,7 @@ async function restoreEncryptedBackupInternal(
         try {
           await safety.copy(saved);
           await verifyEncryptedBackup(saved, credential);
-          saved.rename(`bloolog-before-restore-${Date.now()}.bloo`);
+          saved.rename(`withBloo-before-restore-${Date.now()}.bloo`);
           committed = true;
         } finally {
           if (safety.exists) safety.delete();
@@ -391,7 +391,7 @@ export function latestSafetyBackup() {
     .list()
     .filter(
       (file): file is File =>
-        file instanceof File && /^bloolog-before-restore-\d+\.bloo$/.test(file.name),
+        file instanceof File && /^(?:bloolog|withBloo)-before-restore-\d+\.bloo$/.test(file.name),
     )
     .sort((a, b) => b.name.localeCompare(a.name))[0];
 }

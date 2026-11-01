@@ -7,7 +7,7 @@ export interface BackupEntry {
   created: number;
 }
 export function parseAutomaticBackup(name: string, device: string): BackupEntry | null {
-  const match = /^bloolog-([a-f0-9]{16})-(\d{4}-\d{2}-\d{2})-(\d+)-([a-f0-9]{16})\.bloo$/.exec(
+  const match = /^(?:bloolog|withBloo)-([a-f0-9]{16})-(\d{4}-\d{2}-\d{2})-(\d+)-([a-f0-9]{16})\.bloo$/.exec(
     name,
   );
   if (!match || match[1] !== device) return null;

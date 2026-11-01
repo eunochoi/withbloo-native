@@ -399,7 +399,7 @@ for (const failure of [null, 'password', 'truncated', 'tampered'] as const) {
       if (failure) {
         await assert.rejects(restore);
         assert.deepEqual(rows(f.target.raw, 'SELECT * FROM diaries'), before);
-        assert(!readdirSync(f.root).some((name) => name.startsWith('bloolog-before-restore-')));
+        assert(!readdirSync(f.root).some((name) => name.startsWith('withBloo-before-restore-')));
       } else {
         await restore;
         assert.deepEqual(
@@ -407,7 +407,7 @@ for (const failure of [null, 'password', 'truncated', 'tampered'] as const) {
           rows(f.source.raw, 'SELECT * FROM diaries'),
         );
         const safety = readdirSync(f.root).find((name) =>
-          name.startsWith('bloolog-before-restore-'),
+          name.startsWith('withBloo-before-restore-'),
         );
         assert(safety);
         const saved = readFileSync(join(f.root, safety));

@@ -9,7 +9,7 @@ const fixed = new Map<string, string>(
     .flatMap(([key, message]) => [
       [message, key],
       // Existing domain errors retain their original text; quote names at the display boundary.
-      [message.replaceAll("'BlooLog'", 'BlooLog'), key],
+      [message.replaceAll("'위블'", '위블'), key],
     ]),
 );
 const patterns = messages

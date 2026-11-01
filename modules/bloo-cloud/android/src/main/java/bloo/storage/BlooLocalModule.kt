@@ -12,7 +12,7 @@ import javax.crypto.spec.PBEKeySpec
 class BlooLocalModule : Module() {
   private val context get() = requireNotNull(appContext.reactContext)
   private val resolver get() = context.contentResolver
-  private val pattern = Regex("^bloolog-[a-f0-9]{16}-[0-9-]{10}-[0-9]+-[a-f0-9]{16}\\.bloo$")
+  private val pattern = Regex("^(?:bloolog|withBloo)-[a-f0-9]{16}-[0-9-]{10}-[0-9]+-[a-f0-9]{16}\\.bloo$")
   private fun folder(value: String): Uri {
     val uri = Uri.parse(value)
     require(uri.scheme == "content" && uri.authority == "com.android.externalstorage.documents") { "BLOO_LOCAL_FOLDER" }
@@ -48,9 +48,11 @@ class BlooLocalModule : Module() {
       resolver.query(parent, arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME), null, null, null).use { cursor ->
         if (cursor != null && cursor.moveToFirst()) name = cursor.getString(0)
       }
-      if (name.equals("bloolog", true)) parent.toString()
-      else (children(parent).firstOrNull { it.first == "bloolog" }?.second
-        ?: checkNotNull(DocumentsContract.createDocument(resolver, parent, DocumentsContract.Document.MIME_TYPE_DIR, "bloolog"))).toString()
+      if (name.equals("withBloo", true)) parent.toString()
+      else if (name.equals("bloolog", true)) {
+        checkNotNull(DocumentsContract.renameDocument(resolver, parent, "withBloo")) { "BLOO_FOLDER_UNAVAILABLE" }.toString()
+      } else (children(parent).firstOrNull { it.first == "withBloo" }?.second
+        ?: checkNotNull(DocumentsContract.createDocument(resolver, parent, DocumentsContract.Document.MIME_TYPE_DIR, "withBloo"))).toString()
     }
     AsyncFunction("names") { value: String -> children(folder(value)).map { it.first } }
     AsyncFunction("publish") { source: String, value: String, name: String ->

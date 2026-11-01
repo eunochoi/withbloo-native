@@ -104,6 +104,10 @@ test('retention keeps newest backup per date for three successful dates, preserv
   assert.equal(parseAutomaticBackup(name('2026-10-28', 6, 'c'.repeat(16)), device), null);
   assert.equal(parseAutomaticBackup(`${names[0]}.pending`, device), null);
   assert.equal(parseAutomaticBackup('manual.bloo', device), null);
+  assert.equal(
+    parseAutomaticBackup(names[0].replace('bloolog-', 'withBloo-'), device)?.day,
+    '2026-10-28',
+  );
   assert.equal(backupDay(new Date(2026, 9, 28, 0, 1)), '2026-10-28');
 });
 

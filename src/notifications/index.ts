@@ -47,7 +47,7 @@ export async function requestReminderPermission(language: Language = getLocale()
     permission = await Notifications.requestPermissionsAsync();
   }
   if (!permission.granted) {
-    throw new Error('기기 설정에서 BlooLog의 알림을 허용해주세요.');
+    throw new Error('기기 설정에서 위블의 알림을 허용해주세요.');
   }
 }
 
