@@ -28,9 +28,7 @@ import { useModalNavigation } from '../../src/navigation/ModalNavigationProvider
 import { habitQueries, useRecordMutation, useToday } from '../../src/queries';
 import { HabitBox } from '../../src/screens/habit/HabitBox';
 import { DEFAULT_HABIT_FILTER, HabitFilterPicker } from '../../src/screens/habit/HabitFilterPicker';
-import { HabitFlowSheet } from '../../src/screens/habit/HabitFlowSheet';
 import { HabitListSkeleton } from '../../src/screens/habit/HabitListSkeleton';
-import { HabitTodayProgress } from '../../src/screens/habit/HabitTodayProgress';
 import { useSettings } from '../../src/settings/SettingsProvider';
 import { useAppTheme } from '../../src/theme/AppThemeProvider';
 import { PAGE_CLASS_NAME } from '../../src/theme/classes';
@@ -40,7 +38,6 @@ export default function HabitList() {
 
   const [sortOpen, setSortOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
-  const [flowOpen, setFlowOpen] = useState(false);
   const [filter, setFilter] = useState(DEFAULT_HABIT_FILTER);
   const { showNotice } = useNotice();
   const { colors, rem: appRem } = useAppTheme();
@@ -112,10 +109,6 @@ export default function HabitList() {
   const gridEntries =
     ready && sorted.length > 0
       ? [
-          ...(!(filter.priorities.length === 1 && filter.priorities[0] === 0) &&
-          sorted.some((habit) => habit.priority > 0)
-            ? ['progress' as const]
-            : []),
           ...filtered,
           ...(sorted.length < MAX_HABIT_COUNT ? ['add' as const] : []),
         ]
@@ -210,14 +203,7 @@ export default function HabitList() {
                   key={typeof item === 'string' ? item : (item?.id ?? 'empty')}
                   className={`w-1/2 border-theme-border/50 ${index < gridItems.length - 2 ? 'border-b' : 'border-b-0'} ${index % 2 === 0 ? 'border-r' : 'border-r-0'}`}
                 >
-                  {item === 'progress' ? (
-                    <HabitTodayProgress
-                      today={today}
-                      habits={sorted}
-                      records={completions.data ?? []}
-                      onPress={() => setFlowOpen(true)}
-                    />
-                  ) : item === 'add' ? (
+                  {item === 'add' ? (
                     <Pressable
                       accessibilityRole="button"
                       accessibilityLabel={t('habit.add')}
@@ -261,9 +247,6 @@ export default function HabitList() {
       </ScrollView>
       <ScrollEdgeFade edge="bottom" visible={fade.bottomVisible} />
 
-      {flowOpen && (
-        <HabitFlowSheet today={today} habits={sorted} onClose={() => setFlowOpen(false)} />
-      )}
       {filterOpen && (
         <HabitFilterPicker
           filter={filter}

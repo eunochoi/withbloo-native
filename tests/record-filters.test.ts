@@ -182,7 +182,7 @@ function soberRows(ui: ReturnType<typeof harness>) {
   return nodes(ui.render()).find((node) => node.type === 'FlatList');
 }
 
-test('habit grid pins total progress first and pads rows after including the summary', () => {
+test('habit grid shows habits and the add action in padded rows', () => {
   for (const count of [1, 2, 3, 4]) {
     const results = {
       habits: { data: Array.from({ length: count }, (_, index) => habit(index + 1, 1)) },
@@ -192,12 +192,10 @@ test('habit grid pins total progress first and pads rows after including the sum
     const tree = ui.render();
     const grid = nodes(tree).find((node) => node.props.className === 'flex-row flex-wrap');
     const cells = grid.props.children;
-    assert.equal(cells.length, Math.ceil((count + 2) / 2) * 2);
-    assert.equal(cells[0].props.children.type, 'HabitTodayProgress');
-    assert.equal(cells[0].props.children.props.habits.length, count);
-    assert.equal(nodes(tree).filter((node) => node.type === 'HabitTodayProgress').length, 1);
+    assert.equal(cells.length, Math.ceil((count + 1) / 2) * 2);
+    assert.equal(nodes(tree).filter((node) => node.type === 'HabitTodayProgress').length, 0);
     assert.equal(nodes(tree).filter((node) => node.type === 'HabitBox').length, count);
-    assert.equal(cells.at(-1).props.children === null, count % 2 === 1);
+    assert.equal(cells.at(-1).props.children === null, count % 2 === 0);
     const add = nodes(tree).find(
       (node) => node.type === 'Pressable' && node.props.accessibilityLabel === '습관 추가',
     );
@@ -208,7 +206,7 @@ test('habit grid pins total progress first and pads rows after including the sum
         .props.children.join(''),
       `(${count}/${MAX_HABIT_COUNT})`,
     );
-    assert.equal(cells[count + 1].props.children, add);
+    assert.equal(cells[count].props.children, add);
     add.props.onPress();
     assert.equal(ui.routes[0], '/habit/new');
     for (const [index, cell] of cells.entries()) {
@@ -218,9 +216,7 @@ test('habit grid pins total progress first and pads rows after including the sum
     applyPageFilter(ui, 'Habit', { completedOnly: true, priorities: [2] });
     const filtered = ui.render();
     assert.equal(nodes(filtered).filter((node) => node.type === 'HabitBox').length, 0);
-    const summary = nodes(filtered).find((node) => node.type === 'HabitTodayProgress');
-    assert.equal(summary.props.habits.length, count);
-    assert.equal(summary.props.records, results.completions.data);
+    assert(!nodes(filtered).some((node) => node.type === 'HabitTodayProgress'));
     const filteredAdd = nodes(filtered).find(
       (node) => node.type === 'Pressable' && node.props.accessibilityLabel === '습관 추가',
     );
@@ -373,7 +369,7 @@ test('habit boxes label the first day today and retain weekday labels and comple
   assert.equal(nodes(tree).find((node) => node.type === 'HabitMenu').props.showDetail, true);
 });
 
-test('habit filters combine exact stars with today completion and retain total progress', () => {
+test('habit filters combine exact stars with today completion', () => {
   const results = {
     habits: { data: [habit(1, 0), habit(2, 1), habit(3, 1)], isError: false },
     completions: {
@@ -388,9 +384,7 @@ test('habit filters combine exact stars with today completion and retain total p
   assert.deepEqual(habitIds(ui), [3, 2, 1]);
   applyPageFilter(ui, 'Habit', { completedOnly: false, priorities: [1] });
   assert.deepEqual(habitIds(ui), [3, 2]);
-  const progress = nodes(ui.render()).find((node) => node.type === 'HabitTodayProgress');
-  assert.equal(progress.props.habits.length, 3);
-  assert.equal(progress.props.records, results.completions.data);
+  assert(!nodes(ui.render()).some((node) => node.type === 'HabitTodayProgress'));
   results.completions.data.push({ habit_id: 2, date: today });
   assert.deepEqual(habitIds(ui), [3, 2]);
   applyPageFilter(ui, 'Habit', { completedOnly: true, priorities: [1] });
@@ -603,24 +597,14 @@ test('habit multi-priority filters combine with completed-only and select-all re
   );
 });
 
-test('habit flow opens from the summary with all habits and closes', () => {
+test('habit list does not render the old progress or flow sheet', () => {
   const habits = [habit(1, 0), habit(2, 1)];
   const ui = harness('app/(tabs)/habit.tsx', { habits: { data: habits } });
   assert.equal(
     nodes(ui.render()).some((node) => node.type === 'HabitFlowSheet'),
     false,
   );
-  nodes(ui.render())
-    .find((node) => node.type === 'HabitTodayProgress')
-    .props.onPress();
-  const sheet = nodes(ui.render()).find((node) => node.type === 'HabitFlowSheet');
-  assert.equal(sheet.props.habits.length, 2);
-  assert.equal(sheet.props.today, today);
-  sheet.props.onClose();
-  assert.equal(
-    nodes(ui.render()).some((node) => node.type === 'HabitFlowSheet'),
-    false,
-  );
+  assert(!nodes(ui.render()).some((node) => node.type === 'HabitTodayProgress'));
 });
 
 test('habit flow sheet keeps loading and errors distinct from zero completion', () => {
@@ -734,7 +718,7 @@ test('exclusion-only filter hides the achievement card and keeps recorded items 
   applyPageFilter(ui, 'Habit', { completedOnly: true, priorities: [0] });
   assert.deepEqual(habitIds(ui), [1]);
   applyPageFilter(ui, 'Habit', { completedOnly: false, priorities: [] });
-  assert(nodes(ui.render()).some((node) => node.type === 'HabitTodayProgress'));
+  assert(!nodes(ui.render()).some((node) => node.type === 'HabitTodayProgress'));
 });
 
 test('English trend dates use numeric US order while preserving percentages, bars and record inputs', () => {
