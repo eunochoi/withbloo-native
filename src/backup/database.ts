@@ -198,7 +198,7 @@ export async function replaceRecords(
   await db.withTransactionAsync(async () => {
     const tx = db;
     await tx.execAsync(
-      'DELETE FROM sober_restarts; DELETE FROM sobers; DELETE FROM diary_images; DELETE FROM habit_completions; DELETE FROM diaries; DELETE FROM habits; DELETE FROM settings;',
+      'DELETE FROM sober_restarts; DELETE FROM sobers; DELETE FROM diary_images; DELETE FROM habit_completions; DELETE FROM diaries; DELETE FROM habits;',
     );
     for (const row of records.diaries)
       await tx.runAsync(
@@ -265,11 +265,23 @@ export async function replaceRecords(
         row.position,
       );
     }
-    if (records.preferences !== null)
+    if (records.preferences !== null) {
+      await tx.execAsync('DELETE FROM settings;');
       await tx.runAsync(
         'INSERT INTO settings (key, value) VALUES (?, ?)',
         'preferences',
         JSON.stringify(parseSettings(JSON.parse(records.preferences))),
       );
+    } else {
+      // Web backups contain records only; keep this device's appearance/reminders.
+      const current = await tx.getFirstAsync<{ value: string }>(
+        "SELECT value FROM settings WHERE key = 'preferences'",
+      );
+      if (current)
+        await tx.runAsync(
+          "UPDATE settings SET value = ? WHERE key = 'preferences'",
+          JSON.stringify({ ...parseSettings(JSON.parse(current.value)), habitOrder: [] }),
+        );
+    }
   });
 }
