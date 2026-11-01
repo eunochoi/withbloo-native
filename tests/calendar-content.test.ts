@@ -706,7 +706,9 @@ test('habit detail only queries completion records and exposes no write action t
       useRouter: () => ({ dismissTo() {} }),
     },
     'expo-sqlite': { useSQLiteContext: () => ({}) },
-    '../../../src/theme/AppThemeProvider': { useAppTheme: () => ({ rem: 15 }) },
+    '../../../src/theme/AppThemeProvider': {
+      useAppTheme: () => ({ rem: 15, mode: 'light', colors: { accent: '#8CADE2', surface: '#FFFFFF' } }),
+    },
     '../../../src/queries': {
       habitQueries: { byId: () => 'habit', completionsByHabit: () => 'completions' },
       useToday: () => day.today,

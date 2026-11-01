@@ -64,15 +64,6 @@ export default function HabitDetail() {
                     {habit.priority === 0 ? t('habit.free') : t('habit.daily')}
                   </Text>
                 </View>
-                <Text className="text-center text-sm text-theme-text-secondary">
-                  {t('habit.started', {
-                    value: formatDisplayDate(
-                      habit.initial_started_at,
-                      formatLocale,
-                      'shortDateTime',
-                    ),
-                  })}
-                </Text>
               </View>
               <HabitStatistics
                 accent={accent}
@@ -81,16 +72,27 @@ export default function HabitDetail() {
                 today={today}
                 unavailable={records.isPending || records.isError}
               />
-              {habit.priority > 0 && (
-                <View className="px-1 gap-2">
-                  <InfoNotice accent={accent} numberOfLines={0} adjustsFontSizeToFit={false}>
-                    {t('habit.eligibleNotice')}
-                  </InfoNotice>
-                  <InfoNotice accent={accent} numberOfLines={0} adjustsFontSizeToFit={false}>
-                    {t('habit.rateNotice')}
-                  </InfoNotice>
-                </View>
-              )}
+              <View className="px-1 gap-2">
+                <InfoNotice accent={accent} numberOfLines={0} adjustsFontSizeToFit={false}>
+                  {t('habit.started', {
+                    value: formatDisplayDate(
+                      habit.initial_started_at,
+                      formatLocale,
+                      'shortDateTime',
+                    ),
+                  })}
+                </InfoNotice>
+                {habit.priority > 0 && (
+                  <>
+                    <InfoNotice accent={accent} numberOfLines={0} adjustsFontSizeToFit={false}>
+                      {t('habit.eligibleNotice')}
+                    </InfoNotice>
+                    <InfoNotice accent={accent} numberOfLines={0} adjustsFontSizeToFit={false}>
+                      {t('habit.rateNotice')}
+                    </InfoNotice>
+                  </>
+                )}
+              </View>
             </>
           ) : !query.isPending && !query.error ? (
             <Text>{t('habit.notFound')}</Text>

@@ -29,7 +29,7 @@ export function HabitYearStatistics({
     [year, dates, startedDate, today],
   );
   return (
-    <View className="gap-4 border-t border-theme-border pt-8">
+    <View className="gap-4 border-t border-theme-border/30 pt-8">
       <View className="flex-row items-center gap-2">
         <Text
           accessibilityRole="header"

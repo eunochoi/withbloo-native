@@ -435,7 +435,7 @@ test('habit statistics refresh replacement records while every date remains read
   const currentNodes = monthUi.render().nodes;
   assert.equal(
     currentNodes.filter(
-      (node) => node.props.className === 'text-theme-text-primary font-bold text-2xl leading-none',
+      (node) => node.props.className === 'w-full px-1 text-center text-theme-text-primary font-bold text-lg',
     ).length,
     3,
   );
@@ -472,9 +472,9 @@ test('yearly statistics refresh records, return to this year and preserve disabl
   const updated = ui.render({ dates: ['2024-03-07', '2024-03-10'] }).nodes;
   assert.equal(ui.calls.year, 2);
   const completed = updated.find(
-    (node) => node.props.className === 'text-theme-text-primary font-bold text-2xl leading-none',
+    (node) => node.props.className === 'w-full px-1 text-center text-theme-text-primary font-bold text-lg',
   );
-  assert.equal(completed.props.children, 2);
+  assert.equal(completed.props.children[0], 2);
   const bars = updated.filter(
     (node) => node.type === 'View' && typeof node.props.style?.height === 'number',
   );
@@ -501,9 +501,9 @@ test('yearly statistics refresh records, return to this year and preserve disabl
     hidden
       .filter(
         (node) =>
-          node.props.className === 'text-theme-text-primary font-bold text-2xl leading-none',
+          node.props.className === 'w-full px-1 text-center text-theme-text-primary font-bold text-lg',
       )
-      .every((node) => node.props.children === '—'),
+      .every((node) => node.props.children[0] === '—'),
   );
   hidden.find((node) => node.props.accessibilityLabel === '이전 연도').props.onPress();
   const past = ui.render().nodes;
@@ -590,9 +590,9 @@ test('yearly habit summary uses monthly label order and refreshes missed counts 
     nodes
       .filter(
         (node) =>
-          node.props.className === 'text-theme-text-primary font-bold text-2xl leading-none',
+          node.props.className === 'w-full px-1 text-center text-theme-text-primary font-bold text-lg',
       )
-      .map((node) => node.props.children);
+      .map((node) => node.props.children[0]);
   assert.deepEqual(values(view), [2, 68, '2.9']);
   assert.deepEqual(values(ui.render({ today: '2024-03-12' }).nodes), [2, 70, '2.8']);
   assert.equal(ui.calls.year, 2);
@@ -609,9 +609,9 @@ test('yearly habit rate displays a dash when the habit has not started yet', () 
   const values = ui
     .render()
     .nodes.filter(
-      (node) => node.props.className === 'text-theme-text-primary font-bold text-2xl leading-none',
+      (node) => node.props.className === 'w-full px-1 text-center text-theme-text-primary font-bold text-lg',
     )
-    .map((node) => node.props.children);
+    .map((node) => node.props.children[0]);
   assert.deepEqual(values, [0, 0, '—']);
 });
 
