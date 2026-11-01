@@ -10,7 +10,7 @@ const { generateImageAsync } = expoRequire('@expo/image-utils');
   for (const size of [1024, 512]) {
     const filename = size === 1024 ? 'icon.png' : 'icon-512.png';
     const image = await generateImageAsync(
-      { projectRoot: root, cacheType: 'bloolog-app-icon' },
+      { projectRoot: root, cacheType: 'withbloo-app-icon' },
       {
         src: source,
         name: filename,

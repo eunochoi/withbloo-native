@@ -73,7 +73,7 @@ const out = path.resolve(__dirname, '../assets/ui');
             blueLeft = Math.min(blueLeft, (i / 4) % dark.width);
           }
         }
-        if (blueLeft === dark.width) throw new Error('BlooLog blue lettering was not found.');
+        if (blueLeft === dark.width) throw new Error('withBloo blue lettering was not found.');
         const color = [1, 3, 5].map((start) => parseInt(foreground.slice(start, start + 2), 16));
         for (let i = 0; i < pixels.data.length; i += 4) {
           const x = (i / 4) % dark.width;
@@ -100,7 +100,7 @@ const out = path.resolve(__dirname, '../assets/ui');
           sample[3]++;
         }
         if (!samples.body[3] || !samples.face[3]) {
-          throw new Error('BlooLog lettering and face could not be separated.');
+          throw new Error('withBloo lettering and face could not be separated.');
         }
         const body = samples.body.slice(0, 3).map((value) => value / samples.body[3]);
         const face = samples.face.slice(0, 3).map((value) => value / samples.face[3]);

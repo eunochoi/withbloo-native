@@ -249,17 +249,24 @@ test('loading logo failure reaches retry UI without reporting readiness', () => 
   assert.equal(h.ready(), 0);
 });
 
-test('wordmark follows accent and mode changes, preserves its ratio and forwards image events', () => {
-  const reference = readFileSync(new URL('../assets/ui/wordmark-blue-light.png', import.meta.url));
+test('withBloo wordmark shares the Next artwork, follows theme colors and forwards image events', () => {
+  const reference = readFileSync(new URL('../assets/ui/withbloo-text-mask.png', import.meta.url));
   const dimensions = { width: reference.readUInt32BE(16), height: reference.readUInt32BE(20) };
   const settings = { themeAccent: 'blue' };
   const theme = { mode: 'light' };
   const h = harness('../src/components/Wordmark.tsx', {
     'react-native': {
+      View: 'View',
       Image: Object.assign('Image', { resolveAssetSource: () => dimensions }),
     },
     '../settings/SettingsProvider': { useSettings: () => ({ settings }) },
     '../theme/AppThemeProvider': { useAppTheme: () => theme },
+    '../theme/colors': {
+      themeColors: (accent: string, mode: string) => ({
+        textPrimary: `${accent}-${mode}-text`,
+        accent: `${accent}-${mode}-accent`,
+      }),
+    },
   });
   const onLoad = () => {};
   const onError = () => {};
@@ -268,21 +275,21 @@ test('wordmark follows accent and mode changes, preserves its ratio and forwards
     for (const mode of ['light', 'dark']) {
       theme.mode = mode;
       const tree = h.render('Wordmark', { size: 45, onLoad, onError });
-      const filename = `../../assets/ui/wordmark-${accent}-${mode}.png`;
-      assert.equal(tree.props.source, filename);
-      const png = readFileSync(new URL(filename.replace('../../', '../'), import.meta.url));
-      assert.equal(png.readUInt32BE(16), dimensions.width);
-      assert.equal(png.readUInt32BE(20), dimensions.height);
+      const [text, color] = tree.props.children;
+      assert.equal(text.props.source, '../../assets/ui/withbloo-text-mask.png');
+      assert.equal(color.props.source, '../../assets/ui/withbloo-accent-mask.png');
+      assert.equal(text.props.style.tintColor, `${accent}-${mode}-text`);
+      assert.equal(color.props.style.tintColor, `${accent}-${mode}-accent`);
       assert.equal(tree.props.style.height, 45);
-      assert.equal(tree.props.style.width, 45 * (dimensions.width / dimensions.height));
-      assert.equal(tree.props.onLoad, onLoad);
-      assert.equal(tree.props.onError, onError);
-      assert.equal(tree.props.accessibilityLabel, "'BlooLog' 로고");
+      assert.equal(tree.props.style.width, (45 * dimensions.width) / dimensions.height);
+      assert.equal(color.props.onLoad, onLoad);
+      assert.equal(color.props.onError, onError);
+      assert.equal(tree.props.accessibilityLabel, "'withBloo' 로고");
     }
   }
   assert.equal(
-    h.render('Wordmark', { mode: 'light' }).props.source,
-    '../../assets/ui/wordmark-grey-light.png',
+    h.render('Wordmark', { mode: 'light' }).props.children[0].props.style.tintColor,
+    'grey-light-text',
   );
 });
 

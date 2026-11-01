@@ -1,35 +1,13 @@
 import { useI18n } from '../i18n/react';
-import { Image, type ImageProps } from 'react-native';
+import { Image, View, type ImageProps } from 'react-native';
 import { useSettings } from '../settings/SettingsProvider';
 import { useAppTheme } from '../theme/AppThemeProvider';
-const images = {
-  blue: {
-    light: require('../../assets/ui/wordmark-blue-light.png'),
-    dark: require('../../assets/ui/wordmark-blue-dark.png'),
-  },
-  purple: {
-    light: require('../../assets/ui/wordmark-purple-light.png'),
-    dark: require('../../assets/ui/wordmark-purple-dark.png'),
-  },
-  pink: {
-    light: require('../../assets/ui/wordmark-pink-light.png'),
-    dark: require('../../assets/ui/wordmark-pink-dark.png'),
-  },
-  green: {
-    light: require('../../assets/ui/wordmark-green-light.png'),
-    dark: require('../../assets/ui/wordmark-green-dark.png'),
-  },
-  yellow: {
-    light: require('../../assets/ui/wordmark-yellow-light.png'),
-    dark: require('../../assets/ui/wordmark-yellow-dark.png'),
-  },
-  grey: {
-    light: require('../../assets/ui/wordmark-grey-light.png'),
-    dark: require('../../assets/ui/wordmark-grey-dark.png'),
-  },
-};
-const dimensions = Image.resolveAssetSource(images.blue.light);
+import { themeColors } from '../theme/colors';
 
+// Alpha masks rendered from Next's public/img/withbloo/wordmark.svg.
+const textMask = require('../../assets/ui/withbloo-text-mask.png');
+const accentMask = require('../../assets/ui/withbloo-accent-mask.png');
+const dimensions = Image.resolveAssetSource(textMask);
 export function Wordmark({
   size = 36,
   mode,
@@ -44,16 +22,32 @@ export function Wordmark({
   const { t } = useI18n();
   const { settings } = useSettings();
   const theme = useAppTheme();
+  const colors = themeColors(settings.themeAccent, mode ?? theme.mode);
   return (
-    <Image
-      source={images[settings.themeAccent][mode ?? theme.mode]}
-      accessibilityLabel={t('ui.brandLogo')}
+    <View
       accessible
+      accessibilityRole="image"
+      accessibilityLabel={t('ui.brandLogo')}
       className="shrink-0"
-      style={{ height: size, width: size * (dimensions.width / dimensions.height) }}
-      resizeMode="contain"
-      onLoad={onLoad}
-      onError={onError}
-    />
+      style={{ height: size, width: (size * dimensions.width) / dimensions.height }}
+    >
+      <Image
+        source={textMask}
+        accessible={false}
+        resizeMode="contain"
+        className="absolute inset-0 h-full w-full"
+        style={{ tintColor: colors.textPrimary }}
+        onError={onError}
+      />
+      <Image
+        source={accentMask}
+        accessible={false}
+        resizeMode="contain"
+        className="absolute inset-0 h-full w-full"
+        style={{ tintColor: colors.accent }}
+        onLoad={onLoad}
+        onError={onError}
+      />
+    </View>
   );
 }

@@ -3,6 +3,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
 import { Image, ScrollView, View } from 'react-native';
 import { ColorView } from '../../src/components/ColorTransition';
+import { Text } from '../../src/components/Text';
 import { Wordmark } from '../../src/components/Wordmark';
 import { DIARY_EMOTION_GROUPS } from '../../src/domain/diaryFilters';
 import { diaryQueries, useToday } from '../../src/queries';
@@ -58,23 +59,28 @@ export default function Home() {
           }}
         >
           <View className="mt-8 shrink-0 flex-row items-center">
-            <Wordmark size={appRem * 2.25} mode={mode} />
+            <Wordmark size={appRem * 2.8} mode={mode} />
           </View>
           <HomeGreeting />
           <View className="gap-3 shrink-0">
             <HomeTodaySection today={today} />
             <HomeAnalysisCard today={today} />
           </View>
-          <Image
-            source={cat}
-            accessibilityLabel="hiding-cat"
-            resizeMode="contain"
-            style={{
-              height: 'auto',
-              aspectRatio: catSize.width / catSize.height,
-            }}
-            className="-mt-6 mx-auto w-4/5 max-h-full shrink"
-          />
+          <View className="-mt-6 min-h-0 shrink items-center">
+            <Image
+              source={cat}
+              accessibilityLabel="hiding-cat"
+              resizeMode="contain"
+              style={{
+                height: 'auto',
+                aspectRatio: catSize.width / catSize.height,
+              }}
+              className="mx-auto w-4/5 max-h-full shrink"
+            />
+            <Text className="text-center text-base text-theme-accent-deep">
+              Bloom with Bloo &amp; Blue.
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </ColorView>

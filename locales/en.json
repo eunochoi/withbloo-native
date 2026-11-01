@@ -1,0 +1,8 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "withBloo"
+  },
+  "android": {
+    "app_name": "withBloo"
+  }
+}

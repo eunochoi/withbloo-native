@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "BlooLog",
+    "name": "withBloo",
     "slug": "took-native",
     "version": "2.2.2",
     "scheme": "took-local",
@@ -35,7 +35,7 @@
         "UTExportedTypeDeclarations": [
           {
             "UTTypeIdentifier": "com.took.bloo",
-            "UTTypeDescription": "BlooLog encrypted backup",
+            "UTTypeDescription": "withBloo encrypted backup",
             "UTTypeConformsTo": [
               "public.data"
             ],
@@ -44,6 +44,7 @@
                 "bloo"
               ],
               "public.mime-type": [
+                "application/x-withbloo-backup",
                 "application/x-bloolog-backup"
               ]
             }
@@ -52,7 +53,7 @@
         "NSUbiquitousContainers": {
           "iCloud.com.took": {
             "NSUbiquitousContainerIsDocumentScopePublic": true,
-            "NSUbiquitousContainerName": "BlooLog",
+            "NSUbiquitousContainerName": "withBloo",
             "NSUbiquitousContainerSupportedFolderLevels": "Any"
           }
         }
@@ -172,6 +173,10 @@
       "eas": {
         "projectId": "b859b201-9bc7-42a0-889b-9b48bae5da45"
       }
+    },
+    "locales": {
+      "en": "./locales/en.json",
+      "ko": "./locales/ko.json"
     }
   }
 }

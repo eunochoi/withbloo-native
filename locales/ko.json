@@ -1,0 +1,8 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "위블"
+  },
+  "android": {
+    "app_name": "위블"
+  }
+}
