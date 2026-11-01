@@ -311,10 +311,18 @@ test('diary calendar owns decorations and future-date limits while using the def
     onMonthChange: () => {},
     onSelect: (date: string) => selected.push(date),
   });
-  assert.equal(
-    nodes(tree).find((node) => node.type === 'CalendarHeader').props.onSelect,
-    undefined,
+  const headerProps = nodes(tree).find((node) => node.type === 'CalendarHeader').props;
+  const { CalendarHeader } = load('src/screens/calendar/CalendarHeader.tsx');
+  const header = CalendarHeader(headerProps);
+  const todayButton = nodes(header).find(
+    (node) =>
+      nodes(node.props?.children).some(
+        (child) => child.type === 'AppIcon' && child.props.name === 'today',
+      ) && node.type === 'Pressable',
   );
+  assert(todayButton);
+  todayButton.props.onPress();
+  assert.deepEqual(selected, [day.today]);
   assert.equal(nodes(tree).find((node) => node.type === 'CalendarGrid').props.minimumRows, 6);
   const cells = nodes(tree).filter((node) => node.type === 'CalendarDay');
   assert.equal(cells.length, calendarDays(day.month).length);

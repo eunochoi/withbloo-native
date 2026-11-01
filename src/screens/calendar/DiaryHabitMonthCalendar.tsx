@@ -65,7 +65,12 @@ export function DiaryHabitMonthCalendar(props: {
         />
       )}
       <View className="px-1">
-        <CalendarHeader month={props.month} today={props.today} navigation={navigation} />
+        <CalendarHeader
+          month={props.month}
+          today={props.today}
+          navigation={navigation}
+          onTodayPress={() => props.onSelect(props.today)}
+        />
       </View>
       <CalendarGrid
         minimumRows={6}

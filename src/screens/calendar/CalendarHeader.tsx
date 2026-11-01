@@ -10,12 +10,14 @@ export function CalendarHeader({
   month,
   today,
   navigation,
+  onTodayPress,
   centerTitle = false,
   detail = false,
 }: {
   month: string;
   today: string;
   navigation: ReturnType<typeof useCalendarNavigation>;
+  onTodayPress?: () => void;
   centerTitle?: boolean;
   detail?: boolean;
 }) {
@@ -72,7 +74,8 @@ export function CalendarHeader({
             disabled={!todayAvailable}
             onPress={() => {
               if (!todayAvailable) return;
-              navigation.changeToMonth(today.slice(0, 7));
+              if (onTodayPress) onTodayPress();
+              else navigation.changeToMonth(today.slice(0, 7));
             }}
             className={`h-10 w-10 items-center justify-center ios:curve-continuous rounded-xl ${todayAvailable ? 'opacity-100' : 'opacity-30'}`}
           >
