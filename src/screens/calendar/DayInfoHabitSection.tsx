@@ -1,3 +1,4 @@
+import { ScrollableName } from '../../components/ScrollableName';
 import { useI18n } from '../../i18n/react';
 import { Pressable, View } from 'react-native';
 import { AppIcon } from '../../components/AppIcon';
@@ -60,9 +61,9 @@ export function DayInfoHabitSection({
               <AppIcon name="check" size={iconSizes.sm} color={colors.textOnAccent} />
             )}
           </View>
-          <Text numberOfLines={1} className="flex-1 text-sm">
-            {habit.name}
-          </Text>
+          <View className="min-w-0 flex-1">
+            <ScrollableName className="text-sm">{habit.name}</ScrollableName>
+          </View>
           {habit.priority === 0 ? (
             <Text className="text-xs text-theme-text-secondary">{t('calendar.free')}</Text>
           ) : (

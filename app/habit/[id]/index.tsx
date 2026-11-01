@@ -1,3 +1,4 @@
+import { ScrollableName } from '../../../src/components/ScrollableName';
 import { resolveIconColor } from '../../../src/domain/constants';
 import { itemAccentColors } from '../../../src/theme/colors';
 import { formatDisplayDate } from '../../../src/i18n/format';
@@ -54,9 +55,9 @@ export default function HabitDetail() {
             <>
               <View className="items-center gap-4 px-1 py-2">
                 <HabitIcon name={habit.icon_key} colorKey={habit.icon_color} size={appRem * 4} />
-                <Text accessibilityRole="header" className="text-center text-xl font-semibold">
+                <ScrollableName heading className="text-center text-xl font-semibold">
                   {habit.name}
-                </Text>
+                </ScrollableName>
                 <View className="items-center gap-1">
                   <HabitStars color={accent.color} priority={habit.priority} size={appRem * 1.1} />
                   <Text className="text-sm text-theme-text-secondary">

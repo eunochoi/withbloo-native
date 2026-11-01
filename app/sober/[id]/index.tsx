@@ -1,3 +1,4 @@
+import { ScrollableName } from '../../../src/components/ScrollableName';
 import { itemAccentColors } from '../../../src/theme/colors';
 import { useQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
@@ -94,9 +95,9 @@ export default function SoberDetail() {
         <View className="gap-7">
           <View className="items-center gap-3 pt-2">
             <SoberIcon name={sober.icon_key} colorKey={sober.icon_color} size={rem * 4} />
-            <Text accessibilityRole="header" className="text-center text-xl font-semibold">
+            <ScrollableName heading className="text-center text-xl font-semibold">
               {sober.name}
-            </Text>
+            </ScrollableName>
           </View>
           <View className="px-1 w-full gap-7">
             <SoberInfoCarousel
