@@ -2,6 +2,7 @@ import { useI18n } from '../../i18n/react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
+import { View } from 'react-native';
 import { AppIcon } from '../../components/AppIcon';
 import { Text } from '../../components/Text';
 import { sortSobers } from '../../db/sober';
@@ -41,6 +42,8 @@ export function HomeTodaySober() {
           ).duration / SOBER_DAY_MS,
         ) + 1
       : null;
+  const [dayPrefix, daySuffix] =
+    days !== null ? t('home.dayOrdinal', { count: days }).split(String(days)) : ['', ''];
 
   return (
     <HomeTodayItem
@@ -53,15 +56,19 @@ export function HomeTodaySober() {
       onPress={() => (sober ? openModal(`/sober/${sober.id}`) : router.push('/sober'))}
     >
       {days !== null ? (
-        <Text
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.5}
-          className="w-full text-center text-2xl leading-tight font-bold"
-          style={{ color: resolveIconColor(sober?.icon_color ?? 'theme', colors.accent) }}
-        >
-          {t('home.dayOrdinal', { count: days })}
-        </Text>
+        <View className="w-full flex-row items-baseline justify-center">
+          {!!dayPrefix && <Text className="text-sm font-normal text-theme-text-secondary">{dayPrefix}</Text>}
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.5}
+            className="shrink text-center text-2xl font-bold"
+            style={{ color: resolveIconColor(sober?.icon_color ?? 'theme', colors.accent) }}
+          >
+            {days}
+          </Text>
+          {!!daySuffix && <Text className="text-sm font-normal text-theme-text-secondary">{daySuffix}</Text>}
+        </View>
       ) : (
         <AppIcon name="sober" size={rem * 3.5} className="text-theme-text-disabled" />
       )}
