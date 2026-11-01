@@ -54,7 +54,7 @@ export function SoberMonthCalendar({
   const navigation = useCalendarNavigation(month, onMonthChange, firstDate, today);
   const swipe = useMonthSwipe(navigation.changeMonth);
   return (
-    <View className="gap-4 border-t border-theme-border pt-8">
+    <View className="gap-4">
       <View className="flex-row items-center gap-2">
         <Text
           accessibilityRole="header"

@@ -44,7 +44,7 @@ export function SoberDayInfo({
       {achievements.map((item) => (
         <View
           key={item.achievedAt}
-          className="flex-row items-center gap-3 ios:curve-continuous rounded-2xl border border-theme-border p-4"
+          className="flex-row items-center gap-3 ios:curve-continuous rounded-2xl border border-theme-border/50 p-4"
         >
           <AppIcon name="auto-awesome" size={iconSizes.lg} color={colors.achievement} />
           <View className="gap-1">

@@ -49,7 +49,7 @@ export function SoberLongRecords({
     </View>
   );
   return (
-    <View className="gap-4 border-t border-theme-border pt-8">
+    <View className="gap-4 border-t border-theme-border/30 pt-8">
       <View className="flex-row items-center gap-2">
         <Text
           accessibilityRole="header"

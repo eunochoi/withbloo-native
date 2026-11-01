@@ -139,11 +139,8 @@ export default function SoberDetail() {
                         'shortDateTime',
                       ),
                     },
-                  ].map((item, index) => (
-                    <View
-                      key={item.label}
-                      className={`flex-1 min-w-0 items-center gap-2 px-2 ${index > 0 ? 'border-l border-theme-border' : ''}`}
-                    >
+                  ].map((item) => (
+                    <View key={item.label} className="flex-1 min-w-0 items-center gap-2 px-2">
                       <View className="items-center gap-1">
                         <Text className="text-center text-base font-semibold text-theme-text-primary">
                           {item.label}
