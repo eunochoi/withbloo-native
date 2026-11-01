@@ -1,15 +1,14 @@
-import { useI18n } from '../../i18n/react';
 import { Pressable, View } from 'react-native';
 import { AppIcon } from '../../components/AppIcon';
-import { InfoNotice } from '../../components/InfoNotice';
-import { PickerOption } from '../../components/PickerOption';
 import { Text } from '../../components/Text';
+import { useI18n } from '../../i18n/react';
 import type { Settings } from '../../settings/model';
-import { ACCENT_KEYS } from '../../theme/accents';
 import { ACCENT_PALETTES } from '../../theme/colors';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 import { EmotionIconStyleSelector } from '../settings/EmotionIconStyleSelector';
-
+import { OnboardingFrame } from './OnboardingFrame';
+import { sectionTitleClassName } from './styles';
+const choiceClassName = 'h-24 min-w-0 items-center justify-center rounded-xl border px-2 py-2';
 export function ThemePage({
   settings,
   busy,
@@ -20,133 +19,120 @@ export function ThemePage({
   onChange: (patch: Partial<Settings>) => Promise<void>;
 }) {
   const { t } = useI18n();
-  const modes = {
-    light: t('settings.themeLight'),
-    dark: t('settings.themeDark'),
-    system: t('settings.themeSystem'),
-  };
-  const sizes = {
-    small: t('settings.small'),
-    normal: t('settings.normal'),
-    large: t('settings.large'),
-  };
   const { rem } = useAppTheme();
   return (
-    <View className="w-full grow justify-evenly gap-6">
-      <View className="gap-2">
-        <Text
-          accessibilityRole="header"
-          className="text-center text-[21px] leading-[28px] font-semibold tracking-tight"
+    <OnboardingFrame
+      title={t('onboarding.themeTitle')}
+      description={t('onboarding.themeDescription')}
+      info={t('onboarding.themeNotice')}
+    >
+      <View>
+        <Text className={sectionTitleClassName}>{t('settings.accentColor')}</Text>
+        <View
+          accessibilityRole="radiogroup"
+          accessibilityLabel={t('settings.accentColor')}
+          className="my-2 flex-row items-center gap-3 py-2"
         >
-          {t('onboarding.themeTitle')}
-        </Text>
-        <Text className="text-center text-[14px] leading-[21px] text-theme-text-secondary">
-          {t('onboarding.themeDescription')}
-        </Text>
+          {(['blue', 'green', 'purple', 'pink', 'yellow', 'grey'] as const).map((accent) => (
+            <Pressable
+              key={accent}
+              accessibilityRole="radio"
+              accessibilityLabel={t(`settings.${accent}`)}
+              accessibilityState={{ checked: settings.themeAccent === accent, disabled: busy }}
+              disabled={busy}
+              onPress={() => void onChange({ themeAccent: accent })}
+              className="aspect-square min-w-0 flex-1 items-center justify-center rounded-full border border-black/10"
+              style={{ backgroundColor: ACCENT_PALETTES[accent].accent }}
+            >
+              {settings.themeAccent === accent && (
+                <AppIcon
+                  name="check"
+                  size={rem * 1.5}
+                  className="text-theme-text-on-accent"
+                  accessible={false}
+                />
+              )}
+            </Pressable>
+          ))}
+        </View>
       </View>
-      <View className="gap-5">
-        <View className="gap-3">
-          <Text className="text-center text-[15.75px] leading-[24.5px] font-semibold">
-            {t('settings.accentColor')}
-          </Text>
-          <View
-            accessibilityRole="radiogroup"
-            accessibilityLabel={t('settings.accentColor')}
-            className={`w-full flex-row items-start gap-3 ${busy ? 'opacity-40' : 'opacity-100'}`}
-          >
-            {ACCENT_KEYS.map((accent) => (
-              <Pressable
-                key={accent}
-                accessibilityRole="radio"
-                accessibilityLabel={t('settings.accentChoice', { color: t(`settings.${accent}`) })}
-                accessibilityState={{ checked: settings.themeAccent === accent, disabled: busy }}
-                disabled={busy}
-                onPress={() => void onChange({ themeAccent: accent })}
-                className="aspect-square min-w-0 flex-1 items-center justify-center rounded-full border active:opacity-65"
-                style={{
-                  backgroundColor: ACCENT_PALETTES[accent].accent,
-                  borderColor: ACCENT_PALETTES[accent].accentDeep,
-                }}
+      <View className="gap-3">
+        <Text className={sectionTitleClassName}>{t('settings.emotionIcons')}</Text>
+        <EmotionIconStyleSelector
+          compact
+          choiceClassName="h-24"
+          labelSize="base"
+          labelClassName="text-base text-theme-text-primary"
+          value={settings.emotionStyle}
+          disabled={busy}
+          onChange={(emotionStyle) => void onChange({ emotionStyle })}
+        />
+      </View>
+      <View className="gap-3">
+        <Text className={sectionTitleClassName}>{t('onboarding.background')}</Text>
+        <View className="flex-row gap-2">
+          {(['light', 'dark', 'system'] as const).map((mode) => (
+            <Pressable
+              key={mode}
+              accessibilityRole="button"
+              accessibilityState={{ selected: settings.themeMode === mode, disabled: busy }}
+              accessibilityLabel={t(
+                mode === 'light' ? 'settings.themeLight' : mode === 'dark' ? 'settings.themeDark' : 'settings.themeSystem',
+              )}
+              disabled={busy}
+              onPress={() => void onChange({ themeMode: mode })}
+              className={`${choiceClassName} flex-1 ${settings.themeMode === mode ? 'border-theme-accent bg-theme-accent-light/50' : 'border-transparent'}`}
+            >
+              <Text
+                className="text-base text-theme-text-primary"
               >
-                {settings.themeAccent === accent && (
-                  <AppIcon
-                    name="check"
-                    size={rem * 1.5}
-                    className="text-theme-text-on-accent"
-                    accessible={false}
-                  />
-                )}
-              </Pressable>
-            ))}
-          </View>
-        </View>
-        <View className="gap-3">
-          <Text className="text-center text-[15.75px] leading-[24.5px] font-semibold">
-            {t('settings.emotionIcons')}
-          </Text>
-          <EmotionIconStyleSelector
-            compact
-            labelSize="base"
-            labelClassName="text-[14px] leading-[21px]"
-            value={settings.emotionStyle}
-            disabled={busy}
-            onChange={(emotionStyle) => void onChange({ emotionStyle })}
-          />
-        </View>
-        <View className="gap-3">
-          <Text className="text-center text-[15.75px] leading-[24.5px] font-semibold">
-            {t('settings.background')}
-          </Text>
-          <View className="flex-row gap-2">
-            {Object.entries(modes).map(([value, label]) => (
-              <View key={value} className="flex-1">
-                <PickerOption
-                  compact
-                  dense
-                  selected={settings.themeMode === value}
-                  disabled={busy}
-                  accessibilityLabel={t('onboarding.backgroundChoice', { value: label })}
-                  onPress={() => void onChange({ themeMode: value as Settings['themeMode'] })}
-                >
-                  <Text
-                    className={`text-center text-[14px] leading-[21px] ${settings.themeMode === value ? 'font-semibold text-theme-accent' : 'text-theme-text-primary'}`}
-                  >
-                    {label}
-                  </Text>
-                </PickerOption>
-              </View>
-            ))}
-          </View>
-        </View>
-        <View className="gap-3">
-          <Text className="text-center text-[15.75px] leading-[24.5px] font-semibold">
-            {t('settings.fontSize')}
-          </Text>
-          <View className="flex-row gap-2">
-            {Object.entries(sizes).map(([value, label]) => (
-              <View key={value} className="flex-1">
-                <PickerOption
-                  compact
-                  dense
-                  selected={settings.fontSize === value}
-                  disabled={busy}
-                  accessibilityLabel={t('onboarding.fontChoice', { value: label })}
-                  onPress={() => void onChange({ fontSize: value as Settings['fontSize'] })}
-                >
-                  <Text
-                    className={`text-center text-[14px] leading-[21px] ${settings.fontSize === value ? 'font-semibold text-theme-accent' : 'text-theme-text-primary'}`}
-                  >
-                    {label}
-                  </Text>
-                </PickerOption>
-              </View>
-            ))}
-          </View>
+                {t(mode === 'light' ? 'settings.themeLight' : mode === 'dark' ? 'settings.themeDark' : 'settings.themeSystem')}
+              </Text>
+            </Pressable>
+          ))}
         </View>
       </View>
-      <InfoNotice textClassName="text-[10.5px] leading-[17.5px]" adjustsFontSizeToFit={false}>
-        {t('onboarding.themeNotice')}
-      </InfoNotice>
-    </View>
+      <View className="gap-3">
+        <Text className={sectionTitleClassName}>{t('settings.fontFamily')}</Text>
+        <View className="flex-row gap-2">
+          {(['tmoney', 'suit', 'maruburi'] as const).map((fontFamily, index) => (
+            <Pressable
+              key={fontFamily}
+              accessibilityRole="button"
+              accessibilityState={{ selected: (settings.fontFamily ?? 'tmoney') === fontFamily, disabled: busy }}
+              accessibilityLabel={t(index === 0 ? 'settings.fontType1' : index === 1 ? 'settings.fontType2' : 'settings.fontType3')}
+              disabled={busy}
+              onPress={() => void onChange({ fontFamily })}
+              className={`${choiceClassName} flex-1 gap-2 ${(settings.fontFamily ?? 'tmoney') === fontFamily ? 'border-theme-accent bg-theme-accent-light/50' : 'border-transparent'}`}
+            >
+              <Text style={{ fontFamily: fontFamily === 'suit' ? 'SUITRegular' : fontFamily === 'maruburi' ? 'MaruBuriRegular' : 'Tmoney' }} className="text-center text-lg">{t('settings.fontPreview')}</Text>
+              <Text className="text-center text-sm">{t(index === 0 ? 'settings.fontType1' : index === 1 ? 'settings.fontType2' : 'settings.fontType3')}</Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+      <View className="gap-3">
+        <Text className={sectionTitleClassName}>{t('onboarding.fontSize')}</Text>
+        <View className="flex-row gap-2">
+          {(['small', 'normal', 'large'] as const).map((size) => (
+            <Pressable
+              key={size}
+              accessibilityRole="button"
+              accessibilityState={{ selected: settings.fontSize === size, disabled: busy }}
+              accessibilityLabel={t(`settings.${size}`)}
+              disabled={busy}
+              onPress={() => void onChange({ fontSize: size })}
+              className={`${choiceClassName} flex-1 ${settings.fontSize === size ? 'border-theme-accent bg-theme-accent-light/50' : 'border-transparent'}`}
+            >
+              <Text
+                className="text-base text-theme-text-primary"
+              >
+                {t(`settings.${size}`)}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+    </OnboardingFrame>
   );
 }

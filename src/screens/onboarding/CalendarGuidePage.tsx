@@ -1,73 +1,89 @@
-import { useI18n } from '../../i18n/react';
-import { MUTED_CARD_BORDER_CLASS_NAME } from '../../theme/classes';
 import { View } from 'react-native';
-import { InfoNotice } from '../../components/InfoNotice';
+import { AppIcon } from '../../components/AppIcon';
+import { EmotionImage } from '../../components/EmotionImage';
 import { Text } from '../../components/Text';
-import { CalendarHabitProgress } from '../calendar/CalendarHabitProgress';
-import { CalendarRecordCounts } from '../calendar/CalendarRecordCounts';
-
+import { useI18n } from '../../i18n/react';
+import { useAppTheme } from '../../theme/AppThemeProvider';
+import { OnboardingFrame } from './OnboardingFrame';
+import {
+  exampleClassName,
+  sectionClassName,
+  sectionContentClassName,
+  sectionTextClassName,
+  sectionTitleClassName,
+} from './styles';
 export function CalendarGuidePage() {
   const { t } = useI18n();
+  const { rem } = useAppTheme();
   return (
-    <View className="w-full grow justify-evenly gap-6">
-      <View className="gap-2">
-        <Text
-          accessibilityRole="header"
-          className="text-center text-[21px] leading-[28px] font-semibold tracking-tight"
-        >
-          {t('onboarding.calendarTitle')}
-        </Text>
-        <Text className="text-center text-[14px] leading-[21px] text-theme-text-secondary">
-          {t('onboarding.calendarDescription')}
-        </Text>
-      </View>
-      <View
-        className={`${MUTED_CARD_BORDER_CLASS_NAME} gap-5 ios:curve-continuous rounded-2xl bg-theme-surface-muted p-4`}
-      >
-        <View className="gap-4">
-          <View className="gap-2">
-            <Text className="text-center text-[15.75px] leading-[24.5px] font-semibold">
-              {t('onboarding.progressTitle')}
-            </Text>
-            <Text className="text-center text-[14px] leading-[21px] text-theme-text-secondary">
-              {t('onboarding.progressDescription')}
-            </Text>
+    <OnboardingFrame
+      title={t('onboarding.calendarTitle')}
+      description={t('onboarding.calendarDescription')}
+    >
+      <View className={sectionClassName}>
+        <Text className={sectionTitleClassName}>{t('onboarding.emotionTitle')}</Text>
+        <View className={sectionContentClassName}>
+          <View className={`${exampleClassName} justify-evenly`}>
+            {[0, 3, 1, 6].map((emotion) => (
+              <View key={emotion} className="h-16 min-w-0 flex-1">
+                <EmotionImage emotion={emotion} size={rem * 4} fill />
+              </View>
+            ))}
           </View>
-          {[
-            { label: t('onboarding.lowBand'), done: 1, total: 5 },
-            { label: t('onboarding.mediumBand'), done: 2, total: 4 },
-            { label: t('onboarding.highBand'), done: 4, total: 4 },
-          ].map(({ label, done, total }) => (
-            <View key={label} className="gap-1.5">
-              <Text className="text-[14px] leading-[21px] text-theme-text-secondary">{label}</Text>
-              <CalendarHabitProgress done={done} total={total} />
+          <Text className={sectionTextClassName}>{t('onboarding.emotionDescription')}</Text>
+        </View>
+      </View>
+      <View className={sectionClassName}>
+        <Text className={sectionTitleClassName}>{t('onboarding.progressTitle')}</Text>
+        <View className={sectionContentClassName}>
+          <View className={`${exampleClassName} justify-evenly gap-4`}>
+            {(
+              [
+                { label: 'lowBand', percent: 20, color: '#E599A5' },
+                { label: 'mediumBand', percent: 50, color: '#EFBE48' },
+                { label: 'highBand', percent: 100, color: '#7BBDAD' },
+              ] as const
+            ).map((item) => (
+              <View key={item.label} className="min-w-0 flex-1 gap-4">
+                <Text className="text-center text-base text-theme-text-secondary">
+                  {t(`onboarding.${item.label}`)}
+                </Text>
+                <View className="h-4 overflow-hidden rounded-full bg-theme-border/30">
+                  <View
+                    className="h-full rounded-full"
+                    style={{ width: `${item.percent}%`, backgroundColor: item.color }}
+                  />
+                </View>
+              </View>
+            ))}
+          </View>
+          <Text className={sectionTextClassName}>{t('onboarding.progressDescription')}</Text>
+        </View>
+      </View>
+      <View className={sectionClassName}>
+        <Text className={sectionTitleClassName}>{t('onboarding.toolbarNumbers')}</Text>
+        <View className={sectionContentClassName}>
+          <View className={`${exampleClassName} justify-evenly`}>
+            <View className="flex-row items-center gap-1.5">
+              <AppIcon name="diary" size={rem * 1.25} className="text-theme-accent" />
+              <Text className="text-base">{t('calendar.entryNumber', { count: 12 })}</Text>
             </View>
-          ))}
-          <Text className="text-center text-[10.5px] leading-[14px] text-theme-text-secondary">
-            {t('onboarding.zeroProgress')}
-          </Text>
-        </View>
-        <View className="h-px bg-theme-border/50" />
-        <View className="gap-3">
-          <Text className="text-center text-[15.75px] leading-[24.5px] font-semibold">
-            {t('onboarding.toolbarNumbers')}
-          </Text>
-          <View className="items-center">
-            <CalendarRecordCounts
-              diaryCount={12}
-              counts={{ low: 2, medium: 5, high: 8 }}
-              textSize="base"
-              textClassName="text-[14px] leading-[21px]"
-            />
+            {[
+              { count: 8, color: '#7BBDAD' },
+              { count: 5, color: '#EFBE48' },
+              { count: 2, color: '#E599A5' },
+            ].map((item) => (
+              <View key={item.color} className="flex-row items-center gap-1.5">
+                <AppIcon name="habit" size={rem * 1.25} color={item.color} />
+                <Text className="text-base">
+                  {t('calendar.compactDayCount', { count: item.count })}
+                </Text>
+              </View>
+            ))}
           </View>
-          <Text className="text-center text-[14px] leading-[21px] text-theme-text-secondary">
-            {t('onboarding.toolbarDescription')}
-          </Text>
+          <Text className={sectionTextClassName}>{t('onboarding.toolbarDescription')}</Text>
         </View>
       </View>
-      <InfoNotice textClassName="text-[10.5px] leading-[17.5px]" adjustsFontSizeToFit={false}>
-        {t('onboarding.freeNotice')}
-      </InfoNotice>
-    </View>
+    </OnboardingFrame>
   );
 }

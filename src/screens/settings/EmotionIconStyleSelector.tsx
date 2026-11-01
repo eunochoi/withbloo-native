@@ -18,6 +18,7 @@ export function EmotionIconStyleSelector({
   dimmed = disabled,
   labelSize = 'sm',
   labelClassName,
+  choiceClassName,
   onChange,
 }: {
   value: Settings['emotionStyle'];
@@ -26,6 +27,7 @@ export function EmotionIconStyleSelector({
   dimmed?: boolean;
   labelSize?: 'sm' | 'base';
   labelClassName?: string;
+  choiceClassName?: string;
   onChange: (value: Settings['emotionStyle']) => void;
 }) {
   const { rem: appRem } = useAppTheme();
@@ -50,6 +52,7 @@ export function EmotionIconStyleSelector({
             value === style ? CHECKED_BOX_CLASS_NAME : UNCHECKED_BOX_CLASS_NAME,
             'flex-1 px-2',
             compact ? 'gap-1 py-2' : 'h-[5.666667rem] min-w-0 gap-1 py-2',
+            choiceClassName,
             dimmed && 'opacity-40',
           )}
         >
