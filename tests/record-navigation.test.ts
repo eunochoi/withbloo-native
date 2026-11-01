@@ -159,6 +159,7 @@ function form(kind: string, router: unknown, isNew = false) {
             DEFAULT_HABIT_ICON_COLOR: 'theme',
           };
         if (dependency === '../domain/date') return { isDate: () => false };
+        if (dependency === '../domain/diaryFilters') return require('../src/domain/diaryFilters');
         if (dependency === '../domain/sober') return require('../src/domain/sober');
         if (dependency === 'date-fns') return { format: () => '', parseISO: () => new Date() };
         return fallback;

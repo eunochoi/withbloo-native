@@ -108,6 +108,7 @@ function harness(
             mediaUri: (name: string) => name,
           };
         if (name.endsWith('/domain/date')) return { isDate };
+        if (name.endsWith('/domain/diaryFilters')) return require('../src/domain/diaryFilters');
         if (name.endsWith('/domain/constants')) return { EMOTIONS };
         if (name.endsWith('/domain/limits'))
           return { DIARY_IMAGE_MAX_COUNT, DIARY_TEXT_MAX_LENGTH };
