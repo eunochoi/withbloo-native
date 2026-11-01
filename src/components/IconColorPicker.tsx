@@ -30,6 +30,7 @@ export function IconColorPicker({
   return (
     <BottomSheetModal
       visible
+      fixedHeight
       title={t('habit.iconColor')}
       onClose={onClose}
       footer={(close) => (
@@ -47,7 +48,7 @@ export function IconColorPicker({
             ref(nativeScroll && 'scrollTo' in nativeScroll ? (nativeScroll as ScrollView) : null);
           }}
           data={keys}
-          numColumns={4}
+          numColumns={3}
           keyExtractor={(key) => key}
           contentContainerClassName="gap-1 pt-6 pb-7"
           columnWrapperClassName="gap-1"

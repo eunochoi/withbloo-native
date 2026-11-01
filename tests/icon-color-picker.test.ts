@@ -13,7 +13,7 @@ function nodes(node: any): any[] {
   return [node, ...nodes(node.props?.children)];
 }
 
-test('color picker combines theme and eleven colors in equal-height four-column rows and defers apply until close', () => {
+test('color picker combines theme and fourteen colors in equal-height three-column rows and defers apply until close', () => {
   let draft = 'theme';
   let deferred: (() => void) | undefined;
   const applied: string[] = [];
@@ -63,14 +63,15 @@ test('color picker combines theme and eleven colors in equal-height four-column 
   let tree = render();
   const options = () => nodes(tree).filter((node) => node.type === 'PickerOption');
   const grid = tree.props.children;
-  assert.equal(grid.props.numColumns, 4);
-  assert.equal(grid.props.data.length, 12);
+  assert.equal(grid.props.numColumns, 3);
+  assert.equal(tree.props.fixedHeight, true);
+  assert.equal(grid.props.data.length, 15);
   assert.equal(grid.props.columnWrapperClassName, 'gap-1');
   assert(grid.props.contentContainerClassName.includes('gap-1'));
   assert.equal(grid.props.onScroll, 'sheet-scroll');
   assert(grid.props.children.every((node: any) => node.props.className === 'flex-1 min-w-0'));
   assert(options().every((node) => node.props.className.includes('aspect-')));
-  assert.equal(options().length, 12);
+  assert.equal(options().length, 15);
   assert.equal(options()[0].props.accessibilityLabel, '기본');
   assert.equal(options()[0].props.selected, true);
   assert(options().every((node) => node.props.className === options()[0].props.className));
