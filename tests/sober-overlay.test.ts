@@ -187,7 +187,7 @@ test('memo launcher pushes a route above sober detail without closing its sheet'
   const ui = scenario();
   const nodes = ui.render();
   const button = nodes.find(
-    (node) => node.type === 'Button' && node.props.label === '메모 기록보기',
+    (node) => node.type === 'Button' && node.props.label === '기록보기',
   );
   assert.equal(button.props.subtle, true);
   button.props.onPress();
@@ -330,7 +330,7 @@ test('memo edit waits for the menu to close and retains the memo route underneat
   assert.equal(ui.pushes[0].params.restartId, '2');
   assert.equal(
     ui.render().find((node) => node.type === 'BottomSheetPage').props.title,
-    '커피 메모',
+    '커피 기록',
   );
 });
 
