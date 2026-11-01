@@ -30,7 +30,7 @@ export function HomeTodayItem({
       onPress={onPress}
       className="w-full min-w-0 items-center gap-2 px-0.5 active:opacity-70"
     >
-      <Text className="text-center text-sm leading-5 font-semibold text-theme-text-secondary">
+      <Text className="text-center text-sm leading-5 font-semibold tracking-tighter text-theme-text-secondary">
         {title}
       </Text>
       <View

@@ -36,7 +36,6 @@ export function HomeAnalysisCard({ today }: { today: string }) {
             {t('home.analysisDescription')}
           </Text>
         </View>
-        <AppIcon name="chevron-right" size={appRem} className="shrink-0 text-theme-accent-deep" />
       </View>
     </Pressable>
   );

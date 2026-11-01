@@ -64,6 +64,8 @@ function harness() {
             return { useSafeAreaInsets: () => ({ top: 0 }) };
           if (dependency === 'tailwind-merge') return require(dependency);
           if (dependency.endsWith('/tokens.json')) return tokens;
+          if (dependency.endsWith('/theme/colors'))
+            return { themeColors: () => ({ textPrimary: '#585858', accent: '#8CADE2' }) };
           if (dependency.endsWith('/AppThemeProvider')) return { useAppTheme: () => theme };
           if (dependency.endsWith('/SettingsProvider'))
             return { useSettings: () => ({ settings: { themeAccent: 'blue' } }) };
@@ -188,11 +190,11 @@ test('common default actions switch language and caller-provided labels remain i
       .accessibilityLabel,
     'Back',
   );
-  assert.equal(h.component('Wordmark')({}).props.accessibilityLabel, "'BlooLog' logo");
+  assert.equal(h.component('Wordmark')({}).props.accessibilityLabel, "'withBloo' logo");
   assert.equal(
     h.component('AppLoadingScreen')({ onReady: () => {}, onError: () => {} }).props
       .accessibilityLabel,
-    "'BlooLog' launch screen",
+    "'withBloo' launch screen",
   );
   assert.equal(
     nodes(h.component('QueryState')({ query: { isPending: true, error: null } }), 'Spinner')[0]

@@ -193,12 +193,8 @@ test('home today items retain separate navigation and loading states', () => {
     assert.equal(actions[0].props.disabled, true);
     assert.equal(actions[1].props.disabled, undefined);
     if (result.isPending) {
-      assert(
-        nodes(pending).some((node) => node.props.accessibilityLabel === '일기 확인 중'),
-      );
-      assert(
-        nodes(pending).some((node) => node.props.accessibilityLabel === '습관 확인 중'),
-      );
+      assert(nodes(pending).some((node) => node.props.accessibilityLabel === '오늘의 일기 확인 중'));
+      assert(nodes(pending).some((node) => node.props.accessibilityLabel === '오늘의 습관 확인 중'));
     } else {
       assert(text(actions[0]).includes('불러오기 실패'));
       assert(actions[1].props.accessibilityLabel.includes('불러오기 실패'));
@@ -320,7 +316,7 @@ test('diary shows three summary columns with monthly average and retains monthly
   const tree = render('DiaryAnalysis', { stats, year: 2024 });
   assert(text(tree).includes('현재 연속 기록'));
   assert(text(tree).includes('역대 최고 기록'));
-  const summary = tree.props.children[1];
+  const summary = tree.props.children[2];
   const columns = summary.props.children;
   assert.equal(columns.length, 3);
   assert(text(columns[0]).includes('3일'));
@@ -331,7 +327,7 @@ test('diary shows three summary columns with monthly average and retains monthly
   assert(
     text(render('DiaryAnalysis', { stats: emptyStats(), year: 2024 })).includes('월평균 일기0개'),
   );
-  assert.equal(tree.props.children[2].props.children.length, 12);
+  assert.equal(tree.props.children[4].props.children.length, 12);
   assert(!text(tree).includes('돌아보기'));
   assert(!text(tree).includes('분기'));
 });
@@ -346,7 +342,7 @@ test('diary monthly average rounds to one decimal and omits trailing zeroes', ()
       stats: { ...emptyStats(), monthlyAverage },
       year: 2024,
     });
-    assert(text(tree.props.children[1].props.children[2]).includes(`월평균 일기${expected}개`));
+    assert(text(tree.props.children[2].props.children[2]).includes(`월평균 일기${expected}개`));
   }
 });
 
@@ -518,7 +514,7 @@ test('sober rankings compare past and current streaks in both directions across 
     undefined,
     { routes },
   );
-  const rows = tree.props.children[2].props.children;
+  const rows = tree.props.children[3].props.children;
   assert.equal(rows.length, 3);
   rows[0].props.onPress();
   rows[2].props.onPress();
@@ -532,7 +528,7 @@ test('sober rankings compare past and current streaks in both directions across 
   assert(!rows[2].props.className.includes('border-b'));
   const bottom = render('SoberAnalysis', { sobers, restarts }, 'bottom');
   assert.deepEqual(
-    Array.from(bottom.props.children[2].props.children, (row: any) =>
+    Array.from(bottom.props.children[3].props.children, (row: any) =>
       Number(row.key.split(':')[0]),
     ),
     [1, 2, 2],
@@ -544,7 +540,7 @@ test('sober rankings compare past and current streaks in both directions across 
   }));
   for (const selection of ['top', 'bottom']) {
     const tieRows = render('SoberAnalysis', { sobers: tied, restarts: [] }, selection).props
-      .children[2].props.children;
+      .children[3].props.children;
     assert.deepEqual(
       Array.from(tieRows, (row: any) => Number(row.key.split(':')[0])),
       [1, 2, 3],
@@ -555,7 +551,7 @@ test('sober rankings compare past and current streaks in both directions across 
     originalOrder,
   );
   const short = render('SoberAnalysis', { sobers: sobers.slice(0, 2), restarts: [] });
-  const shortRows = short.props.children[2].props.children;
+  const shortRows = short.props.children[3].props.children;
   assert.equal(shortRows.length, 2);
   assert(!shortRows[1].props.className.includes('border-b'));
   assert(
@@ -639,7 +635,7 @@ test('home uses three equal-width columns with compact summary titles', () => {
   const buttons = nodes(tree).filter((node) => node.type === 'Pressable');
   assert.deepEqual(
     buttons.map((node) => text(node.props.children[0])),
-    ['일기', '습관', '거리두기'],
+    ['오늘의 일기', '오늘의 습관', '거리두기'],
   );
 });
 
@@ -766,7 +762,7 @@ test('English home cards translate emotions, counts and empty states while prese
     language: 'en',
     results: { diary: { isPending: true } },
   });
-  assert(nodes(pending).some((node) => node.props.accessibilityLabel === 'Checking Diary'));
+  assert(nodes(pending).some((node) => node.props.accessibilityLabel === 'Checking Today Diary'));
 });
 
 test('English Cut Back card translates the day count and preserves a user-authored Korean name', () => {
@@ -883,10 +879,10 @@ test('English habit rankings keep the selected order, counts, names and detail d
   });
   assert(text(english).includes('Habit records'));
   assert(text(english).includes('Bottom 3'));
-  const rows = english.props.children[2].props.children;
+  const rows = english.props.children[3].props.children;
   assert.deepEqual(
     rows.map((row: any) => row.key),
-    korean.props.children[2].props.children.map((row: any) => row.key),
+    korean.props.children[3].props.children.map((row: any) => row.key),
   );
   assert(text(rows[0]).includes('내 기록'));
   assert(text(rows[0]).includes('1time'));
@@ -915,10 +911,10 @@ test('English Cut Back rankings preserve intervals, status, names and navigation
   assert(text(english).includes('Cut Back records'));
   assert(text(english).includes('In progress'));
   assert(text(english).includes('Ended'));
-  const rows = english.props.children[2].props.children;
+  const rows = english.props.children[3].props.children;
   assert.deepEqual(
     rows.map((row: any) => row.key),
-    korean.props.children[2].props.children.map((row: any) => row.key),
+    korean.props.children[3].props.children.map((row: any) => row.key),
   );
   assert(
     rows.every(
@@ -931,4 +927,35 @@ test('English Cut Back rankings preserve intervals, status, names and navigation
   rows[0].props.onPress();
   assert.deepEqual(routes, [`/sober/${rows[0].key.split(':')[0]}`]);
   assert.equal(JSON.stringify({ sobers, restarts }), snapshot);
+});
+
+test('Cut Back distribution shows six duration groups above one proportional bar', () => {
+  const now = Date.parse('2026-10-05T12:00:00.000Z');
+  const sobers = [1, 4, 10, 20, 50, 100].map((days, index) => ({
+    id: index + 1,
+    name: `Item ${index + 1}`,
+    icon_key: 'coffee',
+    icon_color: 'theme',
+    initial_started_at: new Date(now - days * SOBER_DAY_MS).toISOString(),
+    goal_mode: 'AUTO',
+    goal_days: null,
+  }));
+  for (const count of [0, 1, 2, 3, 4, 5, 6]) {
+    const tree = render('SoberAnalysis', { sobers: sobers.slice(0, count), restarts: [] });
+    const card = tree.props.children[1].props.children[1];
+    const summaries = nodes(card.props.children[0]).filter((node) =>
+      node.props.className?.includes('w-1/3'),
+    );
+    const bar = card.props.children.find((node: any) => node?.props?.accessible);
+    const segments = nodes(bar.props.children).filter((node) => node.type === 'View');
+    assert.equal(summaries.length, count);
+    assert.equal(segments.length, count);
+    assert(segments.every((node) => node.props.style.flexGrow === 1));
+    assert.equal(summaries.filter((node) => text(node.props.children[1]) === '1개').length, count);
+    if (count === 6) {
+      for (const label of ['3일 미만', '3일~1주', '1~2주', '2주~1개월', '1~3개월', '3개월 이상']) {
+        assert(text(card.props.children[0]).includes(label));
+      }
+    }
+  }
 });

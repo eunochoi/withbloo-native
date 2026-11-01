@@ -1,9 +1,9 @@
-import { mockI18n, formatDisplayDate } from './helpers/i18n';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import test from 'node:test';
 import { runInNewContext } from 'node:vm';
+import { formatDisplayDate, mockI18n } from './helpers/i18n';
 
 const require = createRequire(import.meta.url);
 const ts = require('typescript');
@@ -369,7 +369,7 @@ test('home retains shared padding and the updated brand, greeting and summary la
   const [brand, greeting, summary] = content.props.children;
   assert(!brand.props.className.includes('px-'));
   assert.equal(brand.props.children.type, 'Wordmark');
-  assert.equal(brand.props.children.props.size, 15 * 2.25);
+  assert.equal(brand.props.children.props.size, 15 * 2.8);
   assert.equal(greeting.type, 'HomeGreeting');
   assert(!summary.props.className.includes('px-'));
   assert.equal(summary.props.children[0].type, 'HomeTodaySection');
