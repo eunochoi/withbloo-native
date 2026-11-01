@@ -255,8 +255,8 @@ for (const kind of ['habit', 'sober'] as const) {
         const row = h.option(label);
         assert.equal(row.props.accessibilityLabel, label);
         assert.equal(nodes(row).filter((node) => node.type === 'Text').length, 1);
-        assert.equal(h.row(key).props.className, 'aspect-square');
-        assert.equal(h.row(key).props.style.width, h.row(category.keys[0]).props.style.width);
+        assert.equal(h.row(key).props.className, 'aspect-square w-1/3 p-1.5');
+        assert.equal(h.row(key).props.style, undefined);
         assert(
           nodes(h.shell.props.fixedContent).some(
             (node) => node.props?.children === category.description,
@@ -390,9 +390,8 @@ for (const kind of ['habit', 'sober'] as const) {
   }
 }
 
-test('short screens and large fonts move top content into the one vertical viewport while keeping the footer fixed', () => {
+test('short screens and large fonts keep categories and footer outside the fixed-height list', () => {
   const h = picker('habit', 'goal');
-  h.shell.props.fixedContent.props.onLayout({ nativeEvent: { layout: { height: 80 } } });
   h.render();
   assert(h.shell.props.fixedContent);
   const fixedKey = h.scroll.key;
@@ -400,8 +399,9 @@ test('short screens and large fonts move top content into the one vertical viewp
   h.dimensions.fontScale = 1.5;
   h.theme.rem = 16;
   h.render();
-  assert.equal(h.shell.props.fixedContent, undefined);
-  assert.notEqual(h.scroll.key, fixedKey);
+  assert(h.shell.props.fixedContent);
+  assert.equal(h.shell.props.fixedHeight, true);
+  assert.equal(h.scroll.key, fixedKey);
   assert(nodes(h.scroll).some((node) => node.props?.accessibilityLabel === '기본 1'));
   assert.equal(nodes(h.scroll).filter((node) => node.type === 'AnimatedScrollView').length, 1);
   assert(!nodes(h.scroll).some((node) => node.props?.label === '선택 완료'));
@@ -410,13 +410,15 @@ test('short screens and large fonts move top content into the one vertical viewp
   assert.deepEqual(h.applied, ['goal']);
 });
 
-test('grid reduces columns for larger text and accounts for its offset when revealing selection', () => {
+test('grid keeps three columns for larger text and accounts for its offset when revealing selection', () => {
   const h = picker('habit', 'photography');
-  const originalWidth = h.row('photography').props.style.width;
+  const originalClass = h.row('photography').props.className;
   h.dimensions.fontScale = 1.5;
   h.render();
-  assert(h.row('photography').props.style.width > originalWidth);
-  const grid = nodes(h.scroll).find((node) => node.props?.className === 'flex-row flex-wrap gap-3');
+  assert.equal(h.row('photography').props.className, originalClass);
+  assert(originalClass.includes('w-1/3'));
+  assert.equal(h.row('photography').props.style, undefined);
+  const grid = nodes(h.scroll).find((node) => node.props?.className === '-mx-1.5 flex-row flex-wrap');
   grid.props.onLayout({ nativeEvent: { layout: { y: 180, width: 330 } } });
   h.render();
   h.row('photography').props.onLayout({ nativeEvent: { layout: { y: 320 } } });
@@ -425,14 +427,14 @@ test('grid reduces columns for larger text and accounts for its offset when reve
 });
 
 for (const kind of ['habit', 'sober'] as const) {
-  test(`${kind} categories extend to the sheet edges in fixed and scrolling layouts while preserving content insets`, () => {
+  test(`${kind} categories stay fixed and extend to the sheet edges at all screen heights while preserving content insets`, () => {
     const h = picker(kind, kind === 'habit' ? 'goal' : 'favorite');
-    h.shell.props.fixedContent.props.onLayout({ nativeEvent: { layout: { height: 80 } } });
     h.render();
     for (const height of [900, 400]) {
       h.dimensions.height = height;
       h.render();
-      assert.equal(!!h.shell.props.fixedContent, height === 900);
+      assert(h.shell.props.fixedContent);
+      assert.equal(h.shell.props.fixedHeight, true);
       assert.equal(h.shell.props.contentFullBleed, true);
       assert(h.scroll.props.contentContainerClassName.includes('px-[5%]'));
       assert(h.chipScroll.props.className.includes('-mx-[5.555556%]'));

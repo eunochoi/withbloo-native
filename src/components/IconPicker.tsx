@@ -2,7 +2,6 @@ import { useI18n } from '../i18n/react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
 import { useAnimatedRef } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../theme/AppThemeProvider';
 import { AnimatedScrollView } from './AnimatedScrollView';
 import { BottomSheetModal } from './BottomSheetModal';
@@ -37,8 +36,7 @@ export function IconPicker<Key extends string>({
   const { t } = useI18n();
 
   const { rem: appRem, reducedMotion } = useAppTheme();
-  const { width, height, fontScale } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
+  const { fontScale } = useWindowDimensions();
   const [draft, setDraft] = useState(value);
   const [categoryId, setCategoryId] = useState(
     () => categories.find(({ keys }) => keys.includes(value))?.id ?? categories[0].id,
@@ -49,21 +47,11 @@ export function IconPicker<Key extends string>({
   const [chipLayouts, setChipLayouts] = useState<Record<string, { x: number; width: number }>>({});
   const [chipViewportWidth, setChipViewportWidth] = useState(0);
   const [chipContentWidth, setChipContentWidth] = useState(0);
-  const [topHeight, setTopHeight] = useState(0);
-  const [gridWidth, setGridWidth] = useState(Math.max(0, width - appRem * 4));
   const gridY = useRef(0);
-  const columns = Math.max(
-    1,
-    Math.min(3, Math.floor((gridWidth + appRem * 0.75) / (appRem * 6 * fontScale + appRem * 0.75))),
-  );
-  const cardWidth = Math.floor((gridWidth - appRem * 0.75 * (columns - 1)) / columns) - 1;
   const opened = useRef(false);
   const initialScrollPending = useRef(true);
   const initialRowY = useRef<number | null>(null);
-  const sheetHeight = Math.min(height * 0.95, height - insets.top);
-  // Reserve room for the sheet header, footer and readable list rows at larger font sizes.
-  const pinTop = sheetHeight - insets.bottom - topHeight >= appRem * 20 * fontScale;
-  const contentKey = `${category.id}-${pinTop ? 'fixed' : 'scroll'}`;
+  const contentKey = `${category.id}-icons`;
 
   useEffect(() => {
     const layout = chipLayouts[categoryId];
@@ -76,7 +64,7 @@ export function IconPicker<Key extends string>({
         animated: opened.current && !reducedMotion,
       });
     }
-  }, [categoryId, chipLayouts, chipViewportWidth, chipContentWidth, pinTop, reducedMotion]);
+  }, [categoryId, chipLayouts, chipViewportWidth, chipContentWidth, reducedMotion]);
 
   function revealInitialSelection() {
     if (
@@ -94,10 +82,7 @@ export function IconPicker<Key extends string>({
   }
 
   const topContent = (
-    <View
-      className="shrink-0 gap-4 pt-4 pb-2"
-      onLayout={(event) => setTopHeight(event.nativeEvent.layout.height)}
-    >
+    <View className="shrink-0 gap-4 pt-4 pb-2">
       <ScrollView
         ref={chipScrollRef}
         horizontal
@@ -172,7 +157,7 @@ export function IconPicker<Key extends string>({
       onClose={onClose}
       scrollRef={scrollRef}
       contentKey={contentKey}
-      fixedContent={pinTop ? topContent : undefined}
+      fixedContent={topContent}
       onOpened={() => {
         opened.current = true;
         revealInitialSelection();
@@ -189,12 +174,10 @@ export function IconPicker<Key extends string>({
             revealInitialSelection();
           }}
         >
-          {!pinTop && topContent}
           <View
-            className="flex-row flex-wrap gap-3"
+            className="-mx-1.5 flex-row flex-wrap"
             onLayout={(event) => {
               gridY.current = event.nativeEvent.layout.y;
-              setGridWidth(event.nativeEvent.layout.width);
               revealInitialSelection();
             }}
           >
@@ -203,8 +186,7 @@ export function IconPicker<Key extends string>({
               return (
                 <View
                   key={key}
-                  className="aspect-square"
-                  style={{ width: cardWidth }}
+                  className="aspect-square w-1/3 p-1.5"
                   onLayout={(event) => {
                     if (key === value && initialScrollPending.current) {
                       initialRowY.current = event.nativeEvent.layout.y;
