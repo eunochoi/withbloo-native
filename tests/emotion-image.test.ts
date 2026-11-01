@@ -50,7 +50,7 @@ function harness(preferredStyle: string) {
   };
 }
 
-test('emotion images follow each preferred style and retain their calendar scaling', () => {
+test('emotion images follow each preferred style without style-specific scaling', () => {
   for (const style of ['basic', 'simple', 'emoji']) {
     const ui = harness(style);
     const image = ui.render({ emotion: 0, fill: true });
@@ -58,10 +58,7 @@ test('emotion images follow each preferred style and retain their calendar scali
     assert.equal(image.props.source, `../../assets/emotions/${style}/happy.png`);
     assert.equal(image.props.accessibilityLabel, EMOTIONS[0].name);
     assert.equal(image.props.className, 'w-full h-full');
-    assert.equal(
-      image.props.style.transform[0].scale,
-      style === 'simple' ? 0.85 : style === 'emoji' ? 1.2 : 1,
-    );
+    assert.equal(image.props.style.transform, undefined);
     assert.equal(image.props.fadeDuration, 0);
   }
 });

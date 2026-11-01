@@ -130,7 +130,9 @@ export function DiaryHabitMonthCalendar(props: {
                   style={{ transform: [{ rotate: `${rotation}deg` }] }}
                 >
                   {diary ? (
-                    <EmotionImage emotion={diary.emotion} fill />
+                    <View className="w-full h-full max-w-[48px] max-h-[48px]" style={{ transform: [{ scale: 1.2 }] }}>
+                      <EmotionImage emotion={diary.emotion} fill />
+                    </View>
                   ) : (
                     <Text
                       className={`text-xs ${weekday === 6 ? 'text-theme-calendar-saturday' : weekday === 0 ? 'text-theme-calendar-sunday' : 'text-theme-text-secondary'}`}
