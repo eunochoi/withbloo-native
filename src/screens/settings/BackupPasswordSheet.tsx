@@ -56,9 +56,12 @@ export function BackupPasswordSheet({
       dismissOnBack={!busy}
     >
       <View className="gap-4">
-        <Text className="text-sm text-theme-text-secondary">
-          {t(creating ? 'settings.backupPasswordWarning' : 'settings.backupPasswordPrompt')}
-          {creating && `\n${t('settings.backupSingleFile')}`}
+        <Text
+          textBreakStrategy="highQuality"
+          lineBreakStrategyIOS="hangul-word"
+          className="text-sm leading-relaxed text-theme-text-secondary"
+        >
+          {t(creating ? 'settings.backupPasswordHint' : 'settings.backupPasswordPrompt')}
         </Text>
         {changing && input(oldPassword, setOldPassword, t('settings.backupOldPassword'))}
         {input(password, setPassword, t('settings.backupPassword'))}
@@ -69,6 +72,12 @@ export function BackupPasswordSheet({
           </Text>
         )}
         {busy && <ActivityIndicator color={colors.accent} />}
+        {creating && (
+          <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
+            {t('settings.backupPasswordWarning')}
+            {changing && ` ${t('settings.backupPreviousPassword')}`}
+          </InfoNotice>
+        )}
         {!!information && (
           <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
             {information}

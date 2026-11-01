@@ -32,9 +32,10 @@ export const settingsEn = {
   backupPassword: 'Password',
   backupOldPassword: 'Current backup password',
   backupPasswordConfirm: 'Confirm password',
-  backupPasswordWarning:
-    'Use 8+ characters. Without the password, you cannot restore. Older backups still need their original password.',
-  backupPasswordPrompt: 'Enter this backup’s password.',
+  backupPasswordHint: 'Protect your backup file with a password of at least 8\u00a0characters.',
+  backupPasswordWarning: 'If you forget this password, you cannot restore the backup.',
+  backupPreviousPassword: 'Older backups still need their original password.',
+  backupPasswordPrompt: 'Enter the password for this backup file.',
   backupPasswordMismatch: 'Passwords do not match.',
   backupPasswordLength: 'Use at least 8 characters.',
   backupPasswordOrDamaged: 'Wrong password or damaged backup.',
@@ -50,7 +51,7 @@ export const settingsEn = {
     'iCloud upload pending. Older backups stay until it finishes.',
   backupEncrypted:
     'Records and photos are password-encrypted. A forgotten password cannot be recovered.',
-  backupSingleFile: 'One .bloo file, up to 1 GB. You need the file and password to restore.',
+  backupSingleFile: 'Backups are saved as .bloo files, up to 1 GB.',
   backupShareTitle: 'Share backup',
   title: 'Settings',
   hashtags: '#MyWay #Style',

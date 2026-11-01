@@ -1,4 +1,5 @@
 import { ActivityIndicator, Pressable, View } from 'react-native';
+import { InfoNotice } from '../../components/InfoNotice';
 import { Text } from '../../components/Text';
 import { useI18n } from '../../i18n/react';
 import { useAppTheme } from '../../theme/AppThemeProvider';
@@ -58,6 +59,9 @@ export function BackupSection({
             </Pressable>
           ))}
         </View>
+        <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
+          {t('settings.backupSingleFile')}
+        </InfoNotice>
       </View>
     </View>
   );

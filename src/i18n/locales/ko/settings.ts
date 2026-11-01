@@ -31,9 +31,10 @@ export const settingsKo = {
   backupPassword: '비밀번호',
   backupOldPassword: '기존 자동 백업 비밀번호',
   backupPasswordConfirm: '비밀번호 확인',
-  backupPasswordWarning:
-    '8자 이상의 비밀번호를 설정해주세요. 잊으면 백업을 복구할 수 없어요. 비밀번호를 변경해도 기존 백업에는 이전 비밀번호가 필요해요.',
-  backupPasswordPrompt: '백업을 만들 때 사용한 비밀번호를 입력해주세요.',
+  backupPasswordHint: '백업 파일을 보호할 비밀번호를 8자\u00a0이상 입력해주세요.',
+  backupPasswordWarning: '비밀번호를 잊으면 백업을 복원할 수 없어요.',
+  backupPreviousPassword: '이전 백업은 기존 비밀번호로 복원할 수 있어요.',
+  backupPasswordPrompt: '이 백업 파일의 비밀번호를 입력해주세요.',
   backupPasswordMismatch: '비밀번호가 일치하지 않아요.',
   backupPasswordLength: '비밀번호는 8자 이상으로 입력해주세요.',
   backupPasswordOrDamaged: '비밀번호가 다르거나 백업 파일이 손상됐어요.',
@@ -47,8 +48,7 @@ export const settingsKo = {
   backupBusy: '백업 작업 중…',
   backupUploadPending: 'iCloud 업로드 대기 중이에요. 완료될 때까지 이전 백업을 보관해요.',
   backupEncrypted: '비밀번호로 기록과 사진을 암호화해요. 비밀번호를 잊으면 복구할 수 없어요.',
-  backupSingleFile:
-    '최대 1GB의 .bloo 파일 하나로 저장해요. 복원할 때 파일 하나와 비밀번호가 필요해요.',
+  backupSingleFile: '백업은 최대 1GB의 .bloo 파일로 저장돼요.',
   backupShareTitle: 'Google Drive 등으로 백업 공유',
   title: '앱 설정',
   hashtags: '#맞춤 #취향',
