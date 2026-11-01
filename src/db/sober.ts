@@ -35,7 +35,7 @@ export async function getSoberMemoPage(
   const comparison = sort === 'ASC' ? '>' : '<';
   const records = await db.getAllAsync<SoberRestart>(
     `SELECT * FROM sober_restarts
-     WHERE sober_id = ? AND memo IS NOT NULL AND trim(memo) != ''
+     WHERE sober_id = ?
      ${cursor ? `AND (restarted_at ${comparison} ? OR (restarted_at = ? AND id ${comparison} ?))` : ''}
      ORDER BY restarted_at ${sort}, id ${sort} LIMIT ?`,
     soberId,

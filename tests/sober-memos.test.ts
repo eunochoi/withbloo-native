@@ -12,7 +12,7 @@ import { localDate } from '../src/domain/date';
 const require = createRequire(import.meta.url);
 const ts = require('typescript');
 
-test('memo cursor pages keep timestamp ties, exclude empty memos and isolate each sober', async () => {
+test('memo cursor pages keep timestamp ties, include empty memos and isolate each sober', async () => {
   const { db, raw } = await database();
   const now = Date.parse('2026-10-09T12:00:00.000Z');
   const input = {
@@ -41,11 +41,11 @@ test('memo cursor pages keep timestamp ties, exclude empty memos and isolate eac
         ),
       );
     for (const memo of [null, '', '   '])
-      await saveSoberRestart(
+      ids.push(await saveSoberRestart(
         db,
         { sober_id: id, restarted_at: '2026-10-09T10:00:00.000Z', memo },
         now,
-      );
+      ));
     await saveSoberRestart(
       db,
       { sober_id: other, restarted_at: '2026-10-09T10:00:00.000Z', memo: '다른 항목' },
@@ -56,10 +56,12 @@ test('memo cursor pages keep timestamp ties, exclude empty memos and isolate eac
       assert.equal(first.records.length, 20);
       assert(first.nextCursor);
       const second = await getSoberMemoPage(db, id, sort, first.nextCursor);
-      assert.equal(second.records.length, 18);
-      assert.equal(second.nextCursor, undefined);
+      assert.equal(second.records.length, 20);
+      const third = await getSoberMemoPage(db, id, sort, second.nextCursor);
+      assert.equal(third.records.length, 1);
+      assert.equal(third.nextCursor, undefined);
       assert.deepEqual(
-        [...first.records, ...second.records].map((row) => row.id),
+        [...first.records, ...second.records, ...third.records].map((row) => row.id),
         sort === 'ASC' ? ids : [...ids].reverse(),
       );
     }
@@ -69,7 +71,7 @@ test('memo cursor pages keep timestamp ties, exclude empty memos and isolate eac
     const second = await getSoberMemoPage(db, id, 'DESC', first.nextCursor);
     assert.deepEqual(
       second.records.map((row) => row.id),
-      [...ids].reverse().slice(20),
+      [...ids].reverse().slice(20, 40),
     );
     await assert.rejects(getSoberMemoPage(db, 0, 'DESC'));
     assert.equal((await getSoberMemoPage(db, 9999, 'ASC')).records.length, 0);
@@ -234,7 +236,7 @@ test('memo route merges dates across pages and sorts without replacing its paren
   assert.equal(card.props.pending, false);
   assert.equal(
     nodes(ui.render()).find((node) => node.type === 'BottomSheetPage').props.title,
-    '커피 메모',
+    '커피 기록',
   );
   assert(!nodes(flat.props.ListHeaderComponent).some((node) => node.props.children === '커피'));
 
@@ -243,7 +245,7 @@ test('memo route merges dates across pages and sorts without replacing its paren
     '/sober/1',
   );
   const sorting = nodes(flat.props.ListHeaderComponent).find((node) => node.type === 'Pressable');
-  assert.equal(sorting.props.accessibilityLabel, '메모 기록 정렬, 최신순');
+  assert.equal(sorting.props.accessibilityLabel, '다시 시작 기록 정렬, 최신순');
   sorting.props.onPress();
   const picker = nodes(ui.render()).find((node) => node.type === 'RecordSortPicker');
   assert.equal(picker.props.sort, 'DESC');
@@ -255,7 +257,7 @@ test('memo route merges dates across pages and sorts without replacing its paren
   assert.equal(
     nodes(ascending.props.ListHeaderComponent).find((node) => node.type === 'Pressable').props
       .accessibilityLabel,
-    '메모 기록 정렬, 과거순',
+    '다시 시작 기록 정렬, 과거순',
   );
   assert.equal(
     nodes(ui.render()).find((node) => node.type === 'RecordSortPicker'),
@@ -267,7 +269,7 @@ test('memo route handles empty, loading, failed and missing-item states', () => 
   const ui = screen();
   assert(
     nodes(ui.flat().props.ListEmptyComponent).some(
-      (node) => node.props.children === '아직 남긴 메모가 없어요.',
+      (node) => node.props.children === '아직 다시 시작한 기록이 없어요.',
     ),
   );
   ui.list.isPending = true;
