@@ -31,6 +31,7 @@ export function AppearanceSettingsSection({
     dark: t('settings.themeDark'),
     system: t('settings.themeSystem'),
   };
+  const fontLabels = { tmoney: t('settings.fontType1'), suit: t('settings.fontType2'), maruburi: t('settings.fontType3') };
   const sizeLabels = {
     small: t('settings.small'),
     normal: t('settings.normal'),
@@ -157,6 +158,20 @@ export function AppearanceSettingsSection({
                 </PickerOption>
               );
             })}
+          </View>
+        </View>
+        <View className="gap-3">
+          <View className="w-full min-w-0 flex-row flex-wrap items-center justify-between gap-2">
+            <Text className="min-w-0 text-base text-theme-text-secondary">{t('settings.fontFamily')}</Text>
+            <Text className="ml-auto text-base text-theme-accent">{fontLabels[settings.fontFamily ?? 'tmoney']}</Text>
+          </View>
+          <View className="flex-row gap-2">
+            {(['tmoney', 'suit', 'maruburi'] as const).map((fontFamily) => (
+              <PickerOption key={fontFamily} accessibilityLabel={fontLabels[fontFamily]} selected={(settings.fontFamily ?? 'tmoney') === fontFamily} disabled={disabled} onPress={() => onChange({ fontFamily })} className={`flex-1 min-w-0 gap-2 px-2 py-4 ${dimmed ? 'opacity-40' : 'opacity-100'}`}>
+                <Text style={{ fontFamily: fontFamily === 'suit' ? 'SUITRegular' : fontFamily === 'maruburi' ? 'MaruBuriRegular' : 'Tmoney' }} className="text-center text-lg">{t('settings.fontPreview')}</Text>
+                <Text className="text-center text-sm">{fontLabels[fontFamily]}</Text>
+              </PickerOption>
+            ))}
           </View>
         </View>
         <View className="gap-3">

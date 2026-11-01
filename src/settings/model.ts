@@ -4,6 +4,7 @@ export interface Settings {
   language: LanguagePreference;
   themeAccent: 'blue' | 'green' | 'purple' | 'pink' | 'yellow' | 'grey';
   themeMode: 'light' | 'dark' | 'system';
+  fontFamily?: 'tmoney' | 'suit' | 'maruburi';
   fontSize: 'small' | 'normal' | 'large';
   emotionStyle: 'basic' | 'simple' | 'emoji';
   diarySort: 'ASC' | 'DESC';
@@ -21,6 +22,7 @@ export const DEFAULT_SETTINGS: Settings = {
   language: 'system',
   themeAccent: 'blue',
   themeMode: 'light',
+  fontFamily: 'tmoney',
   fontSize: 'normal',
   emotionStyle: 'basic',
   diarySort: 'DESC',
@@ -43,6 +45,7 @@ export function parseSettings(raw: unknown): Settings {
     !['system', 'ko', 'en'].includes(settings.language) ||
     !['blue', 'green', 'purple', 'pink', 'yellow', 'grey'].includes(settings.themeAccent) ||
     !['light', 'dark', 'system'].includes(settings.themeMode) ||
+    !['tmoney', 'suit', 'maruburi'].includes(settings.fontFamily ?? 'tmoney') ||
     !['small', 'normal', 'large'].includes(settings.fontSize) ||
     !['basic', 'simple', 'emoji'].includes(settings.emotionStyle) ||
     !['ASC', 'DESC'].includes(settings.diarySort) ||
@@ -66,6 +69,7 @@ export function parseSettings(raw: unknown): Settings {
     language: settings.language,
     themeAccent: settings.themeAccent,
     themeMode: settings.themeMode,
+    fontFamily: settings.fontFamily ?? 'tmoney',
     fontSize: settings.fontSize,
     emotionStyle: settings.emotionStyle,
     diarySort: settings.diarySort,

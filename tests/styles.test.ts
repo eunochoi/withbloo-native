@@ -32,14 +32,12 @@ test('app 13.5/14.5/15.5px presets scale typography, spacing and dimensions cons
     'mt-8': { marginTop: 30 },
     'rounded-lg': { borderRadius: 7.5 },
     'rounded-theme': { borderRadius: 16 },
-    'font-medium': { fontFamily: 'Tmoney', fontWeight: 'normal' },
-    'font-semibold': { fontFamily: 'TmoneyBold', fontWeight: 'normal' },
-    'font-bold': { fontFamily: 'TmoneyBold', fontWeight: 'normal' },
   };
   const result = await postcss([
-    tailwind({ ...config, content: [{ raw: Object.keys(expected).join(' '), extension: 'html' }] }),
+    tailwind({ ...config, content: [{ raw: `${Object.keys(expected).join(' ')} font-medium font-semibold font-bold`, extension: 'html' }] }),
   ]).process(globalCss, { from: undefined });
   assert.match(result.css, new RegExp(`font-size: ${tokens.metrics.fontSizes.normal}px`));
+  for (const weight of [500, 600, 700]) assert.match(result.css, new RegExp(`var\\(--app-font-${weight}\\)`));
   const native = cssToReactNativeRuntime(result.css, { inlineRem: false });
   for (const [className, properties] of Object.entries(expected)) {
     const rule = native.rules[className];

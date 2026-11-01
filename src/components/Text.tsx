@@ -7,11 +7,11 @@ export function Text({
   size,
   ...props
 }: TextProps & { bold?: boolean; size?: number }) {
-  const { colors, rem: appRem } = useAppTheme();
+  const { colors, rem: appRem, fontFamily, fontBold } = useAppTheme();
   const resolvedSize = size ?? appRem;
   const textStyle = [
     {
-      fontFamily: bold ? 'TmoneyBold' : 'Tmoney',
+      fontFamily: bold ? (fontBold ?? 'TmoneyBold') : (fontFamily ?? 'Tmoney'),
       color: colors.text,
       fontSize: resolvedSize,
       lineHeight: resolvedSize * 1.5,

@@ -11,6 +11,8 @@ import { resolveThemeMode, themeColors } from './colors';
 interface AppTheme {
   colors: ReturnType<typeof themeColors>;
   backgroundColors: { surface: SharedValue<string>; accentLight: SharedValue<string> };
+  fontFamily: string;
+  fontBold: string;
   rem: number;
   navigationHeight: number;
   navigationBottom: number;
@@ -56,6 +58,8 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
     () => ({
       colors,
       backgroundColors,
+      fontFamily: settings.fontFamily === 'suit' ? 'SUITRegular' : settings.fontFamily === 'maruburi' ? 'MaruBuriRegular' : 'Tmoney',
+      fontBold: settings.fontFamily === 'suit' ? 'SUITBold' : settings.fontFamily === 'maruburi' ? 'MaruBuriBold' : 'TmoneyBold',
       rem: rootSize,
       navigationHeight,
       navigationBottom,
@@ -69,11 +73,21 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
         lg: rootSize * tokens.metrics.iconSizes.lg,
       },
     }),
-    [colors, backgroundColors, rootSize, mode, reducedMotion, navigationHeight, navigationBottom],
+    [colors, backgroundColors, rootSize, mode, reducedMotion, navigationHeight, navigationBottom, settings.fontFamily],
   );
   const variables = useMemo(
     () =>
       vars({
+        '--app-font-100': settings.fontFamily === 'suit' ? 'SUITRegular' : settings.fontFamily === 'maruburi' ? 'MaruBuriRegular' : 'Tmoney',
+        '--app-font-200': settings.fontFamily === 'suit' ? 'SUITRegular' : settings.fontFamily === 'maruburi' ? 'MaruBuriRegular' : 'Tmoney',
+        '--app-font-300': settings.fontFamily === 'suit' ? 'SUITRegular' : settings.fontFamily === 'maruburi' ? 'MaruBuriRegular' : 'Tmoney',
+        '--app-font-400': settings.fontFamily === 'suit' ? 'SUITRegular' : settings.fontFamily === 'maruburi' ? 'MaruBuriRegular' : 'Tmoney',
+        '--app-font-500': settings.fontFamily === 'suit' ? 'SUITMedium' : settings.fontFamily === 'maruburi' ? 'MaruBuriRegular' : 'Tmoney',
+        '--app-font-600': settings.fontFamily === 'suit' ? 'SUITSemiBold' : settings.fontFamily === 'maruburi' ? 'MaruBuriSemiBold' : 'TmoneyBold',
+        '--app-font-700': settings.fontFamily === 'suit' ? 'SUITBold' : settings.fontFamily === 'maruburi' ? 'MaruBuriBold' : 'TmoneyBold',
+        '--app-font-800': settings.fontFamily === 'suit' ? 'SUITExtraBold' : settings.fontFamily === 'maruburi' ? 'MaruBuriBold' : 'TmoneyBold',
+        '--app-font-900': settings.fontFamily === 'suit' ? 'SUITExtraBold' : settings.fontFamily === 'maruburi' ? 'MaruBuriBold' : 'TmoneyBold',
+
         '--screen-content-bottom': rootSize * tokens.metrics.screenContentBottomRem + insets.bottom,
         ...Object.fromEntries(
           Object.entries(theme.colors).map(([name, value]) => [
@@ -82,7 +96,7 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
           ]),
         ),
       }),
-    [theme.colors, rootSize, insets.bottom],
+    [theme.colors, rootSize, insets.bottom, settings.fontFamily],
   );
   useLayoutEffect(() => {
     rem.set(rootSize);

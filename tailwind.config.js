@@ -64,7 +64,7 @@ module.exports = {
         Object.fromEntries(
           weights.map((weight, index) => [
             '.font-' + weight,
-            { fontFamily: index >= 5 ? 'TmoneyBold' : 'Tmoney', fontWeight: 'normal' },
+            { fontFamily: `var(--app-font-${(index + 1) * 100})`, fontWeight: 'normal' },
           ]),
         ),
       );

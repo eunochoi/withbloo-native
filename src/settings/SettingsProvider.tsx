@@ -13,6 +13,15 @@ interface Context {
 }
 const SettingsContext = createContext<Context | null>(null);
 const fontAssets = {
+  SUITRegular: require('../../assets/fonts/SUIT-Regular.ttf'),
+  SUITMedium: require('../../assets/fonts/SUIT-Medium.ttf'),
+  SUITSemiBold: require('../../assets/fonts/SUIT-SemiBold.ttf'),
+  SUITBold: require('../../assets/fonts/SUIT-Bold.ttf'),
+  SUITExtraBold: require('../../assets/fonts/SUIT-ExtraBold.ttf'),
+  MaruBuriRegular: require('../../assets/fonts/MaruBuri-Regular.ttf'),
+  MaruBuriSemiBold: require('../../assets/fonts/MaruBuri-SemiBold.ttf'),
+  MaruBuriBold: require('../../assets/fonts/MaruBuri-Bold.ttf'),
+
   Tmoney: require('../../assets/fonts/TmoneyRoundWindRegular.otf'),
   TmoneyBold: require('../../assets/fonts/TmoneyRoundWindExtraBold.otf'),
 };

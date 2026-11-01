@@ -67,7 +67,7 @@ function harness(rem = 15, language: 'ko' | 'en' = 'ko') {
 test('background and font size each expose three visual choices and save immediately', () => {
   const ui = harness();
   const tree = ui.render();
-  const options = nodes(tree, 'Option');
+  const options = nodes(tree, 'Option').filter((option) => option.props.className.includes('h-[5.666667rem]'));
   assert.equal(options.length, 6);
   assert.deepEqual(
     options.map((option) => option.props.accessibilityLabel),
@@ -96,7 +96,7 @@ test('background and font size each expose three visual choices and save immedia
       option.props.children[1].props.className.split(' ').includes('leading-5'),
     ),
   );
-  const previews = nodes(tree, 'Text').filter((text) => text.props.children === '가나다');
+  const previews = nodes(tree, 'Text').filter((text) => text.props.children === '가나다' && text.props.size !== undefined);
   assert.equal(previews.length, 3);
   for (const [index, size] of [13, 17, 23].entries()) {
     assert.equal(previews[index].props.size, size);
@@ -151,7 +151,7 @@ test('font previews keep fixed sizes and line heights at every app root size', (
     [16, 'large'],
   ] as const) {
     const tree = harness(rem).render({ fontSize });
-    const previews = nodes(tree, 'Text').filter((text) => text.props.children === '가나다');
+    const previews = nodes(tree, 'Text').filter((text) => text.props.children === '가나다' && text.props.size !== undefined);
     assert.deepEqual(
       previews.map((preview) => preview.props.size),
       [13, 17, 23],
@@ -172,7 +172,7 @@ test('appearance selections and right-side labels follow persisted settings', ()
     emotionStyle: 'simple',
     themeAccent: 'purple',
   });
-  const options = nodes(tree, 'Option');
+  const options = nodes(tree, 'Option').filter((option) => option.props.className.includes('h-[5.666667rem]'));
   assert.deepEqual(
     options
       .filter((option) => option.props.selected)
@@ -193,7 +193,7 @@ test('appearance selections and right-side labels follow persisted settings', ()
       ),
     );
   }
-  const colors = nodes(tree, 'Pressable');
+  const colors = nodes(tree, 'Pressable').filter((node) => node.props.accessibilityState);
   assert.equal(colors.length, 6);
   assert.equal(colors.filter((color) => color.props.accessibilityState.checked).length, 1);
   colors.find((color) => color.props.accessibilityLabel === '초록 강조 색상')!.props.onPress();
@@ -202,7 +202,7 @@ test('appearance selections and right-side labels follow persisted settings', ()
   assert.equal(emotion.props.value, 'simple');
   emotion.props.onChange('emoji');
   assert.equal(ui.changed[1].emotionStyle, 'emoji');
-  const updated = nodes(ui.render({ themeMode: 'dark', fontSize: 'small' }), 'Option');
+  const updated = nodes(ui.render({ themeMode: 'dark', fontSize: 'small' }), 'Option').filter((option) => option.props.className.includes('h-[5.666667rem]'));
   assert.deepEqual(
     updated
       .filter((option) => option.props.selected)
@@ -215,7 +215,7 @@ test('all appearance choices disable during saves and retain the existing dimmin
   const ui = harness();
   for (const dimmed of [true, false]) {
     const tree = ui.render({}, true, dimmed);
-    const options = nodes(tree, 'Option');
+    const options = nodes(tree, 'Option').filter((option) => option.props.className.includes('h-[5.666667rem]'));
     assert(options.every((option) => option.props.disabled));
     assert(
       options.every((option) =>
@@ -246,4 +246,15 @@ test('English appearance labels preserve the existing theme and font choices', (
     assert(text.includes(label), label);
   }
   assert(nodes(tree, 'Option').every((option) => !/[가-힣]/.test(option.props.accessibilityLabel)));
+});
+
+ test('font family choices preview their own font and persist each selection', () => {
+  const ui = harness();
+  const options = nodes(ui.render({ fontFamily: 'suit' }), 'Option').filter((option) => ['타입1', '타입2', '타입3'].includes(option.props.accessibilityLabel));
+  assert.equal(options.length, 3);
+  assert(nodes(ui.render({ fontFamily: 'suit' }), 'Text').some((text) => text.props.children === '타입2' && text.props.className.includes('ml-auto')));
+  assert.deepEqual(options.map((option) => option.props.selected), [false, true, false]);
+  assert.deepEqual(options.map((option) => option.props.children[0].props.style.fontFamily), ['Tmoney', 'SUITRegular', 'MaruBuriRegular']);
+  options.forEach((option) => option.props.onPress());
+  assert.deepEqual(ui.changed.map((patch) => patch.fontFamily), ['tmoney', 'suit', 'maruburi']);
 });
