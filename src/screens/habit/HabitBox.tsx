@@ -1,3 +1,4 @@
+import { ScrollableName } from '../../components/ScrollableName';
 import { formatDisplayDate } from '../../i18n/format';
 import { useI18n } from '../../i18n/react';
 import { Pressable, View } from 'react-native';
@@ -51,9 +52,9 @@ export function HabitBox({
           >
             <HabitIcon name={habit.icon_key} colorKey={habit.icon_color} size={appRem * 1.875} />
           </View>
-          <Text numberOfLines={1} className="w-full text-base text-center font-semibold">
+          <ScrollableName className="text-base text-center font-semibold">
             {habit.name}
-          </Text>
+          </ScrollableName>
           <View className="h-5 items-center justify-center">
             {excluded ? (
               <Text className="h-5 text-sm leading-5 text-center text-theme-text-secondary">

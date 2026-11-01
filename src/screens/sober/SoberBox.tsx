@@ -1,3 +1,4 @@
+import { ScrollableName } from '../../components/ScrollableName';
 import { formatSoberDuration, formatSoberGoal } from '../../i18n/sober';
 import { useI18n } from '../../i18n/react';
 import { Pressable, View } from 'react-native';
@@ -45,9 +46,9 @@ export function SoberBox({
           onPress={() => openModal(`/sober/${sober.id}`)}
           className="min-h-11 min-w-0 flex-1 flex-row items-center gap-2"
         >
-          <Text numberOfLines={1} className="min-w-0 shrink text-base font-semibold">
-            {sober.name}
-          </Text>
+          <View className="min-w-0 flex-1">
+            <ScrollableName className="text-base font-semibold">{sober.name}</ScrollableName>
+          </View>
           {sober.is_priority ? (
             <View className="shrink-0">
               <StarIcon size={appRem * 1.125} color={colors.textPrimary} />

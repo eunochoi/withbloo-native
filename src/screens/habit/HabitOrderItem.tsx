@@ -1,9 +1,9 @@
+import { ScrollableName } from '../../components/ScrollableName';
 import { useI18n } from '../../i18n/react';
 import { AppIcon } from '../../components/AppIcon';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 import { View } from 'react-native';
 import Sortable from 'react-native-sortables';
-import { Text } from '../../components/Text';
 import type { Habit } from '../../db/types';
 import { HabitStars } from './HabitStars';
 
@@ -28,9 +28,9 @@ export function HabitOrderItem({
       <View className="w-20">
         <HabitStars priority={habit.priority} size={appRem} />
       </View>
-      <Text numberOfLines={1} className="flex-1 min-w-0 text-sm font-medium">
-        {habit.name}
-      </Text>
+      <View className="min-w-0 flex-1">
+        <ScrollableName className="text-sm font-medium">{habit.name}</ScrollableName>
+      </View>
       <Sortable.Handle>
         <View
           accessible

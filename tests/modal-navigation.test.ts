@@ -123,6 +123,7 @@ function harness() {
     '../../components/AppIcon': { AppIcon: 'AppIcon' },
     '../../components/HabitIcon': { HabitIcon: 'HabitIcon' },
     '../../components/Text': { Text: 'Text' },
+    '../../components/ScrollableName': { ScrollableName: 'ScrollableName' },
     '../../domain/constants': { resolveIconColor: () => '#123456' },
     '../../domain/date': require('../src/domain/date.ts'),
     '../../theme/AppThemeProvider': {

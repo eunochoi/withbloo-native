@@ -1,3 +1,4 @@
+import { ScrollableName } from '../../../src/components/ScrollableName';
 import { formatDisplayDate } from '../../../src/i18n/format';
 import { useI18n } from '../../../src/i18n/react';
 import { useQuery } from '@tanstack/react-query';
@@ -68,9 +69,11 @@ export default function DiaryDetail() {
                         size={iconSizes.sm}
                         colorKey={habit.icon_color}
                       />
-                      <Text numberOfLines={1} className="shrink text-sm text-theme-text-secondary">
-                        {habit.name}
-                      </Text>
+                      <View className="min-w-0 shrink">
+                        <ScrollableName className="text-sm text-theme-text-secondary">
+                          {habit.name}
+                        </ScrollableName>
+                      </View>
                     </View>
                   ))}
                 </View>
