@@ -44,7 +44,7 @@ export function SoberMenu({
         accessibilityState={{ disabled: disabled || mutation.isPending }}
         disabled={disabled || mutation.isPending}
         onPress={() => setOpen(true)}
-        className="h-11 w-8 items-center justify-center"
+        className="-mr-3.5 h-11 w-8 items-center justify-center"
       />
       <BottomSheetModal visible={open} title={sober.name} onClose={() => setOpen(false)}>
         {(close) => (

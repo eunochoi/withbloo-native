@@ -19,7 +19,7 @@ export function SoberRestartCard({
 
   const time = format(parseISO(record.restarted_at), 'HH:mm');
   return (
-    <View className="gap-2 ios:curve-continuous rounded-2xl bg-transparent border border-theme-border p-4">
+    <View className="gap-2 ios:curve-continuous rounded-2xl bg-transparent border border-theme-border/50 p-4">
       <View className="flex-row items-center justify-between gap-3">
         <Text className="text-base">{time}</Text>
         {onMenu && (
@@ -28,7 +28,7 @@ export function SoberRestartCard({
             accessibilityLabel={t('sober.restartMenu', { value: time })}
             disabled={pending}
             onPress={() => onMenu(record)}
-            className={`-mr-4 w-11 items-center justify-center ${pending ? 'opacity-40' : 'opacity-100'}`}
+            className={`w-11 items-center justify-center ${pending ? 'opacity-40' : 'opacity-100'}`}
           />
         )}
       </View>

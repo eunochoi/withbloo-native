@@ -42,7 +42,7 @@ export function HabitMenu({
         accessibilityState={{ expanded: open, disabled: mutation.isPending }}
         disabled={mutation.isPending}
         onPress={() => setOpen(true)}
-        className="h-9 w-8 items-center justify-center"
+        className="-mr-3.5 h-9 w-8 items-center justify-center"
       />
       <BottomSheetModal visible={open} title={habit.name} onClose={() => setOpen(false)}>
         {(closePicker) => (

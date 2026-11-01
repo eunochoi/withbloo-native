@@ -1,3 +1,4 @@
+import { twMerge } from 'tailwind-merge';
 import { Pressable, type PressableProps } from 'react-native';
 import { useAppTheme } from '../theme/AppThemeProvider';
 import { AppIcon } from './AppIcon';
@@ -13,7 +14,7 @@ export function RecordMenuButton({
     <Pressable
       {...props}
       accessibilityRole="button"
-      className={`${className ?? ''} ${align === 'left' ? '-ml-2' : '-mr-2'}`}
+      className={twMerge(align === 'left' ? '-ml-5' : '-mr-5', className)}
     >
       <AppIcon
         name="more-vert"
