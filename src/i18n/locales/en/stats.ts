@@ -1,4 +1,12 @@
 export const statsEn = {
+  summaryTitle: 'Record summary',
+  monthlyTitle: 'Monthly records',
+  flowTitle: 'Last 7 days',
+  distributionTitle: 'Duration distribution',
+  recentAverage: '7-day average',
+  previousAverage: 'Previous 7 days',
+  flowNotice: 'The 7-day flow averages completion rates for days with eligible habits.',
+
   diaryTitle: 'Diary records',
   currentStreak: 'Streak',
   longestStreak: 'Best streak',
@@ -6,7 +14,7 @@ export const statsEn = {
   daysUnit: 'd',
   streakNotice: 'Streaks include all dates.',
   averageNotice:
-    'Monthly avg: first entry month–%{end} in the year. Includes empty months; each month counts in full.',
+    'Monthly avg: first entry month–%{end}, including empty months.',
   averageCurrentMonth: 'this month',
   averageDecember: 'Dec',
   emotionTitle: 'Emotion records',
@@ -16,7 +24,7 @@ export const statsEn = {
   habitTitle: 'Habit records',
   topThree: 'Top 3',
   bottomThree: 'Bottom 3',
-  freeNotice: 'Free entries excluded from stats.',
+  freeNotice: 'Free entries are excluded from habit rankings and the 7-day flow.',
   soberTitle: 'Cut Back records',
   longestFirst: 'Longest first',
   shortestFirst: 'Shortest first',

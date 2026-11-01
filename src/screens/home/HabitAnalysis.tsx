@@ -1,3 +1,5 @@
+import { ScrollableName } from '../../components/ScrollableName';
+import { HabitFlowAnalysis } from './HabitFlowAnalysis';
 import { useI18n } from '../../i18n/react';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
@@ -29,6 +31,7 @@ export function HabitAnalysis({
       <AnalysisHeader title={t('stats.habitTitle')}>
         {t('stats.habitYear', { count: year })}
       </AnalysisHeader>
+      <HabitFlowAnalysis />
       <View accessibilityRole="tablist" className={UNDERLINE_TAB_LIST_CLASS_NAME}>
         {(
           [
@@ -66,9 +69,7 @@ export function HabitAnalysis({
                 <HabitIcon name={habit.icon_key} colorKey={habit.icon_color} size={appRem * 2.25} />
               </View>
               <View className="flex-1 min-w-0 gap-1">
-                <Text numberOfLines={1} className="text-base leading-relaxed">
-                  {habit.name}
-                </Text>
+                <ScrollableName className="text-base leading-relaxed">{habit.name}</ScrollableName>
                 <HabitStars
                   priority={habit.priority}
                   size={appRem}
@@ -92,9 +93,14 @@ export function HabitAnalysis({
           </Text>
         )}
       </View>
-      <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
-        {t('stats.freeNotice')}
-      </InfoNotice>
+      <View className="gap-2">
+        <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
+          {t('stats.flowNotice')}
+        </InfoNotice>
+        <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
+          {t('stats.freeNotice')}
+        </InfoNotice>
+      </View>
     </View>
   );
 }

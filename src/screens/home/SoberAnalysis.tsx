@@ -1,3 +1,6 @@
+import { ScrollableName } from '../../components/ScrollableName';
+import { AnalysisSubtitle } from './AnalysisSubtitle';
+import { getSoberSummary, SOBER_DAY_MS } from '../../domain/sober';
 import { formatSoberDuration } from '../../i18n/sober';
 import { formatDisplayDate } from '../../i18n/format';
 import { useI18n } from '../../i18n/react';
@@ -29,6 +32,20 @@ export function SoberAnalysis({ sobers, restarts }: { sobers: Sober[]; restarts:
       now,
     ).map((record) => ({ sober, record })),
   );
+  const labels =
+    language === 'ko'
+      ? ['3일 미만', '3일~1주', '1~2주', '2주~1개월', '1~3개월', '3개월 이상']
+      : ['Under 3 days', '3–7 days', '1–2 weeks', '2 weeks–1 month', '1–3 months', '3+ months'];
+  const counts = Array<number>(6).fill(0);
+  for (const sober of sobers) {
+    const duration = getSoberSummary(
+      sober,
+      restarts.filter((item) => item.sober_id === sober.id),
+      now,
+    ).duration;
+    const index = [3, 7, 14, 30, 90].findIndex((days) => duration < days * SOBER_DAY_MS);
+    counts[index < 0 ? 5 : index]++;
+  }
   const visibleRecords = records
     .sort(
       (a, b) =>
@@ -44,6 +61,56 @@ export function SoberAnalysis({ sobers, restarts }: { sobers: Sober[]; restarts:
       <AnalysisHeader title={t('stats.soberTitle')}>
         {t('stats.totalItems', { count: sobers.length })}
       </AnalysisHeader>
+      <View className="gap-4">
+        <AnalysisSubtitle>{t('stats.distributionTitle')}</AnalysisSubtitle>
+        <View className="mx-1 gap-4 rounded-theme border border-theme-accent/20 bg-theme-accent-light/50 px-4 py-6">
+          <View className="flex-row flex-wrap justify-center gap-y-4">
+            {counts.map(
+              (count, i) =>
+                count > 0 && (
+                  <View key={i} className="w-1/3 min-w-0 items-center gap-2 px-1">
+                    <View className="flex-row items-center justify-center gap-2">
+                      <View
+                        className="h-3 w-3 shrink-0 rounded-full bg-theme-accent"
+                        style={{ opacity: 0.25 + i * 0.15 }}
+                      />
+                      <Text className="shrink text-center text-sm text-theme-text-secondary">
+                        {labels[i]}
+                      </Text>
+                    </View>
+                    <View className="flex-row items-baseline gap-1">
+                      <Text className="text-2xl font-semibold">{count}</Text>
+                      <Text className="text-base text-theme-text-secondary">
+                        {language === 'ko' ? '개' : 'items'}
+                      </Text>
+                    </View>
+                  </View>
+                ),
+            )}
+          </View>
+          {!sobers.length && (
+            <Text className="text-center text-sm text-theme-text-secondary">
+              {t('stats.soberEmpty')}
+            </Text>
+          )}
+          <View
+            accessible
+            accessibilityLabel={labels.map((label, i) => `${label}: ${counts[i]}`).join(', ')}
+            className={`h-4 flex-row gap-0.5 overflow-hidden rounded-full ${sobers.length ? '' : 'bg-theme-accent/30'}`}
+          >
+            {counts.map(
+              (count, i) =>
+                count > 0 && (
+                  <View
+                    key={i}
+                    className="bg-theme-accent"
+                    style={{ flexGrow: count, flexBasis: 0, opacity: 0.25 + i * 0.15 }}
+                  />
+                ),
+            )}
+          </View>
+        </View>
+      </View>
       <View accessibilityRole="tablist" className={UNDERLINE_TAB_LIST_CLASS_NAME}>
         {(
           [
@@ -96,9 +163,9 @@ export function SoberAnalysis({ sobers, restarts }: { sobers: Sober[]; restarts:
                   />
                 </View>
                 <View className="flex-1 min-w-0 gap-1">
-                  <Text numberOfLines={1} className="text-base leading-relaxed">
+                  <ScrollableName className="text-base leading-relaxed">
                     {sober.name}
-                  </Text>
+                  </ScrollableName>
                   <Text
                     className={`text-sm ${record.current ? 'text-theme-accent' : 'text-theme-text-secondary'}`}
                   >

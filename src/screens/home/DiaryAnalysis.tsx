@@ -1,3 +1,4 @@
+import { AnalysisSubtitle } from './AnalysisSubtitle';
 import { useI18n } from '../../i18n/react';
 import { MUTED_CARD_BORDER_CLASS_NAME } from '../../theme/classes';
 import { AnalysisHeader } from './AnalysisHeader';
@@ -24,11 +25,13 @@ export function DiaryAnalysis({
       <AnalysisHeader title={t('stats.diaryTitle')}>
         {t('stats.yearCount', { title: year, count: stats.total })}
       </AnalysisHeader>
+      <AnalysisSubtitle>{t('stats.summaryTitle')}</AnalysisSubtitle>
       <DiaryStatisticsSummary
         current={stats.current}
         longest={stats.longest}
         monthlyAverage={stats.monthlyAverage}
       />
+      <AnalysisSubtitle>{t('stats.monthlyTitle')}</AnalysisSubtitle>
       <View
         className={`${MUTED_CARD_BORDER_CLASS_NAME} mx-1 px-4 py-4 flex-row bg-theme-surface-muted/60 ios:curve-continuous rounded-theme`}
       >

@@ -1,4 +1,12 @@
 export const statsKo = {
+  summaryTitle: '기록 요약',
+  monthlyTitle: '월별 기록',
+  flowTitle: '최근 7일 흐름',
+  distributionTitle: '유지 기간 분포',
+  recentAverage: '최근 7일 평균',
+  previousAverage: '이전 7일',
+  flowNotice: '7일 흐름은 습관이 있었던 날의 실천율을 평균으로 계산해요.',
+
   diaryTitle: '일기 기록',
   currentStreak: '현재 연속 기록',
   longestStreak: '역대 최고 기록',
@@ -6,7 +14,7 @@ export const statsKo = {
   daysUnit: '일',
   streakNotice: '연속·최고 기록은 전체 기간 기준이에요.',
   averageNotice:
-    '월평균: 해당 연도 첫 기록 월부터 %{end}까지 계산해요. 기록 없는 달·진행 중인 달도 1개월로 포함해요.',
+    '월평균: 첫 기록 월~%{end}, 빈 달 포함.',
   averageCurrentMonth: '이번 달',
   averageDecember: '12월',
   emotionTitle: '감정 기록',
@@ -16,7 +24,7 @@ export const statsKo = {
   habitTitle: '습관 기록',
   topThree: '상위 Top 3',
   bottomThree: '하위 Top 3',
-  freeNotice: '자유 기록은 습관 기록 집계에 포함되지 않아요.',
+  freeNotice: '습관 순위와 7일 흐름에는 자유 기록이 포함되지 않아요.',
   soberTitle: '거리두기 기록',
   longestFirst: '오래 유지한 순',
   shortestFirst: '짧게 유지한 순',

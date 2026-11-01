@@ -73,6 +73,8 @@ function section(path: string, name: string, initialProps: Record<string, unknow
           return { useCurrentMinute: () => Date.parse('2024-01-11T00:00:00Z') };
         if (dependency.endsWith('/UnderlineTab')) return { UnderlineTab: 'UnderlineTab' };
         if (dependency.endsWith('/AnalysisHeader')) return { AnalysisHeader: 'AnalysisHeader' };
+        if (dependency.endsWith('/AnalysisSubtitle')) return { AnalysisSubtitle: 'AnalysisSubtitle' };
+        if (dependency.endsWith('/ScrollableName')) return { ScrollableName: 'Text' };
         const habitPart = dependency.split('/').at(-1)!;
         if (['HabitStatisticsSummary', 'HabitYearHeader', 'HabitYearChart'].includes(habitPart)) {
           const child = section(`src/screens/habit/${habitPart}.tsx`, habitPart, {});

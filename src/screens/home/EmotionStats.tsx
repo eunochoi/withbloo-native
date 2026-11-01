@@ -86,7 +86,7 @@ export function EmotionStats({
                 )
                 .join(', '),
             })}
-            className={`h-2 flex-row gap-0.5 overflow-hidden rounded-full ${total ? '' : 'bg-theme-accent/30'}`}
+            className={`h-4 flex-row gap-0.5 overflow-hidden rounded-full ${total ? '' : 'bg-theme-accent/30'}`}
           >
             {groups
               .filter((group) => group.count > 0)
