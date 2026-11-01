@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Keyboard, Pressable, TextInput, View } from 'react-native';
+import { Image, Keyboard, Pressable, TextInput, View } from 'react-native';
 import { AppIcon } from '../components/AppIcon';
 import { BottomSheetPage } from '../components/BottomSheetPage';
 import { CharacterCount } from '../components/CharacterCount';
@@ -17,6 +17,7 @@ import { Text } from '../components/Text';
 import { EMOTIONS } from '../domain/constants';
 import { isDate } from '../domain/date';
 import { DIARY_IMAGE_MAX_COUNT, DIARY_TEXT_MAX_LENGTH } from '../domain/limits';
+import { DIARY_EMOTION_GROUPS } from '../domain/diaryFilters';
 import {
   discardDraftImages,
   mediaUri,
@@ -30,6 +31,10 @@ import { FORM_TEXT_INPUT_CLASS_NAME, SECTION_TITLE_CLASS_NAME } from '../theme/c
 import { DiaryDatePicker } from './diary/DiaryDatePicker';
 import { DiaryEmotionPicker } from './diary/DiaryEmotionPicker';
 import { DiaryImagesPicker } from './diary/DiaryImagesPicker';
+
+const neutralCat = require('../../assets/cats/cat-blue.png');
+const positiveCat = require('../../assets/cats/cat-blue-p.png');
+const negativeCat = require('../../assets/cats/cat-blue-n.png');
 
 export function DiaryForm({
   id,
@@ -120,6 +125,11 @@ export function DiaryForm({
     });
   }, []);
   const title = date ? formatDisplayDate(date, formatLocale, 'form') : t('diary.datePrompt');
+  const cat = (DIARY_EMOTION_GROUPS.positive.emotions as readonly number[]).includes(emotion ?? -1)
+    ? positiveCat
+    : (DIARY_EMOTION_GROUPS.negative.emotions as readonly number[]).includes(emotion ?? -1)
+      ? negativeCat
+      : neutralCat;
   const onClosed = saved
     ? () =>
         showNotice({
@@ -282,11 +292,11 @@ export function DiaryForm({
           </Pressable>
         </View>
       )}
-      <View className="shrink min-h-0 gap-3 pt-2">
+      <View className="flex-1 min-h-0 gap-3 pt-2">
         <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
           {t('diary.storyTitle')}
         </Text>
-        <View className="shrink min-h-0 gap-3 p-1">
+        <View className="flex-1 min-h-0 gap-3 p-1">
           <TextInput
             accessibilityLabel={t('diary.content')}
             multiline
@@ -301,7 +311,7 @@ export function DiaryForm({
             placeholder={t('diary.placeholder')}
             placeholderTextColor={colors.tertiary}
             textAlignVertical="top"
-            className={`shrink min-h-0 pb-6 ${FORM_TEXT_INPUT_CLASS_NAME}`}
+            className={`flex-1 min-h-0 pb-6 ${FORM_TEXT_INPUT_CLASS_NAME}`}
             style={{ height: Math.max(appRem * 12, textHeight) }}
           />
           <CharacterCount length={text.length} maxLength={DIARY_TEXT_MAX_LENGTH} />
@@ -325,6 +335,11 @@ export function DiaryForm({
           </Text>
           <AppIcon name="chevron-right" size={iconSizes.md} className="text-theme-text-secondary" />
         </Pressable>
+      )}
+      {!keyboardVisible && (
+        <View className="shrink-0 items-center pt-2" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          <Image source={cat} resizeMode="contain" style={{ width: appRem * 11, height: appRem * 11 }} />
+        </View>
       )}
     </RecordFormLayout>
   );

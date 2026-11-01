@@ -163,7 +163,7 @@ export function BottomSheetModal({
             onScroll: motion.onScroll,
           })
         ) : fillContent ? (
-          <View className={`${fixedHeight ? 'flex-1' : 'shrink'} min-h-0 pt-6 pb-4`}>
+          <View className={`${fixedHeight ? 'flex-1' : 'shrink'} min-h-0 pt-6`}>
             {typeof children === 'function' ? children(closeSheet) : children}
           </View>
         ) : (
