@@ -10,7 +10,7 @@ import {
 } from '../domain/limits';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-export const SCHEMA_VERSION = 7;
+export const SCHEMA_VERSION = 8;
 const DIARY_COLUMNS = `
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   date TEXT NOT NULL UNIQUE CHECK(length(date) = 10),
@@ -23,6 +23,19 @@ const HABIT_COLUMNS = `
   priority INTEGER NOT NULL CHECK(priority BETWEEN 0 AND 3),
   icon_key TEXT NOT NULL, icon_color TEXT NOT NULL DEFAULT '${DEFAULT_HABIT_ICON_COLOR}', initial_started_at TEXT NOT NULL,
   created_at TEXT NOT NULL, updated_at TEXT NOT NULL`;
+const SOBER_COLUMNS = `
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ name TEXT NOT NULL UNIQUE CHECK(length(trim(name)) BETWEEN 1 AND ${SOBER_NAME_MAX_LENGTH}),
+ description TEXT CHECK(description IS NULL OR length(description) <= ${SOBER_DESCRIPTION_MAX_LENGTH}),
+ icon_key TEXT NOT NULL,
+ icon_color TEXT NOT NULL DEFAULT '${DEFAULT_HABIT_ICON_COLOR}',
+ is_priority INTEGER NOT NULL DEFAULT 0 CHECK(is_priority IN (0, 1)),
+ initial_started_at TEXT NOT NULL,
+ goal_mode TEXT NOT NULL CHECK(goal_mode IN ('AUTO', 'MANUAL')),
+ goal_days INTEGER,
+ created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+ CHECK((goal_mode = 'AUTO' AND goal_days IS NULL) OR (goal_mode = 'MANUAL' AND goal_days IS NOT NULL AND goal_days BETWEEN 1 AND ${SOBER_MAX_GOAL_DAYS}))
+`;
 const SCHEMA = `
 CREATE TABLE diaries (${DIARY_COLUMNS}
 );
@@ -43,18 +56,7 @@ CREATE TABLE diary_images (
 );
 CREATE TABLE settings (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL);
 
-CREATE TABLE sobers (
- id INTEGER PRIMARY KEY AUTOINCREMENT,
- name TEXT NOT NULL UNIQUE CHECK(length(trim(name)) BETWEEN 1 AND ${SOBER_NAME_MAX_LENGTH}),
- description TEXT CHECK(description IS NULL OR length(description) <= ${SOBER_DESCRIPTION_MAX_LENGTH}),
- icon_key TEXT NOT NULL,
- icon_color TEXT NOT NULL DEFAULT '${DEFAULT_HABIT_ICON_COLOR}',
- is_priority INTEGER NOT NULL DEFAULT 0 CHECK(is_priority IN (0, 1)),
- initial_started_at TEXT NOT NULL,
- goal_mode TEXT NOT NULL CHECK(goal_mode IN ('AUTO', 'MANUAL')),
- goal_days INTEGER,
- created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
- CHECK((goal_mode = 'AUTO' AND goal_days IS NULL) OR (goal_mode = 'MANUAL' AND goal_days IS NOT NULL AND goal_days BETWEEN 1 AND ${SOBER_MAX_GOAL_DAYS}))
+CREATE TABLE sobers (${SOBER_COLUMNS}
 );
 CREATE TABLE sober_restarts (
  id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,24 +75,36 @@ export async function initializeDatabase(db: SQLiteDatabase) {
   const version =
     (await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version'))?.user_version ?? 0;
   if (version === SCHEMA_VERSION) return;
-  if (version !== 0 && version !== 5 && version !== 6)
+  if (version !== 0 && version !== 5 && version !== 6 && version !== 7)
     throw new Error('지원하지 않는 DB 버전입니다.');
   // Rebuild CHECK constraints while preserving ids, sequences and child records.
   // Disable foreign keys before BEGIN to prevent cascading photo/completion deletion.
   if (version !== 0) await db.execAsync('PRAGMA foreign_keys = OFF;');
   try {
     await db.withTransactionAsync(async () => {
-      if (version === 5) {
+      if (version !== 0) {
         await db.execAsync(`
           CREATE TABLE habits_next (${HABIT_COLUMNS});
           INSERT INTO habits_next (id, name, priority, icon_key, icon_color, initial_started_at, created_at, updated_at)
             SELECT id, name, priority, icon_key, icon_color, initial_started_at, created_at, updated_at FROM habits;
+          INSERT INTO sqlite_sequence(name, seq) SELECT 'habits_next', seq FROM sqlite_sequence WHERE name = 'habits' AND NOT EXISTS (SELECT 1 FROM sqlite_sequence WHERE name = 'habits_next');
           UPDATE sqlite_sequence SET seq = MAX(seq, COALESCE((SELECT seq FROM sqlite_sequence WHERE name = 'habits'), 0)) WHERE name = 'habits_next';
           DROP TABLE habits;
           ALTER TABLE habits_next RENAME TO habits;
         `);
       }
       if (version !== 0) {
+        await db.execAsync(`
+          CREATE TABLE sobers_next (${SOBER_COLUMNS});
+          INSERT INTO sobers_next (id, name, description, icon_key, icon_color, is_priority, initial_started_at, goal_mode, goal_days, created_at, updated_at)
+            SELECT id, name, description, icon_key, icon_color, is_priority, initial_started_at, goal_mode, goal_days, created_at, updated_at FROM sobers;
+          INSERT INTO sqlite_sequence(name, seq) SELECT 'sobers_next', seq FROM sqlite_sequence WHERE name = 'sobers' AND NOT EXISTS (SELECT 1 FROM sqlite_sequence WHERE name = 'sobers_next');
+          UPDATE sqlite_sequence SET seq = MAX(seq, COALESCE((SELECT seq FROM sqlite_sequence WHERE name = 'sobers'), 0)) WHERE name = 'sobers_next';
+          DROP TABLE sobers;
+          ALTER TABLE sobers_next RENAME TO sobers;
+        `);
+      }
+      if (version === 5 || version === 6) {
         await db.execAsync(`
           CREATE TABLE diaries_next (${DIARY_COLUMNS});
           INSERT INTO diaries_next (id, date, emotion, text, created_at, updated_at)
@@ -99,10 +113,11 @@ export async function initializeDatabase(db: SQLiteDatabase) {
           DROP TABLE diaries;
           ALTER TABLE diaries_next RENAME TO diaries;
         `);
-        if ((await db.getAllAsync('PRAGMA foreign_key_check')).length)
-          throw new Error('기록의 연결을 확인하지 못했습니다.');
-      } else {
+      }
+      if (version === 0) {
         await db.execAsync(SCHEMA);
+      } else if ((await db.getAllAsync('PRAGMA foreign_key_check')).length) {
+        throw new Error('기록의 연결을 확인하지 못했습니다.');
       }
       await db.execAsync(`PRAGMA user_version = ${SCHEMA_VERSION};`);
     });

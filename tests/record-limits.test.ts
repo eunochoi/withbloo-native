@@ -38,6 +38,7 @@ test('habit and sober saves accept maximum name length and reject one extra char
 
 test('habit and sober item limits still allow editing existing items when full', async () => {
   const { db, raw } = await database();
+  assert.equal(MAX_HABIT_COUNT, 20);
   for (let i = 0; i < MAX_HABIT_COUNT; i++)
     await saveHabit(db, { name: `습관${i}`, priority: 1, icon_key: 'goal' });
   for (let i = 0; i < MAX_SOBER_COUNT; i++)

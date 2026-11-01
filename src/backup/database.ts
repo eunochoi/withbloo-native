@@ -29,6 +29,7 @@ export async function readBackupDatabase(
   if (
     version?.user_version !== 5 &&
     version?.user_version !== 6 &&
+    version?.user_version !== 7 &&
     version?.user_version !== SCHEMA_VERSION
   )
     throw new Error('지원하지 않는 DB 버전입니다.');

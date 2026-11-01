@@ -160,6 +160,7 @@ export async function extractBackupArchive(
       (manifest.version !== 1 && manifest.version !== 2) ||
       (manifest.schemaVersion !== 5 &&
         manifest.schemaVersion !== 6 &&
+        manifest.schemaVersion !== 7 &&
         manifest.schemaVersion !== SCHEMA_VERSION) ||
       typeof manifest.createdAt !== 'string' ||
       !Number.isFinite(Date.parse(manifest.createdAt)) ||
