@@ -21,9 +21,9 @@ function ViewToggleExample({ leftText, rightText }: { leftText: string; rightTex
       accessibilityLabel={`${leftText} / ${rightText}`}
       className={`${exampleClassName} items-center justify-between`}
     >
-      <Text className="flex-1 text-center text-base font-semibold">{leftText}</Text>
+      <Text autoLineHeight className="flex-1 text-center text-[13px] font-semibold">{leftText}</Text>
       <ArrowsLeftRightIcon size={rem * 1.125} color={colors.textTertiary} weight="bold" />
-      <Text className="flex-1 text-center text-base font-semibold">{rightText}</Text>
+      <Text autoLineHeight className="flex-1 text-center text-[13px] font-semibold">{rightText}</Text>
     </View>
   );
 }
@@ -35,7 +35,7 @@ export function UsagePage() {
       description={t('onboarding.usageDescription')}
     >
       <View className={sectionClassName}>
-        <Text className={sectionTitleClassName}>{t('onboarding.tapAgain')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('onboarding.tapAgain')}</Text>
         <View className={sectionContentClassName}>
           <Image
             source={navigationPreview}
@@ -44,27 +44,27 @@ export function UsagePage() {
             className="w-full"
             style={{ height: 'auto', aspectRatio: navigationSize.width / navigationSize.height }}
           />
-          <Text className={sectionTextClassName}>{t('onboarding.tapDescription')}</Text>
+          <Text autoLineHeight className={sectionTextClassName}>{t('onboarding.tapDescription')}</Text>
         </View>
       </View>
       <View className={sectionClassName}>
-        <Text className={sectionTitleClassName}>{t('onboarding.durationTitle')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('onboarding.durationTitle')}</Text>
         <View className={sectionContentClassName}>
           <ViewToggleExample
             leftText={t('onboarding.durationLeft')}
             rightText={t('onboarding.durationRight')}
           />
-          <Text className={sectionTextClassName}>{t('onboarding.durationDescription')}</Text>
+          <Text autoLineHeight className={sectionTextClassName}>{t('onboarding.durationDescription')}</Text>
         </View>
       </View>
       <View className={sectionClassName}>
-        <Text className={sectionTitleClassName}>{t('onboarding.longNameTitle')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('onboarding.longNameTitle')}</Text>
         <View className={sectionContentClassName}>
           <ViewToggleExample
             leftText={t('onboarding.longNameLeft')}
             rightText={t('onboarding.longNameRight')}
           />
-          <Text className={sectionTextClassName}>{t('onboarding.longNameDescription')}</Text>
+          <Text autoLineHeight className={sectionTextClassName}>{t('onboarding.longNameDescription')}</Text>
         </View>
       </View>
     </OnboardingFrame>

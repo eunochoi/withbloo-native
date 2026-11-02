@@ -11,14 +11,14 @@ export function StartPage() {
   const { showNotice } = useNotice();
   return (
     <View className="w-full grow justify-evenly items-center gap-4 px-6 py-6">
-      <Text accessibilityRole="header" className="text-center text-3xl font-semibold">
+      <Text autoLineHeight accessibilityRole="header" className="text-center text-[24px] font-semibold">
         {t('onboarding.startTitle')}
       </Text>
       <View className="w-full items-center gap-2">
-        <Text className="text-center text-lg text-theme-text-secondary">
+        <Text autoLineHeight className="text-center text-[15px] text-theme-text-secondary">
           {t('onboarding.startLine1')}
         </Text>
-        <Text className="text-center text-lg text-theme-text-secondary">
+        <Text autoLineHeight className="text-center text-[15px] text-theme-text-secondary">
           {t('onboarding.startLine2')}
         </Text>
       </View>
@@ -33,10 +33,10 @@ export function StartPage() {
         <Wordmark size={36 * 1.35} />
       </View>
       <View className="w-full items-center gap-2">
-        <Text className="text-center text-lg text-theme-text-secondary">
+        <Text autoLineHeight className="text-center text-[15px] text-theme-text-secondary">
           {t('onboarding.startSummary')}
         </Text>
-        <Text className="mt-2 text-center text-base text-theme-accent-deep">
+        <Text autoLineHeight className="mt-2 text-center text-[13px] text-theme-accent-deep">
           {t('onboarding.brandTagline')}
         </Text>
       </View>
@@ -49,7 +49,7 @@ export function StartPage() {
         }}
         className="min-h-12 flex-row items-center gap-2 rounded-xl"
       >
-        <Text className="text-base text-theme-text-secondary/75">{t('onboarding.browseWeb')}</Text>
+        <Text autoLineHeight className="text-[13px] text-theme-text-secondary/75">{t('onboarding.browseWeb')}</Text>
         <AppIcon name="arrow-forward" className="text-theme-text-secondary" />
       </Pressable>
     </View>

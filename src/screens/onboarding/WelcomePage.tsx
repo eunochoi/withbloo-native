@@ -15,16 +15,16 @@ export function WelcomePage() {
   return (
     <View className="w-full max-w-lg grow self-center justify-evenly gap-6 px-6 py-6">
       <View className="shrink-0 gap-1 items-center">
-        <Text
+        <Text autoLineHeight
           accessibilityRole="header"
-          className="mb-4 text-center text-3xl font-semibold tracking-tight"
+          className="mb-4 text-center text-[24px] font-semibold tracking-tight"
         >
           {t('onboarding.welcomeTitle')}
         </Text>
-        <Text className="text-center text-base text-theme-text-secondary">
+        <Text autoLineHeight className="text-center text-[13px] text-theme-text-secondary">
           {t('onboarding.welcomeLine1')}
         </Text>
-        <Text className="text-center text-base text-theme-text-secondary">
+        <Text autoLineHeight className="text-center text-[13px] text-theme-text-secondary">
           {t('onboarding.welcomeLine2')}
         </Text>
       </View>
@@ -44,7 +44,7 @@ export function WelcomePage() {
               fillOpacity={0.2}
             />
           </Svg>
-          <Text accessibilityLiveRegion="polite" className="text-center text-base">
+          <Text autoLineHeight accessibilityLiveRegion="polite" className="text-center text-[13px]">
             {t(`onboarding.${moods[mood].key}Story`)}
           </Text>
         </View>
@@ -74,8 +74,8 @@ export function WelcomePage() {
                 className="h-3 w-3 shrink-0 rounded-full"
                 style={{ backgroundColor: item.color }}
               />
-              <Text
-                className={`text-base ${mood === index ? 'font-semibold text-theme-accent-text' : 'text-theme-text-primary'}`}
+              <Text autoLineHeight
+                className={`text-[13px] ${mood === index ? 'font-semibold text-theme-accent-text' : 'text-theme-text-primary'}`}
               >
                 {t(`onboarding.${item.key}`)}
               </Text>
@@ -84,16 +84,16 @@ export function WelcomePage() {
         </View>
       </View>
       <View className="items-center gap-1">
-        <Text className="mb-2 text-center text-xl font-semibold leading-7">
+        <Text autoLineHeight className="mb-2 text-center text-[16px] font-semibold">
           {t('onboarding.everyColor')}
         </Text>
-        <Text className="text-center text-base text-theme-text-secondary">
+        <Text autoLineHeight className="text-center text-[13px] text-theme-text-secondary">
           {t('onboarding.welcomeSummaryLine1')}
         </Text>
-        <Text className="text-center text-base text-theme-text-secondary">
+        <Text autoLineHeight className="text-center text-[13px] text-theme-text-secondary">
           {t('onboarding.welcomeSummaryLine2')}
         </Text>
-        <Text className="mt-2 text-center text-base text-theme-accent-deep">
+        <Text autoLineHeight className="mt-2 text-center text-[13px] text-theme-accent-deep">
           {t('onboarding.brandTagline')}
         </Text>
       </View>

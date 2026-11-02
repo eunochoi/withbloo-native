@@ -121,9 +121,9 @@ export function OnboardingSheet({
       footer={(close) => (
         <View className="w-full max-w-lg self-center gap-2 px-1 pt-4">
           {!!error && (
-            <Text
+            <Text autoLineHeight
               accessibilityRole="alert"
-              className="text-[14px] leading-[21px] text-theme-danger"
+              className="text-[14px] text-theme-danger"
             >
               {error}
             </Text>
@@ -132,9 +132,10 @@ export function OnboardingSheet({
             {!isFirst && (
               <View className="min-w-0 flex-1 basis-0">
                 <Button
+                  autoLineHeight
                   label={t('common.previous')}
                   labelSize="lg"
-                  labelClassName="text-[15.75px] leading-[24.5px]"
+                  labelClassName="text-[16px]"
                   subtle
                   outline
                   disabled={busy}
@@ -145,8 +146,9 @@ export function OnboardingSheet({
             )}
             <View className="min-w-0 flex-1 basis-0">
               <Button
+                autoLineHeight
                 labelSize="lg"
-                labelClassName="text-[15.75px] leading-[24.5px]"
+                labelClassName="text-[16px]"
                 label={
                   busy
                     ? t('common.saving')

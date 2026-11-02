@@ -17,18 +17,18 @@ export function OnboardingFrame({
   return (
     <View className="w-full max-w-lg grow self-center gap-12 px-6 py-6">
       <View className="shrink-0 gap-2">
-        <Text
+        <Text autoLineHeight
           accessibilityRole="header"
-          className="text-center text-2xl font-semibold leading-7 tracking-tight"
+          className="text-center text-[20px] font-semibold tracking-tight"
         >
           {title}
         </Text>
-        <Text className="text-center text-base text-theme-text-secondary">{description}</Text>
+        <Text autoLineHeight className="text-center text-[13px] text-theme-text-secondary">{description}</Text>
       </View>
       <View className="shrink-0 gap-8">
         {children}
         {info && (
-          <InfoNotice textClassName="text-xs" adjustsFontSizeToFit={false} numberOfLines={0}>
+          <InfoNotice autoLineHeight textClassName="text-[10px]" adjustsFontSizeToFit={false} numberOfLines={0}>
             {info}
           </InfoNotice>
         )}

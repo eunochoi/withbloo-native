@@ -4,9 +4,10 @@ import { Text as NativeText, type TextProps } from 'react-native';
 export function Text({
   style,
   bold,
+  autoLineHeight = false,
   size,
   ...props
-}: TextProps & { bold?: boolean; size?: number }) {
+}: TextProps & { bold?: boolean; autoLineHeight?: boolean; size?: number }) {
   const { colors, rem: appRem, fontFamily, fontBold } = useAppTheme();
   const resolvedSize = size ?? appRem;
   const textStyle = [
@@ -14,7 +15,7 @@ export function Text({
       fontFamily: bold ? (fontBold ?? 'TmoneyBold') : (fontFamily ?? 'Tmoney'),
       color: colors.text,
       fontSize: resolvedSize,
-      lineHeight: resolvedSize * 1.5,
+      lineHeight: autoLineHeight ? undefined : resolvedSize * 1.5,
     },
     style,
   ];

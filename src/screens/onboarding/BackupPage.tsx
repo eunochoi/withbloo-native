@@ -19,34 +19,34 @@ export function BackupPage() {
       info={t('onboarding.backupNotice')}
     >
       <View className={sectionClassName}>
-        <Text className={sectionTitleClassName}>{t('onboarding.webTitle')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('onboarding.webTitle')}</Text>
         <View className={sectionContentClassName}>
           <View className={`${exampleClassName} items-center justify-center gap-4`}>
             <Wordmark size={36 * 1.35} />
-            <Text className="text-2xl font-semibold">-</Text>
-            <Text className="text-2xl font-semibold">Web</Text>
+            <Text autoLineHeight className="text-[20px] font-semibold">-</Text>
+            <Text autoLineHeight className="text-[20px] font-semibold">Web</Text>
           </View>
-          <Text className={sectionTextClassName}>{t('onboarding.webDescription')}</Text>
-          <Text className={sectionTextClassName}>{t('onboarding.webBackupDescription')}</Text>
+          <Text autoLineHeight className={sectionTextClassName}>{t('onboarding.webDescription')}</Text>
+          <Text autoLineHeight className={sectionTextClassName}>{t('onboarding.webBackupDescription')}</Text>
         </View>
       </View>
       <View className={sectionClassName}>
-        <Text className={sectionTitleClassName}>{t('onboarding.localTitle')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('onboarding.localTitle')}</Text>
         <View className={sectionContentClassName}>
           <View className={`${exampleClassName} items-center justify-center gap-4`}>
             <Wordmark size={36 * 1.35} />
-            <Text className="text-2xl font-semibold">-</Text>
-            <Text className="text-2xl font-semibold">App</Text>
+            <Text autoLineHeight className="text-[20px] font-semibold">-</Text>
+            <Text autoLineHeight className="text-[20px] font-semibold">App</Text>
           </View>
-          <Text className={sectionTextClassName}>{t('onboarding.localDescription')}</Text>
-          <Text className={sectionTextClassName}>{t('onboarding.localBackupDescription')}</Text>
+          <Text autoLineHeight className={sectionTextClassName}>{t('onboarding.localDescription')}</Text>
+          <Text autoLineHeight className={sectionTextClassName}>{t('onboarding.localBackupDescription')}</Text>
         </View>
       </View>
       <View className={sectionClassName}>
-        <Text className={sectionTitleClassName}>{t('onboarding.backupRestore')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('onboarding.backupRestore')}</Text>
         <View className={sectionContentClassName}>
-          <Text className={sectionTextClassName}>{t('onboarding.passwordDescription')}</Text>
-          <Text className={sectionTextClassName}>{t('onboarding.backupSizeDescription')}</Text>
+          <Text autoLineHeight className={sectionTextClassName}>{t('onboarding.passwordDescription')}</Text>
+          <Text autoLineHeight className={sectionTextClassName}>{t('onboarding.backupSizeDescription')}</Text>
         </View>
       </View>
     </OnboardingFrame>

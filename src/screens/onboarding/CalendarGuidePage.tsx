@@ -21,7 +21,7 @@ export function CalendarGuidePage() {
       description={t('onboarding.calendarDescription')}
     >
       <View className={sectionClassName}>
-        <Text className={sectionTitleClassName}>{t('onboarding.emotionTitle')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('onboarding.emotionTitle')}</Text>
         <View className={sectionContentClassName}>
           <View className={`${exampleClassName} justify-evenly`}>
             {[0, 3, 1, 6].map((emotion) => (
@@ -30,11 +30,11 @@ export function CalendarGuidePage() {
               </View>
             ))}
           </View>
-          <Text className={sectionTextClassName}>{t('onboarding.emotionDescription')}</Text>
+          <Text autoLineHeight className={sectionTextClassName}>{t('onboarding.emotionDescription')}</Text>
         </View>
       </View>
       <View className={sectionClassName}>
-        <Text className={sectionTitleClassName}>{t('onboarding.progressTitle')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('onboarding.progressTitle')}</Text>
         <View className={sectionContentClassName}>
           <View className={`${exampleClassName} justify-evenly gap-4`}>
             {(
@@ -45,7 +45,7 @@ export function CalendarGuidePage() {
               ] as const
             ).map((item) => (
               <View key={item.label} className="min-w-0 flex-1 gap-4">
-                <Text className="text-center text-base text-theme-text-secondary">
+                <Text autoLineHeight className="text-center text-[13px] text-theme-text-secondary">
                   {t(`onboarding.${item.label}`)}
                 </Text>
                 <View className="h-4 overflow-hidden rounded-full bg-theme-border/30">
@@ -57,16 +57,16 @@ export function CalendarGuidePage() {
               </View>
             ))}
           </View>
-          <Text className={sectionTextClassName}>{t('onboarding.progressDescription')}</Text>
+          <Text autoLineHeight className={sectionTextClassName}>{t('onboarding.progressDescription')}</Text>
         </View>
       </View>
       <View className={sectionClassName}>
-        <Text className={sectionTitleClassName}>{t('onboarding.toolbarNumbers')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('onboarding.toolbarNumbers')}</Text>
         <View className={sectionContentClassName}>
           <View className={`${exampleClassName} justify-evenly`}>
             <View className="flex-row items-center gap-1.5">
               <AppIcon name="diary" size={rem * 1.25} className="text-theme-accent" />
-              <Text className="text-base">{t('calendar.entryNumber', { count: 12 })}</Text>
+              <Text autoLineHeight className="text-[13px]">{t('calendar.entryNumber', { count: 12 })}</Text>
             </View>
             {[
               { count: 8, color: '#7BBDAD' },
@@ -75,13 +75,13 @@ export function CalendarGuidePage() {
             ].map((item) => (
               <View key={item.color} className="flex-row items-center gap-1.5">
                 <AppIcon name="habit" size={rem * 1.25} color={item.color} />
-                <Text className="text-base">
+                <Text autoLineHeight className="text-[13px]">
                   {t('calendar.compactDayCount', { count: item.count })}
                 </Text>
               </View>
             ))}
           </View>
-          <Text className={sectionTextClassName}>{t('onboarding.toolbarDescription')}</Text>
+          <Text autoLineHeight className={sectionTextClassName}>{t('onboarding.toolbarDescription')}</Text>
         </View>
       </View>
     </OnboardingFrame>

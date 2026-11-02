@@ -65,6 +65,45 @@ test('app 13/14/15px presets scale typography, spacing and dimensions consistent
   }
 });
 
+test('onboarding pixel font sizes stay fixed and do not set a line height', async () => {
+  const sizes = [10, 11, 13, 15, 16, 20, 24];
+  const classes = sizes.map((size) => `text-[${size}px]`);
+  const result = await postcss([
+    tailwind({ ...config, content: [{ raw: classes.join(' '), extension: 'html' }] }),
+  ]).process(readFileSync(new URL('../global.css', import.meta.url), 'utf8'), { from: undefined });
+  const native = cssToReactNativeRuntime(result.css, { inlineRem: false });
+  for (const [index, name] of classes.entries()) {
+    const rule = native.rules[name];
+    assert(rule && !rule.warnings?.length, `${name} must compile`);
+    const declarations = rule.n.flatMap((item: { d: unknown[][] }) => item.d);
+    assert.deepEqual(declarations, [[{ fontSize: sizes[index] }]]);
+  }
+});
+
+test('automatic text line height leaves other app text defaults intact', () => {
+  const exports: Record<string, Function> = {};
+  const source = readFileSync(new URL('../src/components/Text.tsx', import.meta.url), 'utf8');
+  const typescript = require('typescript');
+  runInNewContext(
+    typescript.transpileModule(source, {
+      compilerOptions: { module: typescript.ModuleKind.CommonJS, jsx: typescript.JsxEmit.ReactJSX },
+    }).outputText,
+    {
+      exports,
+      require: (name: string) => {
+        if (name === 'react/jsx-runtime') return { jsx: (type: unknown, props: unknown) => ({ type, props }) };
+        if (name === 'nativewind') return { cssInterop: () => {} };
+        if (name === 'react-native') return { Text: 'NativeText' };
+        if (name.endsWith('AppThemeProvider'))
+          return { useAppTheme: () => ({ colors: {}, rem: 13 }) };
+        throw new Error(`Unexpected import: ${name}`);
+      },
+    },
+  );
+  assert.equal(exports.Text({}).props.style[0].lineHeight, 19.5);
+  assert.equal(exports.Text({ autoLineHeight: true }).props.style[0].lineHeight, undefined);
+});
+
 test('theme utilities retain runtime variables and bottom spacing tracks runtime rem', async () => {
   const classes = [
     'bg-theme-surface',

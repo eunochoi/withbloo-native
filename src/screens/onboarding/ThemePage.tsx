@@ -27,7 +27,7 @@ export function ThemePage({
       info={t('onboarding.themeNotice')}
     >
       <View>
-        <Text className={sectionTitleClassName}>{t('settings.accentColor')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('settings.accentColor')}</Text>
         <View
           accessibilityRole="radiogroup"
           accessibilityLabel={t('settings.accentColor')}
@@ -57,19 +57,20 @@ export function ThemePage({
         </View>
       </View>
       <View className="gap-3">
-        <Text className={sectionTitleClassName}>{t('settings.emotionIcons')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('settings.emotionIcons')}</Text>
         <EmotionIconStyleSelector
           compact
+          autoLineHeight
           choiceClassName="h-24"
           labelSize="base"
-          labelClassName="text-base text-theme-text-primary"
+          labelClassName="text-[13px] text-theme-text-primary"
           value={settings.emotionStyle}
           disabled={busy}
           onChange={(emotionStyle) => void onChange({ emotionStyle })}
         />
       </View>
       <View className="gap-3">
-        <Text className={sectionTitleClassName}>{t('onboarding.background')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('onboarding.background')}</Text>
         <View className="flex-row gap-2">
           {(['light', 'dark', 'system'] as const).map((mode) => (
             <Pressable
@@ -83,8 +84,8 @@ export function ThemePage({
               onPress={() => void onChange({ themeMode: mode })}
               className={`${choiceClassName} flex-1 ${settings.themeMode === mode ? 'border-theme-accent bg-theme-accent-light/50' : 'border-transparent'}`}
             >
-              <Text
-                className="text-base text-theme-text-primary"
+              <Text autoLineHeight
+                className="text-[13px] text-theme-text-primary"
               >
                 {t(mode === 'light' ? 'settings.themeLight' : mode === 'dark' ? 'settings.themeDark' : 'settings.themeSystem')}
               </Text>
@@ -93,7 +94,7 @@ export function ThemePage({
         </View>
       </View>
       <View className="gap-3">
-        <Text className={sectionTitleClassName}>{t('settings.fontFamily')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('settings.fontFamily')}</Text>
         <View className="flex-row gap-2">
           {(['tmoney', 'suit', 'maruburi'] as const).map((fontFamily, index) => (
             <Pressable
@@ -105,14 +106,14 @@ export function ThemePage({
               onPress={() => void onChange({ fontFamily })}
               className={`${choiceClassName} flex-1 gap-2 ${(settings.fontFamily ?? 'tmoney') === fontFamily ? 'border-theme-accent bg-theme-accent-light/50' : 'border-transparent'}`}
             >
-              <Text style={{ fontFamily: fontFamily === 'suit' ? 'SUITRegular' : fontFamily === 'maruburi' ? 'MaruBuriRegular' : 'Tmoney' }} className="text-center text-lg">{t('settings.fontPreview')}</Text>
-              <Text className="text-center text-sm">{t(index === 0 ? 'settings.fontType1' : index === 1 ? 'settings.fontType2' : 'settings.fontType3')}</Text>
+              <Text autoLineHeight style={{ fontFamily: fontFamily === 'suit' ? 'SUITRegular' : fontFamily === 'maruburi' ? 'MaruBuriRegular' : 'Tmoney' }} className="text-center text-[15px]">{t('settings.fontPreview')}</Text>
+              <Text autoLineHeight className="text-center text-[11px]">{t(index === 0 ? 'settings.fontType1' : index === 1 ? 'settings.fontType2' : 'settings.fontType3')}</Text>
             </Pressable>
           ))}
         </View>
       </View>
       <View className="gap-3">
-        <Text className={sectionTitleClassName}>{t('onboarding.fontSize')}</Text>
+        <Text autoLineHeight className={sectionTitleClassName}>{t('onboarding.fontSize')}</Text>
         <View className="flex-row gap-2">
           {(['small', 'normal', 'large'] as const).map((size) => (
             <Pressable
@@ -124,8 +125,8 @@ export function ThemePage({
               onPress={() => void onChange({ fontSize: size })}
               className={`${choiceClassName} flex-1 ${settings.fontSize === size ? 'border-theme-accent bg-theme-accent-light/50' : 'border-transparent'}`}
             >
-              <Text
-                className="text-base text-theme-text-primary"
+              <Text autoLineHeight
+                className="text-[13px] text-theme-text-primary"
               >
                 {t(`settings.${size}`)}
               </Text>

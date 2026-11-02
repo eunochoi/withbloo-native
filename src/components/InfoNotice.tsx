@@ -11,6 +11,7 @@ export function InfoNotice({
   accent,
   className,
   textClassName,
+  autoLineHeight = false,
   adjustsFontSizeToFit = true,
   numberOfLines = 1,
 }: {
@@ -18,6 +19,7 @@ export function InfoNotice({
   accent?: ReturnType<typeof itemAccentColors>;
   className?: string;
   textClassName?: string;
+  autoLineHeight?: boolean;
   adjustsFontSizeToFit?: boolean;
   numberOfLines?: number;
 }) {
@@ -33,11 +35,12 @@ export function InfoNotice({
         />
       </View>
       <Text
+        autoLineHeight={autoLineHeight}
         style={accent ? { color: accent.text } : undefined}
         numberOfLines={numberOfLines}
         adjustsFontSizeToFit={adjustsFontSizeToFit}
         className={twMerge(
-          'flex-1 text-sm leading-5 text-theme-accent-deep tracking-tighter',
+          `flex-1 text-sm ${autoLineHeight ? '' : 'leading-5'} text-theme-accent-deep tracking-tighter`,
           textClassName,
         )}
       >

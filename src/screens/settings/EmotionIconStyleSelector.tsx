@@ -19,6 +19,7 @@ export function EmotionIconStyleSelector({
   labelSize = 'sm',
   labelClassName,
   choiceClassName,
+  autoLineHeight = false,
   onChange,
 }: {
   value: Settings['emotionStyle'];
@@ -28,6 +29,7 @@ export function EmotionIconStyleSelector({
   labelSize?: 'sm' | 'base';
   labelClassName?: string;
   choiceClassName?: string;
+  autoLineHeight?: boolean;
   onChange: (value: Settings['emotionStyle']) => void;
 }) {
   const { rem: appRem } = useAppTheme();
@@ -61,6 +63,7 @@ export function EmotionIconStyleSelector({
             <EmotionImage emotion={6} iconStyle={style} size={appRem * 1.75} />
           </View>
           <Text
+            autoLineHeight={autoLineHeight}
             className={twMerge(
               `text-center ${labelSize === 'base' ? 'text-base' : 'text-sm'} font-medium ${compact ? '' : labelSize === 'base' ? 'leading-6' : 'leading-5'} ${value === style ? 'text-theme-accent-deep' : 'text-theme-text-primary'}`,
               labelClassName,
