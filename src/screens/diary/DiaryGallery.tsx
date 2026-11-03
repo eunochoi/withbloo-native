@@ -123,7 +123,7 @@ function DiaryGalleryPages({ images, detail = false, square = false, onPress }: 
           {images.map((image, index) => (
             <View
               key={image.id}
-              className={`m-[3px] h-2 ios:curve-continuous rounded-theme ${page === index ? 'bg-theme-accent w-5' : 'bg-theme-accent/80 w-2'}`}
+              className={`m-[3px] h-2 ios:curve-continuous rounded-theme ${page === index ? 'bg-theme-accent w-5' : 'bg-theme-accent/25 w-2'}`}
             />
           ))}
         </View>

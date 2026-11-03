@@ -72,10 +72,11 @@ export function SoberInfoCarousel({
               setPage(index);
               carousel.current?.scrollTo({ x: index * width, animated: true });
             }}
-            className="h-8 w-8 items-center justify-center active:opacity-65"
+            className="h-8 items-center justify-center px-[3px] active:opacity-65"
+            hitSlop={8}
           >
             <View
-              className={`h-2 w-2 rounded-full ${index === 0 ? 'self-end mr-1' : 'self-start ml-1'} ${page === index ? 'opacity-100' : 'opacity-25'}`}
+              className={`h-2 rounded-full ${page === index ? 'w-5 opacity-100' : 'w-2 opacity-25'}`}
               style={{ backgroundColor: color }}
             />
           </Pressable>
