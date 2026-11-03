@@ -1,9 +1,11 @@
+import { FormTextInput } from '../../components/FormTextInput';
 import { translateErrorMessage } from '../../i18n/errors';
 import { useI18n } from '../../i18n/react';
 import { useRef, useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { View } from 'react-native';
 import { BottomSheetModal } from '../../components/BottomSheetModal';
 import { Button } from '../../components/Button';
+import { HeaderAction } from '../../components/HeaderAction';
 import { Text } from '../../components/Text';
 import type { CloseBottomSheet } from '../../hooks/useBottomSheetLifecycle';
 
@@ -51,8 +53,8 @@ export function NotificationTimePicker({
       title={title}
       onClose={onClose}
       onBeforeClose={() => !saving.current}
-      footer={(close) => (
-        <Button
+      headerRight={(close) => (
+        <HeaderAction
           label={busy ? t('common.saving') : t('common.save')}
           disabled={busy}
           onPress={() => {
@@ -74,7 +76,7 @@ export function NotificationTimePicker({
         <View className="gap-7">
           <View className="flex-row items-center justify-center gap-3">
             <View className={TIME_INPUT_CONTAINER_CLASS_NAME}>
-              <TextInput
+              <FormTextInput
                 accessibilityLabel={t('settings.hourInput')}
                 keyboardType="number-pad"
                 maxLength={2}
@@ -90,7 +92,7 @@ export function NotificationTimePicker({
             </View>
             <Text>:</Text>
             <View className={TIME_INPUT_CONTAINER_CLASS_NAME}>
-              <TextInput
+              <FormTextInput
                 accessibilityLabel={t('settings.minuteInput')}
                 keyboardType="number-pad"
                 maxLength={2}

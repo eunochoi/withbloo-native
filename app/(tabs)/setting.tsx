@@ -338,6 +338,7 @@ export default function SettingsScreen() {
       <ConfirmModal
         danger
         visible={pendingRestore !== null && !restorePasswordPrompt}
+        icon="undo"
         title={t('settings.restoreConfirm')}
         message={t('settings.restoreWarning')}
         confirmLabel={t('settings.restore')}

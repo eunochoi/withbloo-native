@@ -4,12 +4,12 @@ import { useQuery } from '@tanstack/react-query';
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Image, Keyboard, Pressable, TextInput, View } from 'react-native';
+import { Keyboard, Pressable, TextInput, View } from 'react-native';
 import { AppIcon } from '../components/AppIcon';
 import { BottomSheetPage } from '../components/BottomSheetPage';
 import { CharacterCount } from '../components/CharacterCount';
 import { EmotionImage } from '../components/EmotionImage';
-import { FormSubmitButton } from '../components/FormSubmitButton';
+import { HeaderAction } from '../components/HeaderAction';
 import { useNotice } from '../components/NoticeProvider';
 import { QueryState } from '../components/QueryState';
 import { RecordFormLayout } from '../components/RecordFormLayout';
@@ -17,7 +17,6 @@ import { Text } from '../components/Text';
 import { EMOTIONS } from '../domain/constants';
 import { isDate } from '../domain/date';
 import { DIARY_IMAGE_MAX_COUNT, DIARY_TEXT_MAX_LENGTH } from '../domain/limits';
-import { DIARY_EMOTION_GROUPS } from '../domain/diaryFilters';
 import {
   discardDraftImages,
   mediaUri,
@@ -30,11 +29,7 @@ import { useAppTheme } from '../theme/AppThemeProvider';
 import { FORM_TEXT_INPUT_CLASS_NAME, SECTION_TITLE_CLASS_NAME } from '../theme/classes';
 import { DiaryDatePicker } from './diary/DiaryDatePicker';
 import { DiaryEmotionPicker } from './diary/DiaryEmotionPicker';
-import { DiaryImagesPicker } from './diary/DiaryImagesPicker';
-
-const neutralCat = require('../../assets/cats/cat-blue.png');
-const positiveCat = require('../../assets/cats/cat-blue-p.png');
-const negativeCat = require('../../assets/cats/cat-blue-n.png');
+import { DiaryFormImages } from './diary/DiaryFormImages';
 
 export function DiaryForm({
   id,
@@ -56,11 +51,9 @@ export function DiaryForm({
     isDate(initialDate) && initialDate <= today ? initialDate : allowDateChange ? null : today,
   );
   const [text, setText] = useState('');
-  const [textHeight, setTextHeight] = useState(0);
-  const [keyboardVisible, setKeyboardVisible] = useState(() => Keyboard.isVisible());
   const [emotion, setEmotion] = useState<number | null>(null);
   const [images, setImages] = useState<DraftImage[]>([]);
-  const [picker, setPicker] = useState<'emotion' | 'images' | 'date' | null>(null);
+  const [picker, setPicker] = useState<'emotion' | 'date' | null>(null);
   const [picking, setPicking] = useState(false);
   const [saved, setSaved] = useState(false);
   const drafts = useRef<DraftImage[]>([]);
@@ -68,14 +61,6 @@ export function DiaryForm({
   const [draftEmotion, setDraftEmotion] = useState<number | null>(null);
   const [dragging, setDragging] = useState(false);
   const loaded = useRef(false);
-  useEffect(() => {
-    const shown = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
-    const hidden = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
-    return () => {
-      shown.remove();
-      hidden.remove();
-    };
-  }, []);
   useEffect(() => {
     if (query.data && !loaded.current) {
       loaded.current = true;
@@ -125,11 +110,6 @@ export function DiaryForm({
     });
   }, []);
   const title = date ? formatDisplayDate(date, formatLocale, 'form') : t('diary.datePrompt');
-  const cat = (DIARY_EMOTION_GROUPS.positive.emotions as readonly number[]).includes(emotion ?? -1)
-    ? positiveCat
-    : (DIARY_EMOTION_GROUPS.negative.emotions as readonly number[]).includes(emotion ?? -1)
-      ? negativeCat
-      : neutralCat;
   const onClosed = saved
     ? () =>
         showNotice({
@@ -154,17 +134,23 @@ export function DiaryForm({
   return (
     <RecordFormLayout
       backRoute="/diary"
-      fillContent
+      scrollEnabled={!dragging}
+      headerRight={
+        <HeaderAction
+          disabled={busy || dragging || date === null || emotion === null || !text.trim()}
+          onPress={() => mutation.mutate(undefined)}
+          label={mutation.isPending ? t('common.saving') : t('common.save')}
+        />
+      }
       closeRequested={saved && !mutation.isPending}
       onClosed={onClosed}
       title={title}
       titleAction={
         id !== undefined || allowDateChange
           ? {
-              accessibilityLabel: date
-                ? t('diary.dateChoice', { title })
-                : t('diary.chooseDate'),
+              accessibilityLabel: date ? t('diary.dateChoice', { title }) : t('diary.chooseDate'),
               disabled: busy || dragging || picker !== null,
+              showChevron: false,
               onPress: () => {
                 Keyboard.dismiss();
                 setPicker('date');
@@ -173,6 +159,7 @@ export function DiaryForm({
           : undefined
       }
       onBeforeClose={() => {
+        if (dragging) return false;
         if (!busy) return true;
         showNotice({
           tone: 'info',
@@ -181,16 +168,6 @@ export function DiaryForm({
         });
         return false;
       }}
-      footer={
-        <FormSubmitButton
-          loading={mutation.isPending}
-          disabled={busy || dragging || date === null || emotion === null || !text.trim()}
-          onPress={() => mutation.mutate(undefined)}
-          label={
-            mutation.isPending ? t('diary.saving') : id ? t('diary.saveEdited') : t('diary.save')
-          }
-        />
-      }
       overlays={
         <>
           {(id !== undefined || allowDateChange) && picker === 'date' && (
@@ -214,13 +191,75 @@ export function DiaryForm({
               }}
             />
           )}
-          {picker === 'images' && (
-            <DiaryImagesPicker
-              onClose={() => setPicker(null)}
+
+        </>
+      }
+    >
+      <View className="shrink-0">
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('diary.chooseTodayEmotion')}
+          accessibilityState={{ expanded: picker === 'emotion', disabled: busy }}
+          disabled={busy}
+          onPress={() => {
+            Keyboard.dismiss();
+            setDraftEmotion(emotion);
+            setPicker('emotion');
+          }}
+          className="min-h-12 flex-row items-center gap-3 bg-transparent p-1 active:opacity-70"
+        >
+          <View className="h-14 w-14 items-start justify-center">
+            {emotion !== null ? (
+              <EmotionImage emotion={emotion} size={appRem * 3.5} />
+            ) : (
+              <AppIcon name="emoji-emotions" size={appRem * 3.5} color={colors.tertiary} />
+            )}
+          </View>
+          <View className="flex-1 min-w-0 gap-1">
+            <Text className={SECTION_TITLE_CLASS_NAME}>{t('diary.todayEmotion')}</Text>
+            <Text className="text-sm text-theme-text-secondary">
+              {emotion !== null ? t(`emotions.${EMOTIONS[emotion].key}`) : t('diary.emotionPrompt')}
+            </Text>
+          </View>
+          <View className="flex-row items-center gap-0.5">
+            <Text className="text-base text-theme-text-secondary">
+              {emotion !== null ? t('diary.change') : t('diary.choose')}
+            </Text>
+            <AppIcon name="chevron-right" size={iconSizes.md} color={colors.secondary} />
+          </View>
+        </Pressable>
+      </View>
+      <View className="gap-3">
+        <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
+          {t('diary.storyTitle')}
+        </Text>
+        <View className="gap-3 p-1">
+          <TextInput
+            accessibilityLabel={t('diary.content')}
+            multiline
+            scrollEnabled
+            value={text}
+            onChangeText={setText}
+            editable={!busy && picker === null}
+            maxLength={DIARY_TEXT_MAX_LENGTH}
+            placeholder={t('diary.placeholder')}
+            placeholderTextColor={colors.tertiary}
+            textAlignVertical="top"
+            className={`${FORM_TEXT_INPUT_CLASS_NAME} h-[250px] rounded-lg border border-theme-border p-2`}
+          />
+          <CharacterCount length={text.length} maxLength={DIARY_TEXT_MAX_LENGTH} />
+        </View>
+      </View>
+      <View className="gap-3">
+        <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>{t('diary.photoTitle')}</Text>
+        <Text className="text-base text-theme-text-secondary">{t('diary.photoHint')}</Text>
+        <Text className="text-xs text-theme-text-secondary">
+          {t('diary.photoLimit', { count: images.length, value: DIARY_IMAGE_MAX_COUNT })}
+        </Text>
+        <DiaryFormImages
               images={images}
               busy={busy}
               picking={picking}
-              dragging={dragging}
               onDragging={setDragging}
               onReorder={onReorder}
               onRemove={(file) =>
@@ -249,98 +288,8 @@ export function DiaryForm({
                     if (mounted.current) setPicking(false);
                   });
               }}
-            />
-          )}
-        </>
-      }
-    >
-      {!keyboardVisible && (
-        <View className="shrink-0 pb-4">
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('diary.chooseTodayEmotion')}
-            accessibilityState={{ expanded: picker === 'emotion', disabled: busy }}
-            disabled={busy}
-            onPress={() => {
-              Keyboard.dismiss();
-              setDraftEmotion(emotion);
-              setPicker('emotion');
-            }}
-            className="min-h-12 flex-row items-center gap-3 bg-transparent p-1 active:opacity-70"
-          >
-            <View className="h-14 w-14 items-start justify-center">
-              {emotion !== null ? (
-                <EmotionImage emotion={emotion} size={appRem * 3.5} />
-              ) : (
-                <AppIcon name="emoji-emotions" size={appRem * 3.5} color={colors.tertiary} />
-              )}
-            </View>
-            <View className="flex-1 min-w-0 gap-1">
-              <Text className={SECTION_TITLE_CLASS_NAME}>{t('diary.todayEmotion')}</Text>
-              <Text className="text-sm text-theme-text-secondary">
-                {emotion !== null
-                  ? t(`emotions.${EMOTIONS[emotion].key}`)
-                  : t('diary.emotionPrompt')}
-              </Text>
-            </View>
-            <View className="flex-row items-center gap-0.5">
-              <Text className="text-base text-theme-text-secondary">
-                {emotion !== null ? t('diary.change') : t('diary.choose')}
-              </Text>
-              <AppIcon name="chevron-right" size={iconSizes.md} color={colors.secondary} />
-            </View>
-          </Pressable>
-        </View>
-      )}
-      <View className="flex-1 min-h-0 gap-3 pt-2">
-        <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
-          {t('diary.storyTitle')}
-        </Text>
-        <View className="flex-1 min-h-0 gap-3 p-1">
-          <TextInput
-            accessibilityLabel={t('diary.content')}
-            multiline
-            scrollEnabled
-            value={text}
-            onChangeText={setText}
-            onContentSizeChange={({ nativeEvent }) =>
-              setTextHeight(Math.ceil(nativeEvent.contentSize.height))
-            }
-            editable={!busy && picker === null}
-            maxLength={DIARY_TEXT_MAX_LENGTH}
-            placeholder={t('diary.placeholder')}
-            placeholderTextColor={colors.tertiary}
-            textAlignVertical="top"
-            className={`flex-1 min-h-0 pb-6 ${FORM_TEXT_INPUT_CLASS_NAME}`}
-            style={{ height: Math.max(appRem * 12, textHeight) }}
-          />
-          <CharacterCount length={text.length} maxLength={DIARY_TEXT_MAX_LENGTH} />
-        </View>
+        />
       </View>
-      {!keyboardVisible && (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('diary.photoManage', { count: images.length })}
-          accessibilityState={{ expanded: picker === 'images', disabled: busy }}
-          disabled={busy}
-          onPress={() => {
-            Keyboard.dismiss();
-            setPicker('images');
-          }}
-          className="shrink-0 min-h-12 flex-row items-center gap-2 ios:curve-continuous rounded-2xl px-2 active:opacity-70"
-        >
-          <AppIcon name="image" size={iconSizes.md} className="text-theme-accent" />
-          <Text className="flex-1 text-base text-theme-text-secondary">
-            {t('diary.photos', { count: images.length })}
-          </Text>
-          <AppIcon name="chevron-right" size={iconSizes.md} className="text-theme-text-secondary" />
-        </Pressable>
-      )}
-      {!keyboardVisible && (
-        <View className="shrink-0 items-center pt-2" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-          <Image source={cat} resizeMode="contain" style={{ width: appRem * 11, height: appRem * 11 }} />
-        </View>
-      )}
     </RecordFormLayout>
   );
 }

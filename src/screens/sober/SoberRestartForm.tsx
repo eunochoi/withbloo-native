@@ -6,7 +6,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
 import { TextInput, View } from 'react-native';
 import { BottomSheetPage } from '../../components/BottomSheetPage';
-import { Button } from '../../components/Button';
+import { HeaderAction } from '../../components/HeaderAction';
 import { CharacterCount } from '../../components/CharacterCount';
 import { DateTimeFields } from '../../components/DateTimeFields';
 import { useNotice } from '../../components/NoticeProvider';
@@ -142,10 +142,9 @@ export function SoberRestartForm({
       closeRequested={saved && !mutation.isPending}
       onClosed={onClosed}
       onBeforeClose={onBeforeClose}
-      footer={
-        <Button
-          labelWeight="normal"
-          label={editing ? t('diary.saveEdited') : t('sober.recordRestart')}
+      headerRight={
+        <HeaderAction
+          label={editing ? t('common.save') : t('habit.record')}
           disabled={busy}
           onPress={() => {
             if (saving.current || busy) return;

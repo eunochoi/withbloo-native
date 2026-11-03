@@ -1,3 +1,4 @@
+import { FormTextInput } from '../components/FormTextInput';
 import { formatDisplayDate } from '../i18n/format';
 import { formatSoberGoal } from '../i18n/sober';
 import { useI18n } from '../i18n/react';
@@ -5,9 +6,9 @@ import { useQuery } from '@tanstack/react-query';
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Switch, TextInput, View } from 'react-native';
+import { Switch, View } from 'react-native';
 import { BottomSheetPage } from '../components/BottomSheetPage';
-import { Button } from '../components/Button';
+import { HeaderAction } from '../components/HeaderAction';
 import { CharacterCount } from '../components/CharacterCount';
 import { DateTimePicker } from '../components/DateTimePicker';
 import { FormPickerRow } from '../components/FormPickerRow';
@@ -107,26 +108,21 @@ export function SoberForm({ id }: { id?: number }) {
         });
         return false;
       }}
-      footer={
-        <>
-          {mutation.isPending && <ActivityIndicator color={colors.accent} />}
-          <Button
-            label={
-              mutation.isPending ? t('habit.saving') : id ? t('sober.saveChanges') : t('sober.save')
-            }
-            disabled={!draft.name.trim() || mutation.isPending}
-            onPress={() => {
-              if (saving.current) return;
-              saving.current = true;
-              void mutation
-                .mutateAsync(undefined)
-                .catch(() => undefined)
-                .finally(() => {
-                  saving.current = false;
-                });
-            }}
-          />
-        </>
+      headerRight={
+        <HeaderAction
+          label={mutation.isPending ? t('common.saving') : t('common.save')}
+          disabled={!draft.name.trim() || mutation.isPending}
+          onPress={() => {
+            if (saving.current) return;
+            saving.current = true;
+            void mutation
+              .mutateAsync(undefined)
+              .catch(() => undefined)
+              .finally(() => {
+                saving.current = false;
+              });
+          }}
+        />
       }
       overlays={
         <>
@@ -181,7 +177,7 @@ export function SoberForm({ id }: { id?: number }) {
           {t('sober.nameTitle')}
         </Text>
         <View className="gap-3 px-1">
-          <TextInput
+          <FormTextInput
             accessibilityLabel={t('sober.nameInput')}
             value={draft.name}
             onChangeText={(name) => setDraft({ ...draft, name })}
@@ -264,7 +260,7 @@ export function SoberForm({ id }: { id?: number }) {
           {t('sober.pledgeOptional')}
         </Text>
         <View className="gap-3 px-2">
-          <TextInput
+          <FormTextInput
             accessibilityLabel={t('sober.pledge')}
             value={draft.description ?? ''}
             onChangeText={(description) => setDraft({ ...draft, description })}

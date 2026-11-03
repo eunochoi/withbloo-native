@@ -1,9 +1,10 @@
+import { FormTextInput } from '../../components/FormTextInput';
 import { useRef, useState } from 'react';
-import { ActivityIndicator, TextInput, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { validatePassword } from '../../backup/container';
 import { backupErrorMessage } from '../../backup/errors';
 import { BottomSheetModal } from '../../components/BottomSheetModal';
-import { Button } from '../../components/Button';
+import { HeaderAction } from '../../components/HeaderAction';
 import { InfoNotice } from '../../components/InfoNotice';
 import { Text } from '../../components/Text';
 import { useI18n } from '../../i18n/react';
@@ -33,7 +34,7 @@ export function BackupPasswordSheet({
   const [error, setError] = useState('');
   const active = useRef(false);
   const input = (value: string, change: (value: string) => void, label: string) => (
-    <TextInput
+    <FormTextInput
       secureTextEntry
       autoCapitalize="none"
       autoCorrect={false}
@@ -54,6 +55,37 @@ export function BackupPasswordSheet({
       onClose={onClose}
       dismissible={!busy}
       dismissOnBack={!busy}
+      headerRight={(close) => (
+        <HeaderAction
+          disabled={busy || !password}
+          label={t('common.confirm')}
+          onPress={() => {
+            if (active.current) return;
+            if (creating && password !== confirmation) {
+              setError(t('settings.backupPasswordMismatch'));
+              return;
+            }
+            active.current = true;
+            setBusy(true);
+            setError('');
+            void (async () => {
+              try {
+                if (creating) validatePassword(password);
+                await onSubmit(password, changing ? oldPassword : undefined);
+                setPassword('');
+                setConfirmation('');
+                setOldPassword('');
+                close();
+              } catch (value) {
+                setError(backupErrorMessage(value));
+              } finally {
+                active.current = false;
+                setBusy(false);
+              }
+            })();
+          }}
+        />
+      )}
     >
       <View className="gap-4">
         <Text
@@ -83,35 +115,6 @@ export function BackupPasswordSheet({
             {information}
           </InfoNotice>
         )}
-        <Button
-          disabled={busy || !password}
-          label={t('common.confirm')}
-          onPress={() => {
-            if (active.current) return;
-            if (creating && password !== confirmation) {
-              setError(t('settings.backupPasswordMismatch'));
-              return;
-            }
-            active.current = true;
-            setBusy(true);
-            setError('');
-            void (async () => {
-              try {
-                if (creating) validatePassword(password);
-                await onSubmit(password, changing ? oldPassword : undefined);
-                setPassword('');
-                setConfirmation('');
-                setOldPassword('');
-                onClose();
-              } catch (value) {
-                setError(backupErrorMessage(value));
-              } finally {
-                active.current = false;
-                setBusy(false);
-              }
-            })();
-          }}
-        />
       </View>
     </BottomSheetModal>
   );

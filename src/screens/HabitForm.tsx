@@ -9,7 +9,7 @@ import { BottomSheetPage } from '../components/BottomSheetPage';
 import { CharacterCount } from '../components/CharacterCount';
 import { DateTimePicker } from '../components/DateTimePicker';
 import { FormPickerRow } from '../components/FormPickerRow';
-import { FormSubmitButton } from '../components/FormSubmitButton';
+import { HeaderAction } from '../components/HeaderAction';
 import { HabitIcon } from '../components/HabitIcon';
 import { IconColorPicker } from '../components/IconColorPicker';
 import { InfoNotice } from '../components/InfoNotice';
@@ -123,14 +123,11 @@ export function HabitForm({ id }: { id?: number }) {
         });
         return false;
       }}
-      footer={
-        <FormSubmitButton
-          loading={mutation.isPending}
+      headerRight={
+        <HeaderAction
           disabled={!name.trim() || mutation.isPending}
           onPress={() => mutation.mutate(undefined)}
-          label={
-            mutation.isPending ? t('habit.saving') : id ? t('habit.saveEdited') : t('habit.save')
-          }
+          label={mutation.isPending ? t('common.saving') : t('common.save')}
         />
       }
       overlays={

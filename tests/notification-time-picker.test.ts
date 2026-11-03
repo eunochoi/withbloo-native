@@ -62,8 +62,10 @@ test('time picker rejects invalid input, stays open on failure and closes after 
     },
     'react-native': { View: 'View', TextInput: 'TextInput' },
     'react/jsx-runtime': { jsx, jsxs: jsx },
+    '../../components/FormTextInput': { FormTextInput: 'TextInput' },
     '../../components/BottomSheetModal': { BottomSheetModal: 'Modal' },
     '../../components/Button': { Button: 'Button' },
+    '../../components/HeaderAction': { HeaderAction: 'HeaderAction' },
     '../../components/Text': { Text: 'Text' },
   }).NotificationTimePicker;
   function render() {
@@ -87,24 +89,22 @@ test('time picker rejects invalid input, stays open on failure and closes after 
           modal.props.children(() => {
             closes++;
           }),
-          modal.props.footer(() => {
+          modal.props.headerRight(() => {
             closes++;
           }),
         ],
       }),
     };
   }
-  assert.equal(render().modal.props.footer(() => {}).type, 'Button');
+  assert.equal(render().modal.props.headerRight(() => {}).type, 'HeaderAction');
   assert.equal(nodes(render().body, 'Button')[0].props.label, '알림 해제');
   nodes(render().tree, 'TextInput')[0].props.onChangeText('24');
-  nodes(render().tree, 'Button')
-    .find((node) => node.props.label !== '알림 해제')!
+  nodes(render().tree, 'HeaderAction')[0]
     .props.onPress();
   assert.equal(applied.length, 0);
   assert(nodes(render().tree, 'Text').some((node) => node.props.accessibilityRole === 'alert'));
   nodes(render().tree, 'TextInput')[0].props.onChangeText('9');
-  nodes(render().tree, 'Button')
-    .find((node) => node.props.label !== '알림 해제')!
+  nodes(render().tree, 'HeaderAction')[0]
     .props.onPress();
   assert.equal(render().modal.props.onBeforeClose(), false);
   await new Promise<void>((resolve) => setImmediate(resolve));
@@ -112,8 +112,7 @@ test('time picker rejects invalid input, stays open on failure and closes after 
   assert.equal(closes, 0);
   assert(nodes(render().tree, 'Text').some((node) => node.props.children === '예약 실패'));
   fail = false;
-  nodes(render().tree, 'Button')
-    .find((node) => node.props.label !== '알림 해제')!
+  nodes(render().tree, 'HeaderAction')[0]
     .props.onPress();
   await new Promise<void>((resolve) => setImmediate(resolve));
   assert.equal(closes, 1);
