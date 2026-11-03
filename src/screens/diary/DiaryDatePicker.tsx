@@ -49,6 +49,7 @@ export function DiaryDatePicker({
       onClose={onClose}
       headerLeft={
         <HeaderAction
+          side="left"
           label={t('calendar.today')}
           accessibilityLabel={t('diary.chooseToday')}
           accessibilityHint={t('diary.chooseTodayHint')}

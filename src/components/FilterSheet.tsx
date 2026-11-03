@@ -25,6 +25,7 @@ export function FilterSheet({
       title={title}
       headerLeft={
         <HeaderAction
+          side="left"
           label={t('ui.reset')}
           accessibilityLabel={t('ui.resetSelection')}
           onPress={onReset}
