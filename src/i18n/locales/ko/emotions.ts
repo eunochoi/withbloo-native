@@ -9,7 +9,7 @@ export const emotionsKo = {
   angry: '화남',
   confused: '혼란',
   unknown: '무덤덤',
-  tired: '피곤함',
+  tired: '나른함',
   mixed: '싱숭생숭',
   happyDescription: '마음이 포근하고 만족스러워요',
   joyfulDescription: '즐겁고 신나는 마음이 들어요',
@@ -21,6 +21,6 @@ export const emotionsKo = {
   angryDescription: '짜증이 나거나 화가 올라와요',
   confusedDescription: '마음이 복잡하고 정리가 어려워요',
   unknownDescription: '특별한 감정 없이 담담한 상태',
-  tiredDescription: '에너지가 부족하고 지친 상태',
+  tiredDescription: '몸과 마음이 느긋하고 기운이 조금 가라앉아 있어요',
   mixedDescription: '좋고 나쁜 감정이 뒤섞여 미묘한 상태',
 } as const;

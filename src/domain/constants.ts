@@ -193,11 +193,11 @@ export const EMOTIONS = [
     description: '특별한 감정 없이 담담한 상태',
   },
   {
-    name: '피곤함',
+    name: '나른함',
     key: 'tired',
     color: '#B7AAA4',
     emoji: '😮‍💨',
-    description: '에너지가 부족하고 지친 상태',
+    description: '몸과 마음이 느긋하고 기운이 조금 가라앉아 있어요',
   },
   {
     name: '싱숭생숭',

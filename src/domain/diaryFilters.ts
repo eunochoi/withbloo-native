@@ -9,7 +9,7 @@ export const DIARY_EMOTION_GROUPS = {
   neutral: {
     label: '중립',
     emotions: [4, 9, 10, 11],
-    description: '놀람, 무덤덤\n피곤함, 싱숭생숭',
+    description: '놀람, 무덤덤\n나른함, 싱숭생숭',
   },
   negative: { label: '부정', emotions: [5, 6, 7, 8], description: '불안, 슬픔\n화남, 혼란' },
 } as const;

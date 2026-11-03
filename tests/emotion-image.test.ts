@@ -102,6 +102,6 @@ test('all twelve emotions resolve their own artwork in every style with 256px tr
     }
   }
   assert.equal(EMOTIONS[9].name, '무덤덤');
-  assert.equal(EMOTIONS[10].name, '피곤함');
+  assert.equal(EMOTIONS[10].name, '나른함');
   assert.equal(EMOTIONS[11].name, '싱숭생숭');
 });

@@ -418,11 +418,11 @@ test('emotion statistics retain all emotions and counts in one horizontal album 
     [10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
   );
   const cells = nodes(tree).filter((node) => node.props?.children?.[0]?.type === 'EmotionImage');
-  assert.equal(text(cells[0]), '피곤함1회');
+  assert.equal(text(cells[0]), '나른함1회');
   assert.equal(text(cells[1]), '싱숭생숭1회');
   const bar = nodes(tree).find((node) => node.props.accessibilityLabel?.startsWith('감정 비율'))!;
   assert(bar.props.accessibilityLabel.includes('중립 2회 100%'));
-  assert(text(tree).includes('중립: 놀람, 무덤덤, 피곤함, 싱숭생숭'));
+  assert(text(tree).includes('중립: 놀람, 무덤덤, 나른함, 싱숭생숭'));
   const strip = nodes(tree).find((node) => node.type === 'ScrollView');
   assert.equal(strip.props.horizontal, true);
   assert.equal(strip.props.children.length, EMOTIONS.length);
@@ -844,7 +844,7 @@ test('English emotion statistics retain half-year counts, all emotion cards and 
   const cells = nodes(english).filter((node) => node.props?.children?.[0]?.type === 'EmotionImage');
   assert.equal(cells.length, 12);
   assert.equal(text(cells[1]), 'Happy1time');
-  assert.equal(text(cells[0]), 'Tired2times');
+  assert.equal(text(cells[0]), 'Drowsy2times');
   const proportions = nodes(english).find((node) =>
     node.props.accessibilityLabel?.startsWith('Emotion proportions'),
   );

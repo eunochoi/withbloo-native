@@ -9,7 +9,7 @@ export const emotionsEn = {
   angry: 'Angry',
   confused: 'Confused',
   unknown: 'Neutral',
-  tired: 'Tired',
+  tired: 'Drowsy',
   mixed: 'Mixed',
   happyDescription: 'Feeling warm and content',
   joyfulDescription: 'Feeling cheerful and excited',
@@ -21,6 +21,6 @@ export const emotionsEn = {
   angryDescription: 'Feeling irritated or angry',
   confusedDescription: 'Feelings are tangled and hard to sort out',
   unknownDescription: 'Feeling steady, without a strong emotion',
-  tiredDescription: 'Low on energy and feeling worn out',
+  tiredDescription: 'Feeling relaxed and a little low on energy',
   mixedDescription: 'A subtle mix of good and difficult feelings',
 } as const;

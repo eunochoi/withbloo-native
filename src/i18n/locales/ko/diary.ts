@@ -96,7 +96,7 @@ export const diaryKo = {
   neutral: '중립',
   negative: '부정',
   positiveNames: '행복, 기쁨\n사랑, 평온',
-  neutralNames: '놀람, 무덤덤\n피곤함, 싱숭생숭',
+  neutralNames: '놀람, 무덤덤\n나른함, 싱숭생숭',
   negativeNames: '불안, 슬픔\n화남, 혼란',
   positiveSummary: '마음이 밝거나 편안했던 순간',
   neutralSummary: '담담함부터 피로, 미묘하게 섞인 마음까지',

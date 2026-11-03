@@ -293,7 +293,7 @@ test('emotion picker translates names and descriptions while preserving selectio
   ui.setLanguage('en');
   assert.equal(ui.render().shell.props.title, 'How are you feeling today?');
   assert.equal(ui.option('Neutral category').props.selected, true);
-  assert.equal(ui.option('Tired, Low on energy and feeling worn out').props.selected, true);
+  assert.equal(ui.option('Drowsy, Feeling relaxed and a little low on energy').props.selected, true);
   ui.option('Mixed, A subtle mix of good and difficult feelings').props.onPress();
   ui.setLanguage('ko');
   assert.equal(ui.emotion(11).props.selected, true);
