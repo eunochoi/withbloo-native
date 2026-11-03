@@ -10,7 +10,7 @@
       "ios"
     ],
     "userInterfaceStyle": "automatic",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/app-icons/icon.png",
     "ios": {
       "bundleIdentifier": "com.took",
       "buildNumber": "10",
@@ -84,7 +84,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/notification-icon.png"
+          "icon": "./assets/app-icons/notification-icon.png"
         }
       ],
       "expo-font",

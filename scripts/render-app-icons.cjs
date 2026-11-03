@@ -6,7 +6,7 @@ const expoRequire = createRequire(require.resolve('expo/package.json'));
 const { generateImageAsync } = expoRequire('@expo/image-utils');
 
 (async () => {
-  const source = path.join(root, 'assets/icon-source.png');
+  const source = path.join(root, 'assets/app-icons/icon-source.png');
   for (const size of [1024, 512]) {
     const filename = size === 1024 ? 'icon.png' : 'icon-512.png';
     const image = await generateImageAsync(
@@ -21,8 +21,8 @@ const { generateImageAsync } = expoRequire('@expo/image-utils');
         removeTransparency: true,
       },
     );
-    fs.writeFileSync(path.join(root, 'assets', filename), image.source);
-    console.log(`Generated assets/${filename} (${size}×${size}, opaque).`);
+    fs.writeFileSync(path.join(root, 'assets', 'app-icons', filename), image.source);
+    console.log(`Generated assets/app-icons/${filename} (${size}×${size}, opaque).`);
   }
   if (process.argv.includes('--sync-native')) {
     const config = JSON.parse(fs.readFileSync(path.join(root, 'app.json'), 'utf8')).expo;
