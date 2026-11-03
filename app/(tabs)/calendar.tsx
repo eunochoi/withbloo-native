@@ -10,6 +10,7 @@ import { calendarHabitProgressCounts } from '../../src/domain/calendar';
 import { useModalNavigation } from '../../src/navigation/ModalNavigationProvider';
 import { diaryQueries, habitQueries, useToday } from '../../src/queries';
 import { CalendarRecordCounts } from '../../src/screens/calendar/CalendarRecordCounts';
+import { CalendarPageSkeleton } from '../../src/screens/calendar/CalendarPageSkeleton';
 import { DiaryHabitMonthCalendar } from '../../src/screens/calendar/DiaryHabitMonthCalendar';
 import { useAppTheme } from '../../src/theme/AppThemeProvider';
 import { PAGE_CLASS_NAME } from '../../src/theme/classes';
@@ -24,6 +25,7 @@ export default function CalendarScreen() {
   const [selected, setSelected] = useState(today);
   const [month, setMonth] = useState(today.slice(0, 7));
   const scrollRef = useRef<ScrollView>(null);
+  const hasLoadedCalendar = useRef(false);
   const [viewportHeight, setViewportHeight] = useState(0);
   const [contentHeight, setContentHeight] = useState(0);
   const overflowing = contentHeight > viewportHeight + 1;
@@ -33,6 +35,11 @@ export default function CalendarScreen() {
   const diaries = useQuery(diaryQueries.month(db, month));
   const completions = useQuery(habitQueries.completions(db, `${month}-01`, `${month}-31`));
   const habits = useQuery(habitQueries.list(db));
+  const queries = [diaries, completions, habits];
+  const hasCalendarError = queries.some((query) => query.isError);
+  const hasCalendarData = queries.every((query) => query.data !== undefined);
+  if (hasCalendarData) hasLoadedCalendar.current = true;
+  const showCalendarSkeleton = !hasLoadedCalendar.current && !hasCalendarError && !hasCalendarData;
   const progressCounts = useMemo(
     () =>
       habits.data && completions.data && !habits.isError && !completions.isError
@@ -59,7 +66,6 @@ export default function CalendarScreen() {
           <CalendarRecordCounts
             diaryCount={diaries.data?.length ?? 0}
             counts={progressCounts}
-            unavailable={habits.isError || completions.isError}
           />
         </Toolbar>
         <View
@@ -69,19 +75,23 @@ export default function CalendarScreen() {
             paddingBottom: navigationBottom + navigationHeight + rem,
           }}
         >
-          <DiaryHabitMonthCalendar
-            fillHeight
-            minimumRowHeight={rem * 3.5}
-            month={month}
-            onMonthChange={setMonth}
-            selected={selected}
-            today={today}
-            onSelect={(date) => {
-              setSelected(date);
-              setMonth(date.slice(0, 7));
-              openModal({ pathname: '/calendar/[date]', params: { date } });
-            }}
-          />
+          {showCalendarSkeleton ? (
+            <CalendarPageSkeleton />
+          ) : (
+            <DiaryHabitMonthCalendar
+              fillHeight
+              minimumRowHeight={rem * 3.5}
+              month={month}
+              onMonthChange={setMonth}
+              selected={selected}
+              today={today}
+              onSelect={(date) => {
+                setSelected(date);
+                setMonth(date.slice(0, 7));
+                openModal({ pathname: '/calendar/[date]', params: { date } });
+              }}
+            />
+          )}
         </View>
       </ScrollView>
     </ColorView>

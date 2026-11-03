@@ -17,6 +17,7 @@ export const calendarKo = {
   monthToday: '%{value}, 이번 달로 이동',
   goToday: '오늘로 이동',
   goTodayHint: '오늘이 속한 월을 보여줘요.',
+  monthLoading: '월간 기록 불러오는 중',
   monthFailed: '월 기록을 불러오지 못했어요.',
   monthLabel: '%{value} 월간 달력',
   hasDiary: '일기 있음, %{value}',

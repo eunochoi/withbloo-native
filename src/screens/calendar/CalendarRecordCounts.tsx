@@ -9,13 +9,11 @@ import { useAppTheme } from '../../theme/AppThemeProvider';
 export function CalendarRecordCounts({
   diaryCount,
   counts,
-  unavailable = false,
   textSize = 'sm',
   textClassName,
 }: {
   diaryCount: number;
   counts: ReturnType<typeof calendarHabitProgressCounts> | null;
-  unavailable?: boolean;
   textSize?: 'sm' | 'base';
   textClassName?: string;
 }) {
@@ -47,12 +45,10 @@ export function CalendarRecordCounts({
           key: band,
           icon: 'habit' as const,
           className,
-          value: unavailable ? '–' : t('calendar.compactDayCount', { count: counts?.[band] ?? 0 }),
+          value: t('calendar.compactDayCount', { count: counts?.[band] ?? 0 }),
           label: t('calendar.bandCount', {
             title: label,
-            value: unavailable
-              ? t('calendar.unavailable')
-              : t('common.dayCount', { count: counts?.[band] ?? 0 }),
+            value: t('common.dayCount', { count: counts?.[band] ?? 0 }),
           }),
         })),
       ].map(({ key, icon, className, value, label }) => (

@@ -15,7 +15,7 @@ function nodes(node: any): any[] {
   if (Array.isArray(node)) return node.flatMap(nodes);
   return [node, ...nodes(node.props?.children)];
 }
-function load(path: string, states: unknown[], date = '2026-09-30') {
+function load(path: string, states: unknown[], date = '2026-09-30', queryState = { data: [] as unknown[] | undefined, isError: false }) {
   let cursor = 0;
   const navigations: any[] = [];
   const exports: Record<string, Function> = {};
@@ -65,7 +65,7 @@ function load(path: string, states: unknown[], date = '2026-09-30') {
             useLocalSearchParams: () => ({ date }),
           };
         if (name === 'expo-sqlite') return { useSQLiteContext: () => ({}) };
-        if (name === '@tanstack/react-query') return { useQuery: () => ({ data: [] }) };
+        if (name === '@tanstack/react-query') return { useQuery: () => queryState };
         if (name === 'react-native')
           return {
             View: 'View',
@@ -130,6 +130,26 @@ test('calendar pushes the selected date sheet while preserving the selected mont
   const calendar = nodes(render('default')).find((node) => node.type === 'DiaryHabitMonthCalendar');
   assert.equal(calendar.props.selected, '2026-09-30');
   assert.equal(calendar.props.month, '2026-09');
+});
+
+test('calendar keeps its toolbar visible while initial data loads and does not reshow the skeleton', () => {
+  const queryState = { data: undefined as unknown[] | undefined, isError: false };
+  const render = load('app/(tabs)/calendar.tsx', [], '2026-09-30', queryState);
+  const loading = nodes(render('default'));
+  assert(loading.some((node) => node.type === 'CalendarRecordCounts'));
+  assert(loading.some((node) => node.type === 'CalendarPageSkeleton'));
+  assert(!loading.some((node) => node.type === 'DiaryHabitMonthCalendar'));
+  queryState.data = [];
+  assert(nodes(render('default')).some((node) => node.type === 'DiaryHabitMonthCalendar'));
+  queryState.data = undefined;
+  assert(!nodes(render('default')).some((node) => node.type === 'CalendarPageSkeleton'));
+});
+
+test('calendar exposes the calendar error state instead of a permanent skeleton', () => {
+  const render = load('app/(tabs)/calendar.tsx', [], '2026-09-30', { data: undefined, isError: true });
+  const view = nodes(render('default'));
+  assert(view.some((node) => node.type === 'DiaryHabitMonthCalendar'));
+  assert(!view.some((node) => node.type === 'CalendarPageSkeleton'));
 });
 
 test('date route keeps day info in the stack without closing it before opening another page', () => {

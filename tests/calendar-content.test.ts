@@ -896,21 +896,19 @@ test('monthly progress counts match visible days, start dates, boundaries and mo
   );
 });
 
-test('monthly toolbar starts at zero and distinguishes query errors from empty records', () => {
+test('monthly toolbar shows zero for unavailable records', () => {
   const { CalendarRecordCounts } = load('src/screens/calendar/CalendarRecordCounts.tsx');
-  const values = (counts: any, unavailable = false) =>
+  const values = (counts: any) =>
     nodes(
       CalendarRecordCounts({
         diaryCount: 0,
         counts,
-        unavailable,
       }),
     )
       .filter((node) => node.type === 'Text')
       .map((node) => node.props.children);
   assert.deepEqual(values(null), ['0개', '0일', '0일', '0일']);
   assert.deepEqual(values({ low: 2, medium: 3, high: 4 }), ['0개', '4일', '3일', '2일']);
-  assert.deepEqual(values(null, true), ['0개', '–', '–', '–']);
   const bands = nodes(
     CalendarRecordCounts({ diaryCount: 0, counts: { high: 4, medium: 3, low: 2 } }),
   ).filter(

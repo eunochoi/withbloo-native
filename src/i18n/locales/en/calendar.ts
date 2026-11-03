@@ -17,6 +17,7 @@ export const calendarEn = {
   monthToday: '%{value}, go to this month',
   goToday: 'Go to today',
   goTodayHint: "Show today's month.",
+  monthLoading: 'Loading monthly records',
   monthFailed: 'Could not load monthly records.',
   monthLabel: 'Monthly calendar for %{value}',
   hasDiary: 'Diary entry, %{value}',
