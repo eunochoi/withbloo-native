@@ -31,7 +31,7 @@ export function HabitMenu({
   const mutation = useRecordMutation(
     () => deleteHabit(db, habit.id),
     'habit',
-    onDeleted,
+    undefined,
     (error) =>
       showNotice({ tone: 'error', title: t('habit.processFailed'), message: error.message }),
   );
@@ -79,12 +79,10 @@ export function HabitMenu({
         visible={confirmOpen}
         title={t('habit.deleteTitle')}
         message={t('habit.deleteWarning')}
-        confirmLabel={t('habit.deleteAction')}
+        confirmLabel={t('common.delete')}
         onCancel={() => setConfirmOpen(false)}
-        onConfirm={() => {
-          setConfirmOpen(false);
-          mutation.mutate(undefined);
-        }}
+        onConfirm={() => mutation.mutateAsync(undefined)}
+        onConfirmed={onDeleted}
       />
     </>
   );

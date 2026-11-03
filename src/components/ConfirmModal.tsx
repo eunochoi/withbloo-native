@@ -1,9 +1,8 @@
-import { useI18n } from '../i18n/react';
-import { useRef } from 'react';
-import { View } from 'react-native';
-import { Button } from './Button';
+import { useRef, useState, type ComponentProps } from 'react';
 import { BottomSheetModal } from './BottomSheetModal';
-import { Text } from './Text';
+import { View } from 'react-native';
+import { useI18n } from '../i18n/react';
+import { PickerAction } from './PickerAction';
 
 export function ConfirmModal({
   visible,
@@ -11,61 +10,73 @@ export function ConfirmModal({
   message,
   confirmLabel,
   cancelLabel,
+  icon = 'delete-outline',
   danger = false,
   onCancel,
   onConfirm,
+  onConfirmed,
 }: {
   visible: boolean;
   title: string;
   message: string;
   confirmLabel: string;
   cancelLabel?: string;
+  icon?: ComponentProps<typeof PickerAction>['icon'];
   danger?: boolean;
   onCancel: () => void;
-  onConfirm: () => void;
+  onConfirm: () => Promise<unknown> | void;
+  onConfirmed?: () => void;
 }) {
   const { t } = useI18n();
+  const [busy, setBusy] = useState(false);
+  const pending = useRef(false);
   const confirmed = useRef(false);
   return (
     <BottomSheetModal
       visible={visible}
       title={title}
+      onBeforeClose={() => !pending.current}
       onClose={() => {
         const accepted = confirmed.current;
         confirmed.current = false;
-        if (accepted) onConfirm();
-        else onCancel();
+        onCancel();
+        if (accepted) onConfirmed?.();
       }}
-      footer={(close) => (
-        <View className="flex-row gap-3">
-          <Button
-            label={cancelLabel ?? t('common.cancel')}
-            labelWeight="normal"
-            outline
-            subtle
-            onPress={() => {
-              if (!confirmed.current) close();
-            }}
-            className="flex-1"
-          />
-          <Button
-            label={confirmLabel}
-            labelWeight="normal"
+    >
+      {(close) => (
+        <View className="gap-3">
+          <PickerAction
+            icon={icon}
+            title={confirmLabel}
+            description={message}
             danger={danger}
-            onPress={() => {
-              if (confirmed.current) return;
-              confirmed.current = true;
-              // A dismiss already in progress must not turn into a destructive confirm.
-              if (!close()) confirmed.current = false;
+            disabled={busy}
+            onPress={async () => {
+              if (pending.current) return;
+              pending.current = true;
+              setBusy(true);
+              try {
+                await onConfirm();
+                confirmed.current = true;
+                pending.current = false;
+                close();
+              } catch {
+                // The caller displays the operation error; keep the confirmation open.
+              } finally {
+                pending.current = false;
+                setBusy(false);
+              }
             }}
-            className="flex-1"
+          />
+          <PickerAction
+            icon="undo"
+            title={cancelLabel ?? t('common.cancel')}
+            description={t('common.cancelDescription')}
+            disabled={busy}
+            onPress={() => close()}
           />
         </View>
       )}
-    >
-      <Text accessibilityRole="alert" className="text-center text-sm leading-relaxed">
-        {message}
-      </Text>
     </BottomSheetModal>
   );
 }

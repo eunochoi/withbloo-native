@@ -103,18 +103,17 @@ export function SoberRestartActions({
         title={t('sober.deleteRecordTitle')}
         message={t('sober.deleteRecordWarning')}
         danger
-        confirmLabel={t('diary.deleteAction')}
+        confirmLabel={t('common.delete')}
         onCancel={() => setOverlay(null)}
-        onConfirm={() => {
-          if (!confirm || deleting.current || mutation.isPending) return;
+        onConfirm={async () => {
+          if (!confirm || deleting.current || mutation.isPending)
+            throw new Error('Operation unavailable');
           deleting.current = true;
-          setOverlay(null);
-          void mutation
-            .mutateAsync(confirm.id)
-            .catch(() => undefined)
-            .finally(() => {
-              deleting.current = false;
-            });
+          try {
+            await mutation.mutateAsync(confirm.id);
+          } finally {
+            deleting.current = false;
+          }
         }}
       />
     </>

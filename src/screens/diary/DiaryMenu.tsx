@@ -38,7 +38,7 @@ export function DiaryMenu({
       await cleanupImages(db, files);
     },
     'diary',
-    onDeleted,
+    undefined,
     (error) =>
       showNotice({ tone: 'error', title: t('diary.processFailed'), message: error.message }),
   );
@@ -95,12 +95,10 @@ export function DiaryMenu({
         visible={confirmOpen}
         title={t('diary.deleteTitle')}
         message={t('diary.deleteWarning')}
-        confirmLabel={t('diary.deleteAction')}
+        confirmLabel={t('common.delete')}
         onCancel={() => setConfirmOpen(false)}
-        onConfirm={() => {
-          setConfirmOpen(false);
-          mutation.mutate(undefined);
-        }}
+        onConfirm={() => mutation.mutateAsync(undefined)}
+        onConfirmed={onDeleted}
       />
     </>
   );

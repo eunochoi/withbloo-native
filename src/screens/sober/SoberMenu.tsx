@@ -33,7 +33,7 @@ export function SoberMenu({
   const mutation = useRecordMutation(
     () => deleteSober(db, sober.id),
     'sober',
-    onDeleted,
+    undefined,
     (error) =>
       showNotice({ tone: 'error', title: t('sober.deleteFailed'), message: error.message }),
   );
@@ -81,12 +81,10 @@ export function SoberMenu({
         danger
         title={t('sober.deleteTitle')}
         message={t('sober.deleteWarning', { value: sober.name })}
-        confirmLabel={t('diary.deleteAction')}
+        confirmLabel={t('common.delete')}
         onCancel={() => setConfirm(false)}
-        onConfirm={() => {
-          setConfirm(false);
-          mutation.mutate(undefined);
-        }}
+        onConfirm={() => mutation.mutateAsync(undefined)}
+        onConfirmed={onDeleted}
       />
     </>
   );
