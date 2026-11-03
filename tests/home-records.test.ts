@@ -407,7 +407,7 @@ test('home greeting retains its welcome copy and all three hashtag destinations'
   const view = ui.render();
   assert(view.nodes.some((node) => node.type === 'Text' && node.props.children === '어떤 하루든'));
   assert(
-    view.nodes.some((node) => node.type === 'Text' && node.props.children === '모두 나의 기록으로'),
+    view.nodes.some((node) => node.type === 'Text' && node.props.children === '나의 기록으로'),
   );
   const links = view.nodes.filter((node) => node.type === 'Pressable');
   assert.equal(links.length, 3);

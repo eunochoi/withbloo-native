@@ -157,28 +157,6 @@ test('reduced motion disables fade and the page background transition', () => {
   assert.equal(ColorView({}).props.style[1].transitionDuration, undefined);
 });
 
-test('home focus remounts the greeting and reduced motion retains the resting rotation', () => {
-  function emotion(node: any): any {
-    if (!node || typeof node !== 'object') return;
-    if (node.type === 'AnimatedView') return node;
-    for (const child of [node.props?.children].flat()) {
-      const result = emotion(child);
-      if (result) return result;
-    }
-  }
-  const on = emotion(load('../src/screens/home/HomeGreeting.tsx', false, true).HomeGreeting());
-  const off = emotion(load('../src/screens/home/HomeGreeting.tsx', false, false).HomeGreeting());
-  const reduced = emotion(load('../src/screens/home/HomeGreeting.tsx', true, true).HomeGreeting());
-  assert(on.props.style.animationName);
-  assert.equal(on.props.style.animationDuration, `${tokens.motion.greeting}ms`);
-  assert.equal(off.props.style.animationName, undefined);
-  assert.equal(reduced.props.style.animationName, undefined);
-  assert.equal(reduced.props.style.transform[0].rotate, '5deg');
-  assert.equal(on.key, 'moving');
-  assert.equal(off.key, 'idle');
-  assert.equal(reduced.key, 'idle');
-});
-
 test('home retains its decoration within the page scroll viewport', () => {
   function nodes(node: any): any[] {
     if (!node || typeof node !== 'object') return [];

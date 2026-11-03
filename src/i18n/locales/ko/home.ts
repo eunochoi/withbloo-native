@@ -1,6 +1,6 @@
 export const homeKo = {
   greetingFirst: '어떤 하루든',
-  greetingSecond: '모두 나의 기록으로',
+  greetingSecond: '나의 기록으로',
   emotionTag: '감정기록',
   habitTag: '습관관리',
   soberTag: '거리두기',
