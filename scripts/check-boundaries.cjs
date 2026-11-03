@@ -54,12 +54,8 @@ assert.match(config.ios.buildNumber, /^\d+$/);
 assert(pkg.scripts.ios);
 for (const file of source) {
   const text = fs.readFileSync(file, 'utf8');
-  const wordmarkFontSource = ['src/components/Wordmark.tsx', 'src/theme/fonts.ts'].some(
-    (name) => file === path.join(root, name),
-  );
   assert(
-    (!/Fredoka/.test(text) || wordmarkFontSource) &&
-      !/settings\.(mode|accent|font)\b/.test(text),
+    !/Fredoka/.test(text) && !/settings\.(mode|accent|font)\b/.test(text),
     `Retired platform/font code: ${file}`,
   );
 }

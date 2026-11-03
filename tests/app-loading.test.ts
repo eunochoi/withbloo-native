@@ -250,7 +250,7 @@ test('loading logo failure reaches retry UI without reporting readiness', () => 
 });
 
 test('withBloo wordmark shares the Next artwork, follows theme colors and forwards image events', () => {
-  const reference = readFileSync(new URL('../assets/ui/withbloo-text-mask.png', import.meta.url));
+  const reference = readFileSync(new URL('../assets/brand/withbloo-text-mask.png', import.meta.url));
   const dimensions = { width: reference.readUInt32BE(16), height: reference.readUInt32BE(20) };
   const settings = { themeAccent: 'blue' };
   const theme = { mode: 'light' };
@@ -276,8 +276,8 @@ test('withBloo wordmark shares the Next artwork, follows theme colors and forwar
       theme.mode = mode;
       const tree = h.render('Wordmark', { size: 45, onLoad, onError });
       const [text, color] = tree.props.children;
-      assert.equal(text.props.source, '../../assets/ui/withbloo-text-mask.png');
-      assert.equal(color.props.source, '../../assets/ui/withbloo-accent-mask.png');
+      assert.equal(text.props.source, '../../assets/brand/withbloo-text-mask.png');
+      assert.equal(color.props.source, '../../assets/brand/withbloo-accent-mask.png');
       assert.equal(text.props.style.tintColor, `${accent}-${mode}-text`);
       assert.equal(color.props.style.tintColor, `${accent}-${mode}-accent`);
       assert.equal(tree.props.style.height, 45);

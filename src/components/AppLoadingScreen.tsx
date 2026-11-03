@@ -5,8 +5,8 @@ import { StatusBar } from 'expo-status-bar';
 
 const splash =
   Platform.OS === 'android'
-    ? require('../../assets/ui/splash-android.png')
-    : require('../../assets/ui/splash.png');
+    ? require('../../assets/brand/splash-android.png')
+    : require('../../assets/brand/splash.png');
 
 export function AppLoadingScreen({
   onReady,
