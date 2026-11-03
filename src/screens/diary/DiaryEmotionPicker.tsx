@@ -5,7 +5,7 @@ import { useAnimatedRef } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AnimatedScrollView } from '../../components/AnimatedScrollView';
 import { BottomSheetModal } from '../../components/BottomSheetModal';
-import { Button } from '../../components/Button';
+import { HeaderAction } from '../../components/HeaderAction';
 import { EmotionImage } from '../../components/EmotionImage';
 import { PickerOption } from '../../components/PickerOption';
 import { Text } from '../../components/Text';
@@ -205,12 +205,14 @@ export function DiaryEmotionPicker({
           </View>
         </AnimatedScrollView>
       )}
-      footer={(closePicker) => (
-        <Button
-          labelWeight="normal"
-          label={allowDeselect ? t('ui.apply') : t('diary.selectionDone')}
+      headerRight={(closePicker) => (
+        <HeaderAction
+          label={allowDeselect ? t('common.apply') : t('common.done')}
           disabled={!allowDeselect && draft === null}
-          onPress={() => closePicker(() => onApply(draft))}
+          onPress={() => {
+            onApply(draft);
+            closePicker();
+          }}
         />
       )}
     />

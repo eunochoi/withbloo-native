@@ -6,7 +6,7 @@ import { useAppTheme } from '../theme/AppThemeProvider';
 import { adjustColorBrightness } from '../theme/colors';
 import { AnimatedFlatList } from './AnimatedFlatList';
 import { BottomSheetModal } from './BottomSheetModal';
-import { Button } from './Button';
+import { HeaderAction } from './HeaderAction';
 import { PickerOption } from './PickerOption';
 import { Text } from './Text';
 
@@ -33,11 +33,13 @@ export function IconColorPicker({
       fixedHeight
       title={t('habit.iconColor')}
       onClose={onClose}
-      footer={(close) => (
-        <Button
-          labelWeight="normal"
-          label={t('habit.selectionDone')}
-          onPress={() => close(() => onApply(draft))}
+      headerRight={(close) => (
+        <HeaderAction
+          label={t('common.done')}
+          onPress={() => {
+            onApply(draft);
+            close();
+          }}
         />
       )}
       renderScrollView={({ ref, ...scrollProps }) => (

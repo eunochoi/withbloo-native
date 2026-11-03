@@ -1,11 +1,10 @@
 import { useI18n } from '../i18n/react';
 import { InfoNotice } from './InfoNotice';
 import { useState } from 'react';
-import { Pressable, Switch, View } from 'react-native';
+import { Switch, View } from 'react-native';
 import { useAppTheme } from '../theme/AppThemeProvider';
-import { AppIcon } from './AppIcon';
 import { BottomSheetModal } from './BottomSheetModal';
-import { Button } from './Button';
+import { HeaderAction } from './HeaderAction';
 import { PickerOption } from './PickerOption';
 import { Text } from './Text';
 
@@ -35,7 +34,7 @@ export function RecordSortPicker({
   ) => void;
 }) {
   const { t } = useI18n();
-  const { colors, iconSizes } = useAppTheme();
+  const { colors } = useAppTheme();
   const [draftSort, setSort] = useState(sort);
   const [draftRecordSort, setRecordSort] = useState(recordSort);
   const [draftPriority, setPriority] = useState(
@@ -65,33 +64,27 @@ export function RecordSortPicker({
     <BottomSheetModal
       visible
       title={title}
-      headerAction={
-        <Pressable
-          accessibilityRole="button"
+      onClose={onClose}
+      headerLeft={
+        <HeaderAction
+          label={t('ui.reset')}
           accessibilityLabel={t('ui.resetSelection')}
           onPress={() => {
             setSort('DESC');
             setPriority(false);
             setRecordSort(recordSort ? 'DESC' : undefined);
           }}
-          hitSlop={6}
-          className="min-h-9 flex-row items-center justify-center gap-1 px-1 active:opacity-70"
-        >
-          <AppIcon name="restart-alt" size={iconSizes.md} className="text-theme-accent" />
-          <Text className="text-sm text-theme-text-secondary">{t('ui.reset')}</Text>
-        </Pressable>
+        />
       }
-      onClose={onClose}
-      footer={(closePicker) => (
-        <Button
-          label={t('ui.apply')}
-          onPress={() =>
-            closePicker(() => {
-              const priority = draftSort === 'CUSTOM' ? false : draftPriority;
-              if (recordSort) onApply(draftSort, priority, draftRecordSort);
-              else onApply(draftSort, priority);
-            })
-          }
+      headerRight={(closePicker) => (
+        <HeaderAction
+          label={t('common.apply')}
+          onPress={() => {
+            const priority = draftSort === 'CUSTOM' ? false : draftPriority;
+            if (recordSort) onApply(draftSort, priority, draftRecordSort);
+            else onApply(draftSort, priority);
+            closePicker();
+          }}
         />
       )}
     >

@@ -4,7 +4,7 @@ import { ScrollView, View, useWindowDimensions } from 'react-native';
 import type { UseQueryResult } from '@tanstack/react-query';
 import { BottomSheetModal } from '../../components/BottomSheetModal';
 import { PickerOption } from '../../components/PickerOption';
-import { Button } from '../../components/Button';
+import { HeaderAction } from '../../components/HeaderAction';
 import { QueryError } from '../../components/QueryError';
 import { Text } from '../../components/Text';
 export function HomeYearPicker({
@@ -29,13 +29,15 @@ export function HomeYearPicker({
       visible
       title={t('home.yearTitle')}
       onClose={onClose}
-      footer={
+      headerRight={
         !query.isError && !query.isPending
           ? (closePicker) => (
-              <Button
-                labelWeight="normal"
-                label={t('ui.apply')}
-                onPress={() => closePicker(() => onApply(tempYear))}
+              <HeaderAction
+                label={t('common.apply')}
+                onPress={() => {
+                  onApply(tempYear);
+                  closePicker();
+                }}
               />
             )
           : undefined

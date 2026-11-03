@@ -5,7 +5,7 @@ import { useAnimatedRef } from 'react-native-reanimated';
 import { useAppTheme } from '../theme/AppThemeProvider';
 import { AnimatedScrollView } from './AnimatedScrollView';
 import { BottomSheetModal } from './BottomSheetModal';
-import { Button } from './Button';
+import { HeaderAction } from './HeaderAction';
 import { PickerOption } from './PickerOption';
 import { Text } from './Text';
 
@@ -221,11 +221,13 @@ export function IconPicker<Key extends string>({
           </View>
         </AnimatedScrollView>
       )}
-      footer={(close) => (
-        <Button
-          labelWeight="normal"
-          label={t('habit.selectionDone')}
-          onPress={() => close(() => onApply(draft))}
+      headerRight={(close) => (
+        <HeaderAction
+          label={t('common.done')}
+          onPress={() => {
+            onApply(draft);
+            close();
+          }}
         />
       )}
     />

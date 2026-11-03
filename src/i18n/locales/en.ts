@@ -53,6 +53,7 @@ export const en = {
   common: {
     confirm: 'OK',
     cancel: 'Cancel',
+    cancelDescription: 'Return to the previous screen.',
     save: 'Save',
     delete: 'Delete',
     edit: 'Edit',

@@ -44,7 +44,6 @@ export function SoberFilterPicker({
   return (
     <FilterSheet
       title={t('sober.filterTitle')}
-      resetInHeader
       onClose={onClose}
       onReset={() => setDraft(DEFAULT_SOBER_FILTER)}
       onApply={() => onApply(draft)}

@@ -55,6 +55,7 @@ export const ko = {
   common: {
     confirm: '확인',
     cancel: '취소',
+    cancelDescription: '이전 화면으로 돌아가요.',
     save: '저장',
     delete: '삭제',
     edit: '수정',

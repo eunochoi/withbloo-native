@@ -1,7 +1,7 @@
-import type { ComponentProps, ReactNode } from 'react';
+import { useEffect, useRef, type ComponentProps, type ReactNode } from 'react';
 import type { ScrollView } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
-import { View } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import type { useBottomSheetMotion } from '../hooks/useBottomSheetMotion';
 import type { useScrollFade } from '../hooks/useScrollFade';
@@ -35,9 +35,27 @@ export function BottomSheetScrollViewport({
   renderScrollView?: (props: BottomSheetScrollProps) => ReactNode;
   header?: ReactNode;
 }) {
+  const focusedInput = useRef<number | null>(null);
+
+  useEffect(() => {
+    const shown = Keyboard.addListener('keyboardDidShow', () => {
+      if (focusedInput.current !== null) {
+        motion.scrollRef.current?.scrollResponderScrollNativeHandleToKeyboard(focusedInput.current, 16, true);
+      }
+    });
+    return () => shown.remove();
+  }, [motion.scrollRef]);
+
   const scrollProps: BottomSheetScrollProps = {
     ref: motion.scrollRef,
     scrollEnabled,
+    onFocus: (event) => {
+      focusedInput.current = event.nativeEvent.target;
+      if (Keyboard.isVisible() && focusedInput.current !== null) {
+        motion.scrollRef.current?.scrollResponderScrollNativeHandleToKeyboard(focusedInput.current, 16, true);
+      }
+    },
+    onBlur: () => { focusedInput.current = null; },
     onLayout: fade.onLayout,
     onContentSizeChange: fade.onContentSizeChange,
     onScroll: motion.onScroll,
@@ -51,7 +69,7 @@ export function BottomSheetScrollViewport({
     nestedScrollEnabled: true,
     bounces: false,
     overScrollMode: 'never',
-    keyboardShouldPersistTaps: 'handled',
+    keyboardShouldPersistTaps: 'never',
     keyboardDismissMode: 'none',
   };
   const viewport = (

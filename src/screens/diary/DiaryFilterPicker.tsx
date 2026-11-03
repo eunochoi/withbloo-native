@@ -55,7 +55,6 @@ export function DiaryFilterPicker({
   return (
     <FilterSheet
       title={t('diary.filterTitle')}
-      resetInHeader
       onClose={onClose}
       onReset={() => {
         setYear(null);

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { dateTimeDraft, parseDateTime } from '../domain/date';
 import { BottomSheetModal } from './BottomSheetModal';
-import { Button } from './Button';
+import { HeaderAction } from './HeaderAction';
 import { DateTimeFields } from './DateTimeFields';
 import { InfoNotice } from './InfoNotice';
 import { Text } from './Text';
@@ -37,16 +37,16 @@ export function DateTimePicker({
       fixedHeight
       title={title}
       onClose={onClose}
-      footer={(close) => (
-        <Button
-          labelWeight="normal"
-          label={confirmLabel ?? t('habit.selectionDone')}
+      headerRight={(close) => (
+        <HeaderAction
+          label={confirmLabel ?? t('common.done')}
           onPress={() => {
             try {
               const iso = parseDateTime(draft, Date.now());
               if (minTime && Date.parse(iso) < Date.parse(minTime))
                 throw new Error(t('habit.afterStart'));
-              close(() => onApply(iso));
+              onApply(iso);
+              close();
             } catch (failure) {
               setError(failure instanceof Error ? failure.message : t('habit.retry'));
             }

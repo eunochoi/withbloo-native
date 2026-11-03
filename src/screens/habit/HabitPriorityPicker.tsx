@@ -2,7 +2,7 @@ import { useI18n } from '../../i18n/react';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '../../components/BottomSheetModal';
-import { Button } from '../../components/Button';
+import { HeaderAction } from '../../components/HeaderAction';
 import { InfoNotice } from '../../components/InfoNotice';
 import { PickerOption } from '../../components/PickerOption';
 import { Text } from '../../components/Text';
@@ -26,11 +26,13 @@ export function HabitPriorityPicker({
       visible
       title={t('habit.priority')}
       onClose={onClose}
-      footer={(close) => (
-        <Button
-          labelWeight="normal"
-          label={t('habit.selectionDone')}
-          onPress={() => close(() => onApply(draft))}
+      headerRight={(close) => (
+        <HeaderAction
+          label={t('common.done')}
+          onPress={() => {
+            onApply(draft);
+            close();
+          }}
         />
       )}
     >

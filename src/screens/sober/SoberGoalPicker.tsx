@@ -5,7 +5,7 @@ import { TextInput, View } from 'react-native';
 import { BottomSheetModal } from '../../components/BottomSheetModal';
 import { PickerAction } from '../../components/PickerAction';
 import { PickerOption } from '../../components/PickerOption';
-import { Button } from '../../components/Button';
+import { HeaderAction } from '../../components/HeaderAction';
 import { Text } from '../../components/Text';
 import { SOBER_GOALS } from '../../domain/sober';
 import { SOBER_MAX_GOAL_DAYS } from '../../domain/limits';
@@ -40,19 +40,17 @@ export function SoberGoalPicker({
       onClose={onClose}
       dismissOnBack={editor === null}
       onBeforeClose={() => editor === null}
-      footer={(close) => (
-        <Button
-          labelWeight="normal"
-          label={t('sober.setGoal')}
+      headerRight={(close) => (
+        <HeaderAction
+          label={t('common.apply')}
           disabled={editor !== null}
-          onPress={() =>
-            close(() =>
-              onApply(
-                selection === 'AUTO' ? 'AUTO' : 'MANUAL',
-                selection === 'AUTO' ? null : Number(draftDays),
-              ),
-            )
-          }
+          onPress={() => {
+            onApply(
+              selection === 'AUTO' ? 'AUTO' : 'MANUAL',
+              selection === 'AUTO' ? null : Number(draftDays),
+            );
+            close();
+          }}
         />
       )}
     >
@@ -101,17 +99,15 @@ export function SoberGoalPicker({
             visible
             title={editor.kind === 'PERIOD' ? t('sober.periodTitle') : t('sober.daysTitle')}
             onClose={() => setEditor(null)}
-            footer={(close) => (
-              <Button
-                labelWeight="normal"
-                label={t('diary.selectionDone')}
+            headerRight={(close) => (
+              <HeaderAction
+                label={t('common.done')}
                 disabled={!valid}
                 onPress={() => {
                   if (!valid) return;
-                  close(() => {
-                    setSelection(editor.kind);
-                    setDays(String(Number(editor.days)));
-                  });
+                  setSelection(editor.kind);
+                  setDays(String(Number(editor.days)));
+                  close();
                 }}
               />
             )}

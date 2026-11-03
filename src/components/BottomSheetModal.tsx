@@ -1,6 +1,7 @@
 import { useI18n } from '../i18n/react';
 import { useEffect, type ReactNode, type ComponentProps } from 'react';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Pressable,
@@ -28,7 +29,8 @@ export function BottomSheetModal({
   handleColor,
   titleIcon,
   titleAction,
-  headerAction,
+  headerLeft,
+  headerRight,
   fixedContent,
   onClose,
   children,
@@ -58,7 +60,8 @@ export function BottomSheetModal({
   handleColor?: string;
   titleIcon?: ReactNode;
   titleAction?: ComponentProps<typeof BottomSheetHeader>['titleAction'];
-  headerAction?: ReactNode;
+  headerLeft?: ReactNode;
+  headerRight?: ReactNode | ((closeSheet: CloseBottomSheet) => ReactNode);
   fixedContent?: ReactNode;
   onClose: () => void;
   children?: ReactNode | ((closeSheet: CloseBottomSheet) => ReactNode);
@@ -117,15 +120,21 @@ export function BottomSheetModal({
       scrollRef,
     });
   const headerContent = (
-    <BottomSheetHeader
-      handleColor={handleColor}
-      title={title}
-      titleIcon={titleIcon}
-      titleAction={titleAction}
-      headerAction={headerAction}
-      menuAction={menuAction}
-      onClose={dismissible ? () => closeSheet() : undefined}
-    />
+    <View
+      onStartShouldSetResponderCapture={() => Keyboard.isVisible()}
+      onResponderRelease={() => Keyboard.dismiss()}
+    >
+      <BottomSheetHeader
+        handleColor={handleColor}
+        title={title}
+        titleIcon={titleIcon}
+        titleAction={titleAction}
+        headerLeft={headerLeft}
+        headerRight={typeof headerRight === 'function' ? headerRight(closeSheet) : headerRight}
+        menuAction={menuAction}
+        onClose={dismissible ? () => closeSheet() : undefined}
+      />
+    </View>
   );
   const header = contentFullBleed ? (
     <View className="px-[5%]">{headerContent}</View>
@@ -192,6 +201,8 @@ export function BottomSheetModal({
         )}
         {footer && (
           <View
+            onStartShouldSetResponderCapture={() => Keyboard.isVisible()}
+            onResponderRelease={() => Keyboard.dismiss()}
             className={contentFullBleed ? 'pb-4 px-[5%]' : 'pb-4'}
             style={insets.bottom > 0 ? { paddingBottom: appRem + insets.bottom } : undefined}
           >
@@ -222,7 +233,10 @@ export function BottomSheetModal({
               disabled={!dismissible}
               accessibilityRole="button"
               accessibilityLabel={t('common.close')}
-              onPress={() => closeSheet()}
+              onPress={() => {
+                if (Keyboard.isVisible()) Keyboard.dismiss();
+                else closeSheet();
+              }}
               className={`absolute inset-0 ${dimBackdrop ? 'bg-theme-overlay/25' : ''}`}
             />
           </Animated.View>

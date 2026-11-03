@@ -203,7 +203,7 @@ function harness(
           ScrollView: 'ScrollView',
           Pressable: 'Pressable',
           useWindowDimensions: () => ({ height: 800 }),
-          Keyboard: { dismiss: () => {}, addListener: () => ({ remove: () => {} }) },
+          Keyboard: { isVisible: () => false, dismiss: () => {}, addListener: () => ({ remove: () => {} }) },
           AccessibilityInfo: { announceForAccessibility: () => {} },
           BackHandler: {
             addEventListener: (_name: string, callback: () => boolean) => {
@@ -574,7 +574,7 @@ test('sheet delegates keyboard avoidance to its native container without measure
   assert.ok(scroll.props.ref);
   assert.equal(scroll.props.contentContainerStyle.paddingBottom, 56.25);
   assert.equal(scroll.props.contentContainerClassName, 'gap-7 pt-6 pb-7');
-  assert.equal(scroll.props.keyboardShouldPersistTaps, 'handled');
+  assert.equal(scroll.props.keyboardShouldPersistTaps, 'never');
   assert.equal(scroll.props.keyboardDismissMode, 'none');
 });
 

@@ -10,7 +10,8 @@ export function BottomSheetHeader({
   handleColor,
   titleIcon,
   titleAction,
-  headerAction,
+  headerLeft,
+  headerRight,
   menuAction,
   onClose,
 }: {
@@ -21,8 +22,10 @@ export function BottomSheetHeader({
     onPress: () => void;
     accessibilityLabel: string;
     disabled?: boolean;
+    showChevron?: boolean;
   };
-  headerAction?: ReactNode;
+  headerLeft?: ReactNode;
+  headerRight?: ReactNode;
   menuAction?: ReactNode;
   onClose?: () => void;
 }) {
@@ -44,9 +47,9 @@ export function BottomSheetHeader({
           />
         </Pressable>
       )}
-      {(title || titleIcon || menuAction || headerAction) && (
+      {(title || titleIcon || menuAction || headerLeft || headerRight) && (
         <View
-          className={`relative self-stretch flex-row items-center gap-2 py-1 ${headerAction ? 'px-20' : ''}`}
+          className={`relative self-stretch flex-row items-center gap-2 py-1 ${headerLeft || headerRight ? 'px-20' : ''}`}
         >
           {menuAction && <View className="w-11 shrink-0" />}
           <View className="flex-1 min-w-0 flex-row items-center justify-center gap-2">
@@ -62,24 +65,28 @@ export function BottomSheetHeader({
                 }}
                 className="min-h-11 min-w-0 shrink flex-row items-center justify-center gap-1.5 px-2 active:opacity-70"
               >
-                <View style={{ width: iconSizes.md }} className="shrink-0" accessible={false} />
+                {titleAction.showChevron !== false && (
+                  <View style={{ width: iconSizes.md }} className="shrink-0" accessible={false} />
+                )}
                 <Text
                   numberOfLines={1}
                   className="min-w-0 shrink text-center text-lg font-semibold tracking-tight"
                 >
                   {title}
                 </Text>
-                <View
-                  style={{ width: iconSizes.md }}
-                  className="shrink-0 items-center"
-                  accessible={false}
-                >
-                  <AppIcon
-                    name="chevron-right"
-                    size={iconSizes.md}
-                    className="text-theme-text-secondary"
-                  />
-                </View>
+                {titleAction.showChevron !== false && (
+                  <View
+                    style={{ width: iconSizes.md }}
+                    className="shrink-0 items-center"
+                    accessible={false}
+                  >
+                    <AppIcon
+                      name="chevron-right"
+                      size={iconSizes.md}
+                      className="text-theme-text-secondary"
+                    />
+                  </View>
+                )}
               </Pressable>
             ) : (
               <Text
@@ -91,7 +98,8 @@ export function BottomSheetHeader({
             )}
           </View>
           {menuAction && <View className="w-11 shrink-0 items-end">{menuAction}</View>}
-          {headerAction && <View className="absolute right-0 items-center">{headerAction}</View>}
+          {headerLeft && <View className="absolute left-0 items-center">{headerLeft}</View>}
+          {headerRight && <View className="absolute right-0 items-center">{headerRight}</View>}
         </View>
       )}
     </View>

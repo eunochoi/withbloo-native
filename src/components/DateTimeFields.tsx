@@ -1,8 +1,9 @@
+import { FormTextInput } from './FormTextInput';
 import { formatDisplayDate } from '../i18n/format';
 import { useI18n } from '../i18n/react';
 import { format } from 'date-fns';
 import { useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { View } from 'react-native';
 import type { dateTimeDraft } from '../domain/date';
 import type { Sober } from '../db/types';
 import { useCurrentMinute } from '../hooks/useCurrentMinute';
@@ -79,7 +80,7 @@ export function DateTimeFields({
           />
           <View className="flex-row items-center justify-center gap-3">
             <View className={TIME_INPUT_CONTAINER_CLASS_NAME}>
-              <TextInput
+              <FormTextInput
                 accessibilityLabel={t('habit.hourInput')}
                 keyboardType="number-pad"
                 maxLength={2}
@@ -94,7 +95,7 @@ export function DateTimeFields({
             </View>
             <Text>:</Text>
             <View className={TIME_INPUT_CONTAINER_CLASS_NAME}>
-              <TextInput
+              <FormTextInput
                 accessibilityLabel={t('habit.minuteInput')}
                 keyboardType="number-pad"
                 maxLength={2}

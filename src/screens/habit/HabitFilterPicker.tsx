@@ -32,7 +32,6 @@ export function HabitFilterPicker({
   return (
     <FilterSheet
       title={t('habit.filterTitle')}
-      resetInHeader
       onClose={onClose}
       onReset={() => setDraft(DEFAULT_HABIT_FILTER)}
       onApply={() => onApply(draft)}
