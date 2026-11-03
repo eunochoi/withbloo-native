@@ -2,7 +2,7 @@
   "expo": {
     "name": "withBloo",
     "slug": "took-native",
-    "version": "2.2.3",
+    "version": "2.2.4",
     "scheme": "took-local",
     "orientation": "portrait",
     "platforms": [
@@ -13,7 +13,7 @@
     "icon": "./assets/icon.png",
     "ios": {
       "bundleIdentifier": "com.took",
-      "buildNumber": "9",
+      "buildNumber": "10",
       "supportsTablet": false,
       "entitlements": {
         "com.apple.security.application-groups": [
@@ -71,7 +71,7 @@
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE"
       ],
-      "versionCode": 33
+      "versionCode": 34
     },
     "plugins": [
       "@bacons/apple-targets",
