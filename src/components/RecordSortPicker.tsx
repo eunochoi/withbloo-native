@@ -47,7 +47,7 @@ export function RecordSortPicker({
   ] as { value: 'ASC' | 'DESC' | 'CUSTOM'; label: string }[];
   const prioritySection = priorityFirst !== undefined && (
     <View className="flex-row items-center justify-between gap-3">
-      <Text className="text-base font-semibold">{t('ui.priorityFirst')}</Text>
+      <Text className="text-lg font-semibold">{t('ui.priorityFirst')}</Text>
       <Switch
         accessibilityLabel={t('ui.priorityFirst')}
         value={draftPriority}
@@ -93,7 +93,7 @@ export function RecordSortPicker({
         {prioritySection}
         {recordSort && (
           <View className="gap-3">
-            <Text className="text-base font-semibold">{t('ui.records')}</Text>
+            <Text className="text-lg font-semibold">{t('ui.records')}</Text>
             <View className="flex-row gap-3">
               {(['DESC', 'ASC'] as const).map((value) => (
                 <View key={value} className="flex-1">
@@ -118,7 +118,7 @@ export function RecordSortPicker({
           </View>
         )}
         <View className="gap-3">
-          <Text className="text-base font-semibold">{sortLabel ?? t('ui.createdDateSort')}</Text>
+          <Text className="text-lg font-semibold">{sortLabel ?? t('ui.createdDateSort')}</Text>
           <View className="flex-row gap-3">
             {options.map((option) => (
               <View key={option.value} className="flex-1">

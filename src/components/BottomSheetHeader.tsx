@@ -49,7 +49,7 @@ export function BottomSheetHeader({
       )}
       {(title || titleIcon || menuAction || headerLeft || headerRight) && (
         <View
-          className={`relative self-stretch flex-row items-center gap-2 py-1 ${headerLeft || headerRight ? 'px-20' : ''}`}
+          className={`relative mb-4 self-stretch flex-row items-center gap-2 py-1 ${headerLeft || headerRight ? 'px-20' : ''}`}
         >
           {menuAction && <View className="w-11 shrink-0" />}
           <View className="flex-1 min-w-0 flex-row items-center justify-center gap-2">
@@ -70,7 +70,7 @@ export function BottomSheetHeader({
                 )}
                 <Text
                   numberOfLines={1}
-                  className="min-w-0 shrink text-center text-lg font-semibold tracking-tight"
+                  className="min-w-0 shrink text-center text-xl font-semibold tracking-tight"
                 >
                   {title}
                 </Text>
@@ -91,7 +91,7 @@ export function BottomSheetHeader({
             ) : (
               <Text
                 accessibilityRole="header"
-                className="shrink text-center text-lg font-semibold tracking-tight"
+                className="shrink text-center text-xl font-semibold tracking-tight"
               >
                 {title}
               </Text>

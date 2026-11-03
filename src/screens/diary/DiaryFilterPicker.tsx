@@ -64,7 +64,7 @@ export function DiaryFilterPicker({
       onApply={() => onApply(selectedYear, draftSeasons, draftEmotionGroups)}
     >
       <View className="gap-4">
-        <Text className="text-base font-semibold">{t('diary.yearLabel')}</Text>
+        <Text className="text-lg font-semibold">{t('diary.yearLabel')}</Text>
         <FormPickerRow
           label={
             selectedYear === null ? t('diary.allYears') : t('home.year', { count: selectedYear })
@@ -76,7 +76,7 @@ export function DiaryFilterPicker({
       </View>
       <View className="gap-4">
         <View className="flex-row items-baseline justify-between gap-3">
-          <Text className="text-base font-semibold">{t('diary.seasonLabel')}</Text>
+          <Text className="text-lg font-semibold">{t('diary.seasonLabel')}</Text>
           <Text className="min-w-0 shrink text-right text-sm text-theme-text-secondary">
             {selectionSummary(
               draftSeasons.map((season) => t(`diary.${season}`)),
@@ -136,7 +136,7 @@ export function DiaryFilterPicker({
       </InfoNotice>
       <View className="gap-4">
         <View className="flex-row items-baseline justify-between gap-3">
-          <Text className="text-base font-semibold">{t('diary.emotionLabel')}</Text>
+          <Text className="text-lg font-semibold">{t('diary.emotionLabel')}</Text>
           <Text className="shrink text-sm text-theme-text-secondary">
             {selectionSummary(
               draftEmotionGroups.map((group) => t(`diary.${group}`)),
