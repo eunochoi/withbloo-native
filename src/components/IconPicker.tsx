@@ -82,7 +82,7 @@ export function IconPicker<Key extends string>({
   }
 
   const topContent = (
-    <View className="shrink-0 gap-4 pt-4 pb-2">
+    <View className="shrink-0 gap-4 pt-8 pb-2">
       <ScrollView
         ref={chipScrollRef}
         horizontal
@@ -166,7 +166,7 @@ export function IconPicker<Key extends string>({
         <AnimatedScrollView
           {...scrollProps}
           key={contentKey}
-          contentContainerClassName="gap-3 px-[5%] pt-4 pb-7"
+          contentContainerClassName="gap-3 px-[5%] pt-4 pb-8"
           onContentSizeChange={(width, contentHeight) => {
             if (typeof scrollProps.onContentSizeChange === 'function') {
               scrollProps.onContentSizeChange(width, contentHeight);

@@ -52,7 +52,7 @@ export function IconColorPicker({
           data={keys}
           numColumns={3}
           keyExtractor={(key) => key}
-          contentContainerClassName="gap-1 pt-6 pb-7"
+          contentContainerClassName="gap-1 py-8"
           columnWrapperClassName="gap-1"
           renderItem={({ item: key }) => {
             const { value: backgroundColor } =

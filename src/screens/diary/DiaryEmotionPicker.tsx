@@ -74,7 +74,7 @@ export function DiaryEmotionPicker({
 
   const topContent = (
     <View
-      className="shrink-0 gap-4 pt-4 pb-2"
+      className={`shrink-0 gap-4 pb-2 ${pinTop ? 'pt-8' : ''}`}
       onLayout={(event) => setTopHeight(event.nativeEvent.layout.height)}
     >
       <View className="flex-row flex-wrap gap-2">
@@ -137,7 +137,7 @@ export function DiaryEmotionPicker({
         <AnimatedScrollView
           {...scrollProps}
           key={contentKey}
-          contentContainerClassName="gap-3 pt-4 pb-7"
+          contentContainerClassName={`gap-3 pb-8 ${pinTop ? 'pt-4' : 'pt-8'}`}
           onContentSizeChange={(width, contentHeight) => {
             if (typeof scrollProps.onContentSizeChange === 'function') {
               scrollProps.onContentSizeChange(width, contentHeight);
