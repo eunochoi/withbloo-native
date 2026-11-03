@@ -172,7 +172,7 @@ export function BottomSheetModal({
             onScroll: motion.onScroll,
           })
         ) : fillContent ? (
-          <View className={`${fixedHeight ? 'flex-1' : 'shrink'} min-h-0 pt-6`}>
+          <View className={`${fixedHeight ? 'flex-1' : 'shrink'} min-h-0 py-8`}>
             {typeof children === 'function' ? children(closeSheet) : children}
           </View>
         ) : (
@@ -193,7 +193,7 @@ export function BottomSheetModal({
             contentKey={contentKey}
             bottomPadding={
               contentBottomPadding ??
-              (!footer && insets.bottom > 0 ? appRem * 1.75 + insets.bottom : undefined)
+              (!footer && insets.bottom > 0 ? appRem * 2 + insets.bottom : undefined)
             }
           >
             {typeof children === 'function' ? children(closeSheet) : children}

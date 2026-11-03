@@ -53,7 +53,7 @@ export default function HabitDetail() {
           <QueryState query={records} />
           {habit ? (
             <>
-              <View className="items-center gap-4 px-1 py-2">
+              <View className="items-center gap-4 px-1 pb-2">
                 <HabitIcon name={habit.icon_key} colorKey={habit.icon_color} size={appRem * 4} />
                 <ScrollableName heading className="text-center text-xl font-semibold">
                   {habit.name}

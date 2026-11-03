@@ -93,7 +93,7 @@ export default function SoberDetail() {
     >
       <View className="gap-8">
         <View className="gap-7">
-          <View className="items-center gap-3 pt-2">
+          <View className="items-center gap-3">
             <SoberIcon name={sober.icon_key} colorKey={sober.icon_color} size={rem * 4} />
             <ScrollableName heading className="text-center text-xl font-semibold">
               {sober.name}

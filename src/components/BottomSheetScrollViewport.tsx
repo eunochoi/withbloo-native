@@ -63,7 +63,7 @@ export function BottomSheetScrollViewport({
     showsVerticalScrollIndicator: false,
     showsHorizontalScrollIndicator: false,
     className: `${fixedHeight ? 'flex-1' : 'grow-0 shrink'} min-h-0`,
-    contentContainerClassName: 'gap-7 pt-6 pb-7',
+    contentContainerClassName: 'gap-7 py-8',
     contentContainerStyle:
       bottomPadding === undefined ? undefined : { paddingBottom: bottomPadding },
     nestedScrollEnabled: true,

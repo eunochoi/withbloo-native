@@ -572,8 +572,8 @@ test('sheet delegates keyboard avoidance to its native container without measure
   assert.equal(surface.props.style.paddingBottom, undefined);
   assert.equal(surface.props.style.maxHeight, 800 * 0.95);
   assert.ok(scroll.props.ref);
-  assert.equal(scroll.props.contentContainerStyle.paddingBottom, 56.25);
-  assert.equal(scroll.props.contentContainerClassName, 'gap-7 pt-6 pb-7');
+  assert.equal(scroll.props.contentContainerStyle.paddingBottom, 60);
+  assert.equal(scroll.props.contentContainerClassName, 'gap-7 py-8');
   assert.equal(scroll.props.keyboardShouldPersistTaps, 'never');
   assert.equal(scroll.props.keyboardDismissMode, 'none');
 });
@@ -658,7 +658,7 @@ test('custom list viewport shares native scrolling, safe-area padding and sheet 
   h.completeOpen();
   assert.equal(h.scroll().type, 'MemoList');
   assert.equal(h.native.props, undefined);
-  assert.equal(h.scroll().props.contentContainerStyle.paddingBottom, 56.25);
+  assert.equal(h.scroll().props.contentContainerStyle.paddingBottom, 60);
   assert.equal(h.scroll().props.nestedScrollEnabled, true);
   assert.equal(h.native.config.requireExternalGestureToFail, h.pan);
   h.offset(120);
@@ -920,7 +920,7 @@ test('form drag lock disables the sheet pan and the footer stays outside the scr
   assert.equal(footer.props.style.paddingBottom, 45);
   assert.equal(footer.props.className, 'pb-4');
   assert.equal(h.scroll().props.contentContainerStyle, undefined);
-  assert.equal(h.scroll().props.contentContainerClassName, 'gap-7 pt-6 pb-7');
+  assert.equal(h.scroll().props.contentContainerClassName, 'gap-7 py-8');
 });
 
 test('full-bleed content retains header, fixed content and footer insets without narrowing the viewport', () => {
@@ -940,7 +940,7 @@ test('full-bleed content retains header, fixed content and footer insets without
   assert.equal(body.props.children[0].props.children, fixedContent);
   assert.equal(footer.props.className, 'pb-4 px-[5%]');
   assert.equal(footer.props.children, 'save');
-  assert.equal(h.scroll().props.contentContainerClassName, 'gap-7 pt-6 pb-7');
+  assert.equal(h.scroll().props.contentContainerClassName, 'gap-7 py-8');
   h.begin(10, 10);
   h.move(120, 15);
   assert.equal(h.gestureState, 'failed');
