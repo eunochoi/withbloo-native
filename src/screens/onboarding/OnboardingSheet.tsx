@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import { BottomSheetModal } from '../../components/BottomSheetModal';
 import { AnimatedScrollView } from '../../components/AnimatedScrollView';
 import { Button } from '../../components/Button';
-import { HeaderAction } from '../../components/HeaderAction';
 import { Text } from '../../components/Text';
 import { View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
@@ -117,38 +116,52 @@ export function OnboardingSheet({
           >
             <Page settings={settings} busy={busy} onChange={change} />
           </Animated.View>
-          <View className="w-full max-w-lg self-center gap-2 px-6 pb-6 pt-4">
-            {!!error && (
-              <Text accessibilityRole="alert" className="text-[14px] text-theme-danger">
-                {error}
-              </Text>
-            )}
-            {!isFirst && (
-              <Button
-                label={t('common.previous')}
-                subtle
-                outline
-                disabled={busy}
-                onPress={() => changePage(page - 1)}
-              />
-            )}
-          </View>
         </AnimatedScrollView>
       )}
-      headerRight={(close) => (
-        <HeaderAction
-          label={
-            busy
-              ? t('common.saving')
-              : isLast
-                ? firstRun
-                  ? t('onboarding.start')
-                  : t('common.close')
-                : t('common.next')
-          }
-          disabled={busy}
-          onPress={() => (isLast ? confirm(close) : changePage(page + 1))}
-        />
+      footer={(close) => (
+        <View className="w-full max-w-lg self-center gap-2 px-1 pt-4">
+          {!!error && (
+            <Text accessibilityRole="alert" className="text-[14px] text-theme-danger">
+              {error}
+            </Text>
+          )}
+          <View className="flex-row items-stretch gap-3">
+            {!isFirst && (
+              <View className="min-w-0 flex-1 basis-0">
+                <Button
+                  autoLineHeight
+                  label={t('common.previous')}
+                  labelSize="lg"
+                  labelClassName="text-[16px]"
+                  subtle
+                  outline
+                  disabled={busy}
+                  onPress={() => changePage(page - 1)}
+                  className="w-full grow"
+                />
+              </View>
+            )}
+            <View className="min-w-0 flex-1 basis-0">
+              <Button
+                autoLineHeight
+                labelSize="lg"
+                labelClassName="text-[16px]"
+                label={
+                  busy
+                    ? t('common.saving')
+                    : isLast
+                      ? firstRun
+                        ? t('onboarding.start')
+                        : t('common.close')
+                      : t('common.next')
+                }
+                disabled={busy}
+                onPress={() => (isLast ? confirm(close) : changePage(page + 1))}
+                className="w-full grow"
+              />
+            </View>
+          </View>
+        </View>
       )}
     />
   );
