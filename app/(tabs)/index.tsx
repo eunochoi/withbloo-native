@@ -59,7 +59,7 @@ export default function Home() {
           }}
         >
           <View className="mt-8 shrink-0 flex-row items-center">
-            <Wordmark size={appRem * 2.8} mode={mode} />
+            <Wordmark size={appRem * 4} mode={mode} />
           </View>
           <HomeGreeting />
           <View className="gap-3 shrink-0">
