@@ -56,7 +56,7 @@ test('shared submit button retains busy/disabled accessibility, loading indicato
   assert.equal(writes, 1);
 });
 
-test('shared underline tab retains selection, accessibility and the caller selection action', () => {
+test('shared dot tab retains selection, accessibility and the caller selection action', () => {
   const tab = load('DotTab');
   let selected = 'top';
   const bottom = tab({
