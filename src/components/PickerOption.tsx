@@ -10,6 +10,7 @@ import {
 export function PickerOption({
   selected,
   keepUncheckedBorder = false,
+  softUncheckedBorder = false,
   checkbox = false,
   compact = false,
   dense = false,
@@ -21,6 +22,7 @@ export function PickerOption({
 }: {
   selected: boolean;
   keepUncheckedBorder?: boolean;
+  softUncheckedBorder?: boolean;
   checkbox?: boolean;
   compact?: boolean;
   dense?: boolean;
@@ -41,7 +43,7 @@ export function PickerOption({
       className={twMerge(
         SELECTION_BOX_CLASS_NAME,
         stateClassName,
-        !selected && keepUncheckedBorder && 'border border-theme-border',
+        !selected && keepUncheckedBorder && (softUncheckedBorder ? 'border border-theme-border/70' : 'border border-theme-border'),
         dense
           ? 'gap-1 min-h-12 px-1 py-2'
           : compact
