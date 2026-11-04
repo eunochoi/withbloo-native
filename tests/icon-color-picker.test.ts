@@ -13,9 +13,8 @@ function nodes(node: any): any[] {
   return [node, ...nodes(node.props?.children)];
 }
 
-test('color picker combines theme and fourteen colors in equal-height three-column rows and defers apply until close', () => {
+test('color picker combines theme and fourteen colors in equal-height three-column rows and previews the draft and applies on confirmation', () => {
   let draft = 'theme';
-  let deferred: (() => void) | undefined;
   const applied: string[] = [];
   const theme = { colors: { accent: '#123456' }, rem: 15 };
   const exports: any = {};
@@ -50,9 +49,10 @@ test('color picker combines theme and fourteen colors in equal-height three-colu
       },
     },
   );
-  const render = () => {
+  const render = (kind: 'habit' | 'sober' = 'habit') => {
     const shell = exports.IconColorPicker({
       value: 'theme',
+      kind,
       onApply: (key: string) => applied.push(key),
       onClose() {},
     });
@@ -61,41 +61,39 @@ test('color picker combines theme and fourteen colors in equal-height three-colu
     return { ...shell, props: { ...shell.props, children: list } };
   };
   let tree = render();
-  const options = () => nodes(tree).filter((node) => node.type === 'PickerOption');
+  const options = () => nodes(tree).filter((node) => node.type === 'PickerGridItem');
   const grid = tree.props.children;
   assert.equal(grid.props.numColumns, 3);
   assert.equal(tree.props.fixedHeight, true);
   assert.equal(grid.props.data.length, 15);
-  assert.equal(grid.props.columnWrapperClassName, 'gap-1');
-  assert(grid.props.contentContainerClassName.includes('gap-1'));
+  assert.equal(grid.props.columnWrapperClassName, 'gap-3');
+  assert(grid.props.contentContainerClassName.includes('gap-3'));
   assert.equal(grid.props.onScroll, 'sheet-scroll');
   assert(grid.props.children.every((node: any) => node.props.className === 'flex-1 min-w-0'));
-  assert(options().every((node) => node.props.className.includes('aspect-')));
   assert.equal(options().length, 15);
-  assert.equal(options()[0].props.accessibilityLabel, '기본');
+  assert.equal(options()[0].props.label, '기본');
   assert.equal(options()[0].props.selected, true);
-  assert(options().every((node) => node.props.className === options()[0].props.className));
   assert.equal(
     nodes(options()[0]).find((node) => node.props?.style?.backgroundColor)?.props.style
       .backgroundColor,
     theme.colors.accent,
   );
   options()
-    .find((node) => node.props.accessibilityLabel === '모카')
+    .find((node) => node.props.label === '모카')
     .props.onPress();
   tree = render();
   assert.equal(
-    options().find((node) => node.props.accessibilityLabel === '모카').props.selected,
+    options().find((node) => node.props.label === '모카').props.selected,
     true,
   );
   assert.deepEqual(applied, []);
-  tree.props
-    .footer((action: () => void) => {
-      deferred = action;
-    })
-    .props.onPress();
-  assert.deepEqual(applied, []);
-  deferred?.();
+  const preview = nodes(tree.props.fixedContent).filter((node) => node.type === 'HabitIcon');
+  assert.deepEqual(preview.map((node) => node.props.name), ['water', 'walking', 'reading']);
+  assert(preview.every((node) => node.props.colorKey === 'mocha'));
+  const soberPreview = nodes(render('sober').props.fixedContent).filter((node) => node.type === 'SoberIcon');
+  assert.deepEqual(soberPreview.map((node) => node.props.name), ['phone', 'coffee', 'shopping']);
+  assert(soberPreview.every((node) => node.props.colorKey === 'mocha'));
+  tree.props.headerRight(() => {}).props.onPress();
   assert.deepEqual(applied, ['mocha']);
   assert(isHabitIconColor('mocha'));
   assert.equal(resolveIconColor('mocha', theme.colors.accent), '#B99E8C');

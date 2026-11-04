@@ -153,6 +153,7 @@ export function SoberForm({ id }: { id?: number }) {
           )}
           {picker === 'color' && (
             <IconColorPicker
+              kind="sober"
               value={draft.icon_color}
               onClose={() => setPicker(null)}
               onApply={(icon_color) => setDraft({ ...draft, icon_color })}

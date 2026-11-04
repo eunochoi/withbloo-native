@@ -7,22 +7,27 @@ import { adjustColorBrightness } from '../theme/colors';
 import { AnimatedFlatList } from './AnimatedFlatList';
 import { BottomSheetModal } from './BottomSheetModal';
 import { HeaderAction } from './HeaderAction';
-import { PickerOption } from './PickerOption';
+import { HabitIcon } from './HabitIcon';
+import { SoberIcon } from './SoberIcon';
+import { PickerInfoCard } from './PickerInfoCard';
+import { PickerGridItem } from './PickerGridItem';
 import { Text } from './Text';
 
 export function IconColorPicker({
   value,
+  kind = 'habit',
   onApply,
   onClose,
 }: {
   value: HabitIconColorKey;
+  kind?: 'habit' | 'sober';
   onApply: (value: HabitIconColorKey) => void;
   onClose: () => void;
 }) {
   const { t } = useI18n();
 
   const [draft, setDraft] = useState(value);
-  const { colors } = useAppTheme();
+  const { colors, rem } = useAppTheme();
   const keys: HabitIconColorKey[] = [
     'theme',
     ...(Object.keys(HABIT_ICON_COLORS) as (keyof typeof HABIT_ICON_COLORS)[]),
@@ -31,8 +36,40 @@ export function IconColorPicker({
     <BottomSheetModal
       visible
       fixedHeight
+      scrollFade
       title={t('habit.iconColor')}
       onClose={onClose}
+      fixedContent={
+        <View className="pt-8 pb-4">
+          <PickerInfoCard>
+            {(kind === 'habit'
+              ? (['water', 'walking', 'reading'] as const)
+              : (['phone', 'coffee', 'shopping'] as const)
+            ).map((name) => (
+              <View key={name} className="min-w-0 flex-1 items-center gap-4">
+                {kind === 'habit' ? (
+                  <HabitIcon
+                    name={name as 'water' | 'walking' | 'reading'}
+                    colorKey={draft}
+                    size={rem * 2.25}
+                  />
+                ) : (
+                  <SoberIcon
+                    name={name as 'phone' | 'coffee' | 'shopping'}
+                    colorKey={draft}
+                    size={rem * 2.25}
+                  />
+                )}
+                <Text className="text-center text-sm font-normal text-theme-text-secondary">
+                  {kind === 'habit'
+                    ? t(`habitIcons.${name as 'water' | 'walking' | 'reading'}`)
+                    : t(`soberIcons.${name as 'phone' | 'coffee' | 'shopping'}`)}
+                </Text>
+              </View>
+            ))}
+          </PickerInfoCard>
+        </View>
+      }
       headerRight={(close) => (
         <HeaderAction
           label={t('common.done')}
@@ -52,19 +89,17 @@ export function IconColorPicker({
           data={keys}
           numColumns={3}
           keyExtractor={(key) => key}
-          contentContainerClassName="gap-1 py-8"
-          columnWrapperClassName="gap-1"
+          contentContainerClassName="gap-3 pb-8"
+          columnWrapperClassName="gap-3"
           renderItem={({ item: key }) => {
             const { value: backgroundColor } =
               key === 'theme' ? { value: colors.accent } : HABIT_ICON_COLORS[key];
             const label = key === 'theme' ? t('habit.defaultColor') : t(`iconColors.${key}`);
             return (
               <View className="flex-1 min-w-0">
-                <PickerOption
-                  compact
-                  className="aspect-[0.85] w-full min-h-0 justify-center gap-2 rounded-2xl p-2"
+                <PickerGridItem
                   selected={draft === key}
-                  accessibilityLabel={label}
+                  label={label}
                   onPress={() => setDraft(key)}
                 >
                   <View
@@ -74,14 +109,7 @@ export function IconColorPicker({
                       borderColor: adjustColorBrightness(backgroundColor, -0.1),
                     }}
                   />
-                  <Text
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                    className={`w-full text-sm leading-5 tracking-tight text-center ${draft === key ? 'font-semibold text-theme-accent' : 'text-theme-text-secondary'}`}
-                  >
-                    {label}
-                  </Text>
-                </PickerOption>
+                </PickerGridItem>
               </View>
             );
           }}

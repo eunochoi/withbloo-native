@@ -112,6 +112,10 @@ function picker(kind: 'habit' | 'sober', value: string, colorKey = 'pink') {
           if (name.endsWith('soberIconCategories'))
             return require('../src/screens/sober/soberIconCategories');
           if (name.endsWith('/IconPicker')) return load('src/components/IconPicker.tsx');
+          if (name.endsWith('/UnderlineTabs')) return load('src/components/UnderlineTabs.tsx');
+          if (name.endsWith('/UnderlineTab')) return load('src/components/UnderlineTab.tsx');
+          if (name.endsWith('/PickerInfoCard')) return load('src/components/PickerInfoCard.tsx');
+          if (name.endsWith('/PickerGridItem')) return load('src/components/PickerGridItem.tsx');
           if (name.endsWith('/PickerOption')) return load('src/components/PickerOption.tsx');
           if (name.endsWith('/classes')) return require('../src/theme/classes');
           if (name === 'tailwind-merge') return require(name);
@@ -144,7 +148,7 @@ function picker(kind: 'habit' | 'sober', value: string, colorKey = 'pink') {
         onLayout: 'sheet-layout-handler',
         onContentSizeChange: (...size: number[]) => sizes.push(size),
       });
-      footer = shell.props.footer((action?: () => void) => {
+      footer = shell.props.headerRight((action?: () => void) => {
         closed++;
         deferred = action;
       });
@@ -195,7 +199,7 @@ function picker(kind: 'habit' | 'sober', value: string, colorKey = 'pink') {
         (node) =>
           node.type === 'Pressable' &&
           (node.props.accessibilityLabel === label ||
-            node.props.accessibilityLabel.startsWith(`${label}. `)),
+            node.props.accessibilityLabel?.startsWith(`${label}. `)),
       );
     },
     press(label: string) {
@@ -262,7 +266,7 @@ for (const kind of ['habit', 'sober'] as const) {
             (node) => node.props?.children === category.description,
           ),
         );
-        assert(!JSON.stringify(row).includes('numberOfLines'));
+        assert(nodes(row).some((node) => node.props?.numberOfLines === 2));
       }
     }
     assert.equal(h.scroll.props.onScroll, 'sheet-scroll-handler');

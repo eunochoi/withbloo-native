@@ -5,13 +5,13 @@ export const SOBER_ICON_CATEGORIES = [
   {
     id: 'basic',
     label: '기본',
-    description: '나에게 필요한 거리두기를\n자유롭게 정해요.',
+    description: '나에게 필요한 거리두기를 자유롭게 정해요.',
     keys: ['favorite', 'shield', 'pause', 'leaf', 'anchor'],
   },
   {
     id: 'screen',
     label: '화면과 콘텐츠',
-    description: '잠시 화면을 내려놓고\n나의 시간을 챙겨요.',
+    description: '잠시 화면을 내려놓고 나의 시간을 챙겨요.',
     keys: [
       'phone',
       'social',
@@ -28,7 +28,7 @@ export const SOBER_ICON_CATEGORIES = [
   {
     id: 'food',
     label: '음식과 음료',
-    description: '먹는 즐거움을 지키며\n나에게 맞는 양을 찾아요.',
+    description: '먹는 즐거움을 지키며 나에게 맞는 양을 찾아요.',
     keys: [
       'moon',
       'food',
@@ -51,7 +51,7 @@ export const SOBER_ICON_CATEGORIES = [
   {
     id: 'spending',
     label: '소비와 금전',
-    description: '바로 결정하지 않아도 돼요.\n선택할 여유를 가져요.',
+    description: '바로 결정하지 않아도 돼요. 선택할 여유를 가져요.',
     keys: [
       'shopping',
       'gambling',
@@ -65,7 +65,7 @@ export const SOBER_ICON_CATEGORIES = [
   {
     id: 'routine',
     label: '생활 패턴',
-    description: '익숙한 생활도 작은 선택부터\n바꿔갈 수 있어요.',
+    description: '익숙한 생활도 작은 선택부터 바꿔갈 수 있어요.',
     keys: [
       'oversleep',
       'lateSleep',
@@ -80,13 +80,13 @@ export const SOBER_ICON_CATEGORIES = [
   {
     id: 'relationships',
     label: '마음과 관계',
-    description: '감정은 자연스러워요.\n반응은 천천히 골라도 돼요.',
+    description: '감정은 자연스러워요. 반응은 천천히 골라도 돼요.',
     keys: ['anger', 'swearing', 'gossip', 'complaining', 'comparison'],
   },
   {
     id: 'adult',
     label: '19+',
-    description: '술·담배·성인 콘텐츠와\n나에게 맞는 거리를 정해요.',
+    description: '술·담배·성인 콘텐츠와 나에게 맞는 거리를 정해요.',
     keys: ['smoking', 'alcohol', 'age19'],
   },
 ] as const satisfies readonly IconCategory<SoberIconKey>[];

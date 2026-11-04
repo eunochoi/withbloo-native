@@ -197,7 +197,7 @@ export const EMOTIONS = [
     key: 'tired',
     color: '#B7AAA4',
     emoji: '😮‍💨',
-    description: '몸과 마음이 느긋하고 기운이 조금 가라앉아 있어요',
+    description: '몸과 마음이 느긋하고 기운이 살짝 가라앉아요',
   },
   {
     name: '싱숭생숭',

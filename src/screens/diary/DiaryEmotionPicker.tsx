@@ -8,12 +8,19 @@ import { BottomSheetModal } from '../../components/BottomSheetModal';
 import { HeaderAction } from '../../components/HeaderAction';
 import { EmotionImage } from '../../components/EmotionImage';
 import { PickerOption } from '../../components/PickerOption';
+import { PickerInfoCard } from '../../components/PickerInfoCard';
 import { Text } from '../../components/Text';
+import { UnderlineTabs } from '../../components/UnderlineTabs';
 import { EMOTIONS } from '../../domain/constants';
 import { DIARY_EMOTION_GROUPS, type DiaryEmotionGroup } from '../../domain/diaryFilters';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 
 const categories = ['positive', 'neutral', 'negative'] as const;
+const representativeEmotions: Record<DiaryEmotionGroup, number> = {
+  positive: 0,
+  neutral: 11,
+  negative: 6,
+};
 
 export function DiaryEmotionPicker({
   value,
@@ -74,34 +81,26 @@ export function DiaryEmotionPicker({
 
   const topContent = (
     <View
-      className={`shrink-0 gap-4 pb-2 ${pinTop ? 'pt-8' : ''}`}
+      className={`shrink-0 gap-4 ${pinTop ? 'pt-8' : 'pb-1'}`}
       onLayout={(event) => setTopHeight(event.nativeEvent.layout.height)}
     >
-      <View className="flex-row flex-wrap gap-2">
-        {categories.map((id) => (
-          <PickerOption
-            key={id}
-            selected={categoryId === id}
-            accessibilityLabel={t('diary.category', { value: t(`diary.${id}`) })}
-            className="min-h-12 rounded-full px-4 py-2"
-            onPress={() => {
-              if (categoryId === id) return;
-              initialScrollPending.current = false;
-              initialRowY.current = null;
-              setCategoryId(id);
-            }}
-          >
-            <Text
-              className={`text-sm ${categoryId === id ? 'font-semibold text-theme-accent' : 'text-theme-text-secondary'}`}
-            >
-              {t(`diary.${id}`)}
-            </Text>
-          </PickerOption>
-        ))}
-      </View>
-      <View className="flex-row items-center gap-3 rounded-2xl border border-theme-accent-border bg-theme-accent-soft/70 p-4">
-        <View className="h-12 w-12 shrink-0 items-center justify-center rounded-full bg-theme-surface">
-          <EmotionImage emotion={category.emotions[0]} size={appRem * 2.75} />
+      <UnderlineTabs
+        options={categories.map((id) => ({
+          value: id,
+          label: t(`diary.${id}`),
+          accessibilityLabel: t('diary.category', { value: t(`diary.${id}`) }),
+        }))}
+        value={categoryId}
+        scrollToSelected
+        onChange={(id) => {
+          initialScrollPending.current = false;
+          initialRowY.current = null;
+          setCategoryId(id);
+        }}
+      />
+      <PickerInfoCard>
+        <View className="h-12 w-12 shrink-0 items-center justify-center">
+          <EmotionImage emotion={representativeEmotions[categoryId]} size={appRem * 2.75} />
         </View>
         <View className="min-w-0 flex-1 gap-1.5">
           <Text className="text-base font-semibold text-theme-accent-deep">
@@ -109,13 +108,14 @@ export function DiaryEmotionPicker({
           </Text>
           <Text
             className="text-sm leading-5 tracking-tight text-theme-text-secondary"
+            style={{ minHeight: appRem * 2.5 * Math.max(1, fontScale) }}
             lineBreakStrategyIOS="hangul-word"
             textBreakStrategy="balanced"
           >
             {t(`diary.${categoryId}Summary`)}
           </Text>
         </View>
-      </View>
+      </PickerInfoCard>
     </View>
   );
 
@@ -174,7 +174,7 @@ export function DiaryEmotionPicker({
                         selected={selected}
                         accessibilityLabel={t('diary.emotionSummary', {
                           title: t(`emotions.${emotion.key}`),
-                          value: t(`emotions.${emotion.key}Description`),
+                          value: t(`emotions.${emotion.key}Description`).replace(/\n/g, ' '),
                         })}
                         className={`grow w-full gap-2 rounded-2xl border px-4 py-6 ${selected ? 'border-theme-accent' : 'border-transparent'}`}
                         onPress={() => {
