@@ -32,14 +32,16 @@ export function HabitAnalysis({
         {t('stats.habitYear', { count: year })}
       </AnalysisHeader>
       <HabitFlowAnalysis />
-      <DotTabs
-        options={[
-          { value: 'top', label: t('stats.topThree') },
-          { value: 'bottom', label: t('stats.bottomThree') },
-        ]}
-        value={tab}
-        onChange={setTab}
-      />
+      <View className="mx-1">
+        <DotTabs
+          options={[
+            { value: 'top', label: t('stats.topThree') },
+            { value: 'bottom', label: t('stats.bottomThree') },
+          ]}
+          value={tab}
+          onChange={setTab}
+        />
+      </View>
       <View
         className={`${MUTED_CARD_BORDER_CLASS_NAME} mx-1 p-6 bg-theme-surface-muted/60 ios:curve-continuous rounded-theme`}
       >

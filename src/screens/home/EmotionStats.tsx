@@ -43,58 +43,62 @@ export function EmotionStats({
   });
   return (
     <View className="gap-4">
-      <View className="gap-4 px-[5%]">
-        <AnalysisHeader title={t('stats.emotionTitle')}>
-          {t('stats.yearCount', { title: year, count: total })}
-        </AnalysisHeader>
-        <DotTabs
-          options={halves.map((label, value) => ({ label, value }))}
-          value={half}
-          onChange={setHalf}
-        />
-        <View
-          className={`${ACCENT_CARD_BORDER_CLASS_NAME} gap-6 mx-1 px-4 py-6 bg-theme-accent-light/50 ios:curve-continuous rounded-theme`}
-        >
-          <View
-            accessible
-            accessibilityLabel={t('stats.emotionRatio', {
-              value: groups
-                .map((group) =>
-                  t('stats.groupShare', {
-                    title: group.label,
-                    count: group.count,
-                    value: total ? Math.round((group.count / total) * 100) : 0,
-                  }),
-                )
-                .join(', '),
-            })}
-            className={`h-4 flex-row gap-0.5 overflow-hidden rounded-full ${total ? '' : 'bg-theme-accent/30'}`}
-          >
-            {groups
-              .filter((group) => group.count > 0)
-              .map((group) => (
-                <View
-                  key={group.key}
-                  className={group.className}
-                  style={{ flexGrow: group.count, flexBasis: 0 }}
-                />
-              ))}
+      <View className="px-[5%]">
+        <View className="gap-4 px-1">
+          <AnalysisHeader title={t('stats.emotionTitle')}>
+            {t('stats.yearCount', { title: year, count: total })}
+          </AnalysisHeader>
+          <View className="mx-1">
+            <DotTabs
+              options={halves.map((label, value) => ({ label, value }))}
+              value={half}
+              onChange={setHalf}
+            />
           </View>
-          <View className="flex-row">
-            {groups.map((group) => (
-              <View key={group.key} className="flex-1 gap-2 items-center">
-                <View className="flex-row items-center gap-2">
-                  <View className={`h-3 w-3 rounded-full ${group.className}`} />
-                  <Text className="text-sm text-theme-text-secondary">{group.label}</Text>
+          <View
+            className={`${ACCENT_CARD_BORDER_CLASS_NAME} gap-6 mx-1 px-4 py-6 bg-theme-accent-light/50 ios:curve-continuous rounded-theme`}
+          >
+            <View
+              accessible
+              accessibilityLabel={t('stats.emotionRatio', {
+                value: groups
+                  .map((group) =>
+                    t('stats.groupShare', {
+                      title: group.label,
+                      count: group.count,
+                      value: total ? Math.round((group.count / total) * 100) : 0,
+                    }),
+                  )
+                  .join(', '),
+              })}
+              className={`h-4 flex-row gap-0.5 overflow-hidden rounded-full ${total ? '' : 'bg-theme-accent/30'}`}
+            >
+              {groups
+                .filter((group) => group.count > 0)
+                .map((group) => (
+                  <View
+                    key={group.key}
+                    className={group.className}
+                    style={{ flexGrow: group.count, flexBasis: 0 }}
+                  />
+                ))}
+            </View>
+            <View className="flex-row">
+              {groups.map((group) => (
+                <View key={group.key} className="flex-1 gap-2 items-center">
+                  <View className="flex-row items-center gap-2">
+                    <View className={`h-3 w-3 rounded-full ${group.className}`} />
+                    <Text className="text-sm text-theme-text-secondary">{group.label}</Text>
+                  </View>
+                  <View className="flex-row items-baseline gap-1">
+                    <Text className="text-2xl font-semibold">{group.count}</Text>
+                    <Text className="text-base text-theme-text-secondary">
+                      {t('stats.timesUnit', { count: group.count })}
+                    </Text>
+                  </View>
                 </View>
-                <View className="flex-row items-baseline gap-1">
-                  <Text className="text-2xl font-semibold">{group.count}</Text>
-                  <Text className="text-base text-theme-text-secondary">
-                    {t('stats.timesUnit', { count: group.count })}
-                  </Text>
-                </View>
-              </View>
-            ))}
+              ))}
+            </View>
           </View>
         </View>
       </View>
@@ -102,7 +106,7 @@ export function EmotionStats({
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerClassName="flex-row items-center gap-3"
-        contentContainerStyle={{ paddingHorizontal: width * 0.05 }}
+        contentContainerStyle={{ paddingHorizontal: width * 0.05 + appRem * 0.25 }}
       >
         {EMOTIONS.map((emotion, index) => ({ emotion, index }))
           .sort((a, b) => counts[b.index] - counts[a.index] || a.index - b.index)
@@ -137,12 +141,14 @@ export function EmotionStats({
           ))}
       </ScrollView>
 
-      <View className="gap-2 px-[5%]">
-        {groups.map((group) => (
-          <InfoNotice key={group.key} numberOfLines={0} adjustsFontSizeToFit={false}>
-            {`${group.label}: ${t(`diary.${group.key}Names`).replace(/\n/g, ', ')}`}
-          </InfoNotice>
-        ))}
+      <View className="px-[5%]">
+        <View className="gap-2 px-1">
+          {groups.map((group) => (
+            <InfoNotice key={group.key} numberOfLines={0} adjustsFontSizeToFit={false}>
+              {`${group.label}: ${t(`diary.${group.key}Names`).replace(/\n/g, ', ')}`}
+            </InfoNotice>
+          ))}
+        </View>
       </View>
     </View>
   );

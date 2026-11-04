@@ -85,46 +85,56 @@ export function HomeStatsScreen({
                     : 'px-[5%]'
                 }
               >
-                {section.queries.some((query) => query.isError && !query.data) ? (
-                  <QueryError
-                    className="min-h-32"
-                    message={t('home.sectionFailed', { title: section.label })}
-                    retryAccessibilityLabel={t('home.sectionRetry', { title: section.label })}
-                    onRetry={() => {
-                      section.queries.forEach((query) => {
-                        if (query.isError) void query.refetch();
-                      });
-                    }}
-                  />
-                ) : section.queries.some((query) => !query.data) ? (
-                  <HomeStatsSkeleton />
-                ) : (
-                  section.content
-                )}
+                <View
+                  className={
+                    section.fullBleed && section.queries.every((query) => query.data)
+                      ? undefined
+                      : 'px-1'
+                  }
+                >
+                  {section.queries.some((query) => query.isError && !query.data) ? (
+                    <QueryError
+                      className="min-h-32"
+                      message={t('home.sectionFailed', { title: section.label })}
+                      retryAccessibilityLabel={t('home.sectionRetry', { title: section.label })}
+                      onRetry={() => {
+                        section.queries.forEach((query) => {
+                          if (query.isError) void query.refetch();
+                        });
+                      }}
+                    />
+                  ) : section.queries.some((query) => !query.data) ? (
+                    <HomeStatsSkeleton />
+                  ) : (
+                    section.content
+                  )}
+                </View>
               </View>
             ))}
 
             <View className="px-[5%]">
-              <View className="gap-2 px-2">
-                <Text className="text-xl font-bold">{t('home.otherYearTitle')}</Text>
-                <Text className="text-base text-theme-text-secondary">
-                  {t('home.otherYearDescription')}
-                </Text>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={t('home.yearChoice', { count: year })}
-                  onPress={() => setPicker(true)}
-                  className="py-2 my-3 self-end flex-row items-center justify-center gap-2 active:opacity-70"
-                >
-                  <Text className="text-base font-semibold text-theme-accent-deep">
-                    {t('home.chooseYear')}
+              <View className="px-1">
+                <View className="gap-2 px-2">
+                  <Text className="text-xl font-bold">{t('home.otherYearTitle')}</Text>
+                  <Text className="text-base text-theme-text-secondary">
+                    {t('home.otherYearDescription')}
                   </Text>
-                  <AppIcon
-                    name="arrow-forward"
-                    size={iconSizes.md}
-                    className="text-theme-accent-deep"
-                  />
-                </Pressable>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={t('home.yearChoice', { count: year })}
+                    onPress={() => setPicker(true)}
+                    className="py-2 my-3 self-end flex-row items-center justify-center gap-2 active:opacity-70"
+                  >
+                    <Text className="text-base font-semibold text-theme-accent-deep">
+                      {t('home.chooseYear')}
+                    </Text>
+                    <AppIcon
+                      name="arrow-forward"
+                      size={iconSizes.md}
+                      className="text-theme-accent-deep"
+                    />
+                  </Pressable>
+                </View>
               </View>
             </View>
           </View>

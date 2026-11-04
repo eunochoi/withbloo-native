@@ -107,14 +107,16 @@ export function SoberAnalysis({ sobers, restarts }: { sobers: Sober[]; restarts:
           )}
         </View>
       </View>
-      <DotTabs
-        options={[
-          { value: 'top', label: t('stats.longestFirst') },
-          { value: 'bottom', label: t('stats.shortestFirst') },
-        ]}
-        value={tab}
-        onChange={setTab}
-      />
+      <View className="mx-1">
+        <DotTabs
+          options={[
+            { value: 'top', label: t('stats.longestFirst') },
+            { value: 'bottom', label: t('stats.shortestFirst') },
+          ]}
+          value={tab}
+          onChange={setTab}
+        />
+      </View>
       <View
         className={`${MUTED_CARD_BORDER_CLASS_NAME} mx-1 p-6 bg-theme-surface-muted/60 ios:curve-continuous rounded-theme`}
       >
