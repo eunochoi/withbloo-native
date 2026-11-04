@@ -26,6 +26,7 @@ import { NoticeHost } from './NoticeProvider';
 export function BottomSheetModal({
   visible,
   title,
+  scrollableTitle,
   handleColor,
   titleIcon,
   titleAction,
@@ -58,6 +59,7 @@ export function BottomSheetModal({
 }: {
   visible: boolean;
   title?: string;
+  scrollableTitle?: boolean;
   handleColor?: string;
   titleIcon?: ReactNode;
   titleAction?: ComponentProps<typeof BottomSheetHeader>['titleAction'];
@@ -129,6 +131,7 @@ export function BottomSheetModal({
       <BottomSheetHeader
         handleColor={handleColor}
         title={title}
+        scrollableTitle={scrollableTitle}
         titleIcon={titleIcon}
         titleAction={titleAction}
         headerLeft={headerLeft}

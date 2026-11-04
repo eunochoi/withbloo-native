@@ -4,9 +4,11 @@ import { Pressable, View } from 'react-native';
 import { useAppTheme } from '../theme/AppThemeProvider';
 import { AppIcon } from './AppIcon';
 import { Text } from './Text';
+import { ScrollableName } from './ScrollableName';
 
 export function BottomSheetHeader({
   title,
+  scrollableTitle = false,
   handleColor,
   titleIcon,
   titleAction,
@@ -17,6 +19,7 @@ export function BottomSheetHeader({
   handleDisabled = false,
 }: {
   title?: string;
+  scrollableTitle?: boolean;
   handleColor?: string;
   titleIcon?: ReactNode;
   titleAction?: {
@@ -92,6 +95,12 @@ export function BottomSheetHeader({
                   </View>
                 )}
               </Pressable>
+            ) : scrollableTitle && title ? (
+              <View className="min-w-0 flex-1">
+                <ScrollableName heading className="text-center text-xl font-semibold tracking-tight">
+                  {title}
+                </ScrollableName>
+              </View>
             ) : (
               <Text
                 accessibilityRole="header"

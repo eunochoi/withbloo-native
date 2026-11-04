@@ -1,6 +1,7 @@
 import { type PressableProps, type TextProps, Pressable } from 'react-native';
 import { twMerge } from 'tailwind-merge';
 import { Text } from './Text';
+import { ScrollableName } from './ScrollableName';
 export function Button({
   label,
   subtle,
@@ -13,6 +14,7 @@ export function Button({
   labelClassName,
   labelStyle,
   autoLineHeight = false,
+  scrollableLabel = false,
   ...props
 }: PressableProps & {
   label: string;
@@ -25,7 +27,12 @@ export function Button({
   labelClassName?: string;
   labelStyle?: TextProps['style'];
   autoLineHeight?: boolean;
+  scrollableLabel?: boolean;
 }) {
+  const textClassName = twMerge(
+    `${labelSize === 'lg' ? 'text-lg' : 'text-base'} ${labelWeight === 'normal' ? 'font-normal' : 'font-semibold'} ${outline ? (danger ? 'text-theme-danger' : subtle && !selected ? 'text-theme-text-primary' : 'text-theme-accent') : selected || danger || !subtle ? 'text-theme-text-on-accent' : 'text-theme-text-primary'}`,
+    labelClassName,
+  );
   return (
     <Pressable
       accessibilityRole="button"
@@ -33,16 +40,15 @@ export function Button({
       {...props}
       className={`min-h-12 items-center justify-center ios:curve-continuous rounded-full border px-5 py-3 active:opacity-65 ${props.disabled ? 'opacity-40' : 'opacity-100'} ${outline ? `bg-transparent ${danger ? 'border-theme-danger' : subtle && !selected ? 'border-theme-border' : 'border-theme-accent'}` : selected ? 'bg-theme-accent border-theme-accent-deep' : danger ? 'bg-theme-danger border-theme-overlay/15' : subtle ? 'bg-theme-surface-muted border-theme-text-secondary/10' : 'bg-theme-accent border-theme-accent-deep'} ${className ?? ''}`}
     >
-      <Text
+      {scrollableLabel ? (
+        <ScrollableName className={`${textClassName} text-center`}>{label}</ScrollableName>
+      ) : <Text
         autoLineHeight={autoLineHeight}
         style={labelStyle}
-        className={twMerge(
-          `${labelSize === 'lg' ? 'text-lg' : 'text-base'} ${labelWeight === 'normal' ? 'font-normal' : 'font-semibold'} ${outline ? (danger ? 'text-theme-danger' : subtle && !selected ? 'text-theme-text-primary' : 'text-theme-accent') : selected || danger || !subtle ? 'text-theme-text-on-accent' : 'text-theme-text-primary'}`,
-          labelClassName,
-        )}
+        className={textClassName}
       >
         {label}
-      </Text>
+      </Text>}
     </Pressable>
   );
 }
