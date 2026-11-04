@@ -14,7 +14,7 @@ import { useNotice } from '../../src/components/NoticeProvider';
 import { AppIcon } from '../../src/components/AppIcon';
 import { ColorView } from '../../src/components/ColorTransition';
 import { QueryError } from '../../src/components/QueryError';
-import { RecordSortPicker } from '../../src/components/RecordSortPicker';
+import { SoberSortPicker } from '../../src/screens/sober/SoberSortPicker';
 import { ScrollEdgeFade } from '../../src/components/ScrollEdgeFade';
 import { TabBottomSpacer } from '../../src/components/TabBottomSpacer';
 import { Text } from '../../src/components/Text';
@@ -53,7 +53,7 @@ export default function SoberList() {
   const { openModal } = useModalNavigation();
   const list = useQuery(soberQueries.list(db));
   const restarts = useQuery(soberQueries.restarts(db));
-  const { settings, updateSettings } = useSettings();
+  const { settings } = useSettings();
   const [sortOpen, setSortOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filter, setFilter] = useState(DEFAULT_SOBER_FILTER);
@@ -99,12 +99,6 @@ export default function SoberList() {
       ? filtered.map((sober, index): Row => ({ kind: 'sober', sober, first: index === 0 }))
       : [{ kind: 'state' } as const]),
   ];
-  const change = (patch: Parameters<typeof updateSettings>[0]) =>
-    void updateSettings(patch)
-      .then(() => scroll.current?.scrollToOffset({ offset: 0, animated: true }))
-      .catch((error: Error) =>
-        showNotice({ tone: 'error', title: t('settings.saveFailed'), message: error.message }),
-      );
   return (
     <ColorView background="surface" className={PAGE_CLASS_NAME}>
       <FlatList
@@ -250,24 +244,7 @@ export default function SoberList() {
         />
       )}
       {sortOpen && (
-        <RecordSortPicker
-          title={t('sober.sort')}
-          sortLabel={t('ui.createdDate')}
-          sort={settings.soberSort}
-          recordSort={settings.soberRecordSort}
-          priorityFirst={settings.soberPriorityFirst}
-          ascendingLabel={t('ui.oldest')}
-          onClose={() => setSortOpen(false)}
-          onApply={(sort, priorityFirst, recordSort) => {
-            setSortOpen(false);
-            if (sort === 'CUSTOM') return;
-            change({
-              soberSort: sort,
-              soberPriorityFirst: priorityFirst,
-              soberRecordSort: recordSort,
-            });
-          }}
-        />
+        <SoberSortPicker visible={sortOpen} onClose={() => setSortOpen(false)} onApplied={() => scroll.current?.scrollToOffset({ offset: 0, animated: true })} />
       )}
     </ColorView>
   );
