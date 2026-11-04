@@ -275,9 +275,8 @@ test('today sober item shows its day count and name, opens details and handles l
   );
   assert(text(card).includes('5일차'));
   assert(!text(card).includes('진행 중'));
-  const name = nodes(card).find((node) => node.type === 'Text' && text(node) === '금연');
-  assert.equal(name.props.numberOfLines, 1);
-  assert.equal(name.props.adjustsFontSizeToFit, true);
+  const name = nodes(card).find((node) => node.type === 'ScrollableName' && text(node) === '금연');
+  assert(name);
   const dayCount = nodes(card).find((node) => node.type === 'Text' && text(node) === '5');
   assert(dayCount.props.className.includes('text-2xl'));
   assert.equal(dayCount.props.numberOfLines, 1);
