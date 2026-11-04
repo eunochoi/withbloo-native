@@ -9,13 +9,13 @@ import { Pressable, View } from 'react-native';
 import { InfoNotice } from '../../components/InfoNotice';
 import { SoberIcon } from '../../components/SoberIcon';
 import { Text } from '../../components/Text';
-import { UnderlineTab } from '../../components/UnderlineTab';
+import { UnderlineTabs } from '../../components/UnderlineTabs';
 import type { Sober, SoberRestart } from '../../db/types';
 import { getSoberStreaks } from '../../domain/sober';
 import { useCurrentMinute } from '../../hooks/useCurrentMinute';
 import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
-import { MUTED_CARD_BORDER_CLASS_NAME, UNDERLINE_TAB_LIST_CLASS_NAME } from '../../theme/classes';
+import { MUTED_CARD_BORDER_CLASS_NAME } from '../../theme/classes';
 import { AnalysisHeader } from './AnalysisHeader';
 
 export function SoberAnalysis({ sobers, restarts }: { sobers: Sober[]; restarts: SoberRestart[] }) {
@@ -63,36 +63,7 @@ export function SoberAnalysis({ sobers, restarts }: { sobers: Sober[]; restarts:
       </AnalysisHeader>
       <View className="gap-4">
         <AnalysisSubtitle>{t('stats.distributionTitle')}</AnalysisSubtitle>
-        <View className="mx-1 gap-4 rounded-theme border border-theme-accent/20 bg-theme-accent-light/50 px-4 py-6">
-          <View className="flex-row flex-wrap justify-center gap-y-4">
-            {counts.map(
-              (count, i) =>
-                count > 0 && (
-                  <View key={i} className="w-1/3 min-w-0 items-center gap-2 px-1">
-                    <View className="flex-row items-center justify-center gap-2">
-                      <View
-                        className="h-3 w-3 shrink-0 rounded-full bg-theme-accent"
-                        style={{ opacity: 0.25 + i * 0.15 }}
-                      />
-                      <Text className="shrink text-center text-sm text-theme-text-secondary">
-                        {labels[i]}
-                      </Text>
-                    </View>
-                    <View className="flex-row items-baseline gap-1">
-                      <Text className="text-2xl font-semibold">{count}</Text>
-                      <Text className="text-base text-theme-text-secondary">
-                        {language === 'ko' ? '개' : 'items'}
-                      </Text>
-                    </View>
-                  </View>
-                ),
-            )}
-          </View>
-          {!sobers.length && (
-            <Text className="text-center text-sm text-theme-text-secondary">
-              {t('stats.soberEmpty')}
-            </Text>
-          )}
+        <View className="mx-1 gap-6 rounded-theme border border-theme-accent/20 bg-theme-accent-light/50 px-4 py-6">
           <View
             accessible
             accessibilityLabel={labels.map((label, i) => `${label}: ${counts[i]}`).join(', ')}
@@ -109,24 +80,41 @@ export function SoberAnalysis({ sobers, restarts }: { sobers: Sober[]; restarts:
                 ),
             )}
           </View>
+          {sobers.length ? (
+            <View className="gap-4">
+              {counts.map(
+                (count, i) =>
+                  count > 0 && (
+                    <View key={i} className="flex-row items-center gap-3">
+                      <View
+                        className="h-4 w-4 shrink-0 rounded-full bg-theme-accent"
+                        style={{ opacity: 0.25 + i * 0.15 }}
+                      />
+                      <Text className="min-w-0 flex-1 text-sm">{labels[i]}</Text>
+                      <Text className="text-sm text-theme-text-secondary">
+                        {language === 'ko'
+                          ? `${count}개`
+                          : `${count} ${count === 1 ? 'item' : 'items'}`}
+                      </Text>
+                    </View>
+                  ),
+              )}
+            </View>
+          ) : (
+            <Text className="text-center text-sm text-theme-text-secondary">
+              {t('stats.soberEmpty')}
+            </Text>
+          )}
         </View>
       </View>
-      <View accessibilityRole="tablist" className={UNDERLINE_TAB_LIST_CLASS_NAME}>
-        {(
-          [
-            { value: 'top', label: t('stats.longestFirst') },
-            { value: 'bottom', label: t('stats.shortestFirst') },
-          ] as const
-        ).map((option) => (
-          <UnderlineTab
-            key={option.value}
-            selected={tab === option.value}
-            onPress={() => setTab(option.value)}
-          >
-            {option.label}
-          </UnderlineTab>
-        ))}
-      </View>
+      <UnderlineTabs
+        options={[
+          { value: 'top', label: t('stats.longestFirst') },
+          { value: 'bottom', label: t('stats.shortestFirst') },
+        ]}
+        value={tab}
+        onChange={setTab}
+      />
       <View
         className={`${MUTED_CARD_BORDER_CLASS_NAME} mx-1 p-6 bg-theme-surface-muted/60 ios:curve-continuous rounded-theme`}
       >

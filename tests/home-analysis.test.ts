@@ -57,6 +57,8 @@ function render(
           };
         if (dependency === 'react-native-svg')
           return { __esModule: true, default: 'Svg', Circle: 'Circle' };
+        if (dependency.endsWith('/UnderlineTabs'))
+          return { UnderlineTabs: ({ options, value, onChange }: any) => ({ type: 'View', props: { children: options.map((option: any) => ({ type: 'UnderlineTab', props: { selected: value === option.value, onPress: () => onChange(option.value), children: option.label } })) } }) };
         if (dependency.endsWith('/AnalysisHeader'))
           return {
             AnalysisHeader: (headerProps: any) =>
@@ -193,8 +195,12 @@ test('home today items retain separate navigation and loading states', () => {
     assert.equal(actions[0].props.disabled, true);
     assert.equal(actions[1].props.disabled, undefined);
     if (result.isPending) {
-      assert(nodes(pending).some((node) => node.props.accessibilityLabel === '오늘의 일기 확인 중'));
-      assert(nodes(pending).some((node) => node.props.accessibilityLabel === '오늘의 습관 확인 중'));
+      assert(
+        nodes(pending).some((node) => node.props.accessibilityLabel === '오늘의 일기 확인 중'),
+      );
+      assert(
+        nodes(pending).some((node) => node.props.accessibilityLabel === '오늘의 습관 확인 중'),
+      );
     } else {
       assert(text(actions[0]).includes('불러오기 실패'));
       assert(actions[1].props.accessibilityLabel.includes('불러오기 실패'));
@@ -929,7 +935,7 @@ test('English Cut Back rankings preserve intervals, status, names and navigation
   assert.equal(JSON.stringify({ sobers, restarts }), snapshot);
 });
 
-test('Cut Back distribution shows six duration groups above one proportional bar', () => {
+test('Cut Back distribution shows a proportional bar above duration rows', () => {
   const now = Date.parse('2026-10-05T12:00:00.000Z');
   const sobers = [1, 4, 10, 20, 50, 100].map((days, index) => ({
     id: index + 1,
@@ -943,18 +949,18 @@ test('Cut Back distribution shows six duration groups above one proportional bar
   for (const count of [0, 1, 2, 3, 4, 5, 6]) {
     const tree = render('SoberAnalysis', { sobers: sobers.slice(0, count), restarts: [] });
     const card = tree.props.children[1].props.children[1];
-    const summaries = nodes(card.props.children[0]).filter((node) =>
-      node.props.className?.includes('w-1/3'),
+    const summaries = nodes(card.props.children[1]).filter((node) =>
+      node.props.className?.includes('flex-row items-center gap-3'),
     );
     const bar = card.props.children.find((node: any) => node?.props?.accessible);
     const segments = nodes(bar.props.children).filter((node) => node.type === 'View');
     assert.equal(summaries.length, count);
     assert.equal(segments.length, count);
     assert(segments.every((node) => node.props.style.flexGrow === 1));
-    assert.equal(summaries.filter((node) => text(node.props.children[1]) === '1개').length, count);
+    assert.equal(summaries.filter((node) => text(node.props.children[2]) === '1개').length, count);
     if (count === 6) {
       for (const label of ['3일 미만', '3일~1주', '1~2주', '2주~1개월', '1~3개월', '3개월 이상']) {
-        assert(text(card.props.children[0]).includes(label));
+        assert(text(card.props.children[1]).includes(label));
       }
     }
   }

@@ -33,7 +33,7 @@ export function HabitFlowAnalysis() {
   return (
     <View className="gap-4">
       <AnalysisSubtitle>{t('stats.flowTitle')}</AnalysisSubtitle>
-      <View className="mx-1 gap-4 rounded-theme border border-theme-text-secondary/10 bg-theme-surface-muted/60 p-4">
+      <View className="mx-1 gap-4 rounded-theme border border-theme-accent/20 bg-theme-accent-light/50 p-4">
         <View className="flex-row items-center justify-between gap-3">
           <View>
             <Text className="text-sm text-theme-text-secondary">{t('stats.recentAverage')}</Text>

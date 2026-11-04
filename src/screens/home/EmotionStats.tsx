@@ -4,12 +4,12 @@ import { ScrollView, useWindowDimensions, View } from 'react-native';
 import { EmotionImage } from '../../components/EmotionImage';
 import { InfoNotice } from '../../components/InfoNotice';
 import { Text } from '../../components/Text';
-import { UnderlineTab } from '../../components/UnderlineTab';
+import { UnderlineTabs } from '../../components/UnderlineTabs';
 import type { getDiaryStats } from '../../db/stats';
 import { EMOTIONS } from '../../domain/constants';
 import { DIARY_EMOTION_GROUPS } from '../../domain/diaryFilters';
 import { useAppTheme } from '../../theme/AppThemeProvider';
-import { ACCENT_CARD_BORDER_CLASS_NAME, UNDERLINE_TAB_LIST_CLASS_NAME } from '../../theme/classes';
+import { ACCENT_CARD_BORDER_CLASS_NAME } from '../../theme/classes';
 import { AnalysisHeader } from './AnalysisHeader';
 export function EmotionStats({
   stats,
@@ -47,32 +47,14 @@ export function EmotionStats({
         <AnalysisHeader title={t('stats.emotionTitle')}>
           {t('stats.yearCount', { title: year, count: total })}
         </AnalysisHeader>
-        <View accessibilityRole="tablist" className={UNDERLINE_TAB_LIST_CLASS_NAME}>
-          {halves.map((label, index) => (
-            <UnderlineTab key={index} selected={half === index} onPress={() => setHalf(index)}>
-              {label}
-            </UnderlineTab>
-          ))}
-        </View>
+        <UnderlineTabs
+          options={halves.map((label, value) => ({ label, value }))}
+          value={half}
+          onChange={setHalf}
+        />
         <View
-          className={`${ACCENT_CARD_BORDER_CLASS_NAME} gap-4 mx-1 px-4 py-6 bg-theme-accent-light/50 ios:curve-continuous rounded-theme`}
+          className={`${ACCENT_CARD_BORDER_CLASS_NAME} gap-6 mx-1 px-4 py-6 bg-theme-accent-light/50 ios:curve-continuous rounded-theme`}
         >
-          <View className="flex-row">
-            {groups.map((group) => (
-              <View key={group.key} className="flex-1 gap-2 items-center">
-                <View className="flex-row items-center gap-2">
-                  <View className={`h-3 w-3 rounded-full ${group.className}`} />
-                  <Text className="text-sm text-theme-text-secondary">{group.label}</Text>
-                </View>
-                <View className="flex-row items-baseline gap-1">
-                  <Text className="text-2xl font-semibold">{group.count}</Text>
-                  <Text className="text-base text-theme-text-secondary">
-                    {t('stats.timesUnit', { count: group.count })}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </View>
           <View
             accessible
             accessibilityLabel={t('stats.emotionRatio', {
@@ -97,6 +79,22 @@ export function EmotionStats({
                   style={{ flexGrow: group.count, flexBasis: 0 }}
                 />
               ))}
+          </View>
+          <View className="flex-row">
+            {groups.map((group) => (
+              <View key={group.key} className="flex-1 gap-2 items-center">
+                <View className="flex-row items-center gap-2">
+                  <View className={`h-3 w-3 rounded-full ${group.className}`} />
+                  <Text className="text-sm text-theme-text-secondary">{group.label}</Text>
+                </View>
+                <View className="flex-row items-baseline gap-1">
+                  <Text className="text-2xl font-semibold">{group.count}</Text>
+                  <Text className="text-base text-theme-text-secondary">
+                    {t('stats.timesUnit', { count: group.count })}
+                  </Text>
+                </View>
+              </View>
+            ))}
           </View>
         </View>
       </View>

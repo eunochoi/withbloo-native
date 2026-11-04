@@ -6,11 +6,11 @@ import { Pressable, View } from 'react-native';
 import { HabitIcon } from '../../components/HabitIcon';
 import { InfoNotice } from '../../components/InfoNotice';
 import { Text } from '../../components/Text';
-import { UnderlineTab } from '../../components/UnderlineTab';
+import { UnderlineTabs } from '../../components/UnderlineTabs';
 import type { getHabitStats } from '../../db/stats';
 import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
-import { MUTED_CARD_BORDER_CLASS_NAME, UNDERLINE_TAB_LIST_CLASS_NAME } from '../../theme/classes';
+import { MUTED_CARD_BORDER_CLASS_NAME } from '../../theme/classes';
 import { HabitStars } from '../habit/HabitStars';
 import { AnalysisHeader } from './AnalysisHeader';
 export function HabitAnalysis({
@@ -32,28 +32,14 @@ export function HabitAnalysis({
         {t('stats.habitYear', { count: year })}
       </AnalysisHeader>
       <HabitFlowAnalysis />
-      <View accessibilityRole="tablist" className={UNDERLINE_TAB_LIST_CLASS_NAME}>
-        {(
-          [
-            {
-              value: 'top',
-              label: t('stats.topThree'),
-            },
-            {
-              value: 'bottom',
-              label: t('stats.bottomThree'),
-            },
-          ] as const
-        ).map((option) => (
-          <UnderlineTab
-            key={option.value}
-            selected={tab === option.value}
-            onPress={() => setTab(option.value)}
-          >
-            {option.label}
-          </UnderlineTab>
-        ))}
-      </View>
+      <UnderlineTabs
+        options={[
+          { value: 'top', label: t('stats.topThree') },
+          { value: 'bottom', label: t('stats.bottomThree') },
+        ]}
+        value={tab}
+        onChange={setTab}
+      />
       <View
         className={`${MUTED_CARD_BORDER_CLASS_NAME} mx-1 p-6 bg-theme-surface-muted/60 ios:curve-continuous rounded-theme`}
       >
