@@ -47,6 +47,7 @@ export function BottomSheetModal({
   menuAction,
   dismissOnBack = true,
   dismissible = true,
+  preserveHandle = false,
   onBeforeClose,
   onOpening,
   onOpened,
@@ -76,6 +77,7 @@ export function BottomSheetModal({
   menuAction?: ReactNode;
   dismissOnBack?: boolean;
   dismissible?: boolean;
+  preserveHandle?: boolean;
   onBeforeClose?: () => boolean;
   onOpening?: () => void;
   onOpened?: () => void;
@@ -132,7 +134,8 @@ export function BottomSheetModal({
         headerLeft={headerLeft}
         headerRight={typeof headerRight === 'function' ? headerRight(closeSheet) : headerRight}
         menuAction={menuAction}
-        onClose={dismissible ? () => closeSheet() : undefined}
+        onClose={dismissible || preserveHandle ? () => closeSheet() : undefined}
+        handleDisabled={!dismissible}
       />
     </View>
   );

@@ -54,6 +54,7 @@ export function BackupPasswordSheet({
       title={title}
       onClose={onClose}
       dismissible={!busy}
+      preserveHandle
       dismissOnBack={!busy}
       headerRight={(close) => (
         <HeaderAction

@@ -14,6 +14,7 @@ export function BottomSheetHeader({
   headerRight,
   menuAction,
   onClose,
+  handleDisabled = false,
 }: {
   title?: string;
   handleColor?: string;
@@ -28,6 +29,7 @@ export function BottomSheetHeader({
   headerRight?: ReactNode;
   menuAction?: ReactNode;
   onClose?: () => void;
+  handleDisabled?: boolean;
 }) {
   const { t } = useI18n();
   const { iconSizes } = useAppTheme();
@@ -37,6 +39,8 @@ export function BottomSheetHeader({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('common.close')}
+          accessibilityState={{ disabled: handleDisabled }}
+          disabled={handleDisabled}
           onPress={() => onClose()}
           className="h-9 w-9 items-center justify-center ios:curve-continuous rounded-full"
           hitSlop={4}
