@@ -175,19 +175,24 @@ export function BottomSheetModal({
             onScroll: motion.onScroll,
           })
         ) : fillContent ? (
-          <View className={`${fixedHeight ? 'flex-1' : 'shrink'} min-h-0 py-8`}>
+          <View
+            className={`${fixedHeight ? 'flex-1' : 'shrink'} min-h-0 py-8 ${contentFullBleed ? '' : 'px-1'}`}
+          >
             {typeof children === 'function' ? children(closeSheet) : children}
           </View>
         ) : (
           <BottomSheetScrollViewport
             header={
               contentFullBleed && fixedContent ? (
-                <View className="px-[5%]">{fixedContent}</View>
+                <View className="px-[5%]">
+                  <View className="px-1">{fixedContent}</View>
+                </View>
               ) : (
                 fixedContent
               )
             }
             motion={motion}
+            insetContent={!contentFullBleed}
             renderScrollView={renderScrollView}
             fade={fade}
             fixedHeight={fixedHeight}

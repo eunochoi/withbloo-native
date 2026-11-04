@@ -23,6 +23,7 @@ export function BottomSheetScrollViewport({
   children,
   renderScrollView,
   header,
+  insetContent = false,
 }: {
   motion: ReturnType<typeof useBottomSheetMotion>;
   fade: ReturnType<typeof useScrollFade>;
@@ -34,6 +35,7 @@ export function BottomSheetScrollViewport({
   children?: ReactNode;
   renderScrollView?: (props: BottomSheetScrollProps) => ReactNode;
   header?: ReactNode;
+  insetContent?: boolean;
 }) {
   const focusedInput = useRef<number | null>(null);
 
@@ -73,7 +75,7 @@ export function BottomSheetScrollViewport({
     keyboardDismissMode: 'none',
   };
   const viewport = (
-    <View className={`${fixedHeight ? 'flex-1' : 'shrink'} min-h-0 overflow-hidden`}>
+    <View className={`${fixedHeight ? 'flex-1' : 'shrink'} min-h-0 overflow-hidden ${insetContent && !header ? 'mx-1' : ''}`}>
       <GestureDetector gesture={motion.scrollGesture}>
         {renderScrollView ? (
           renderScrollView(scrollProps)
@@ -97,7 +99,7 @@ export function BottomSheetScrollViewport({
     </View>
   );
   return header ? (
-    <View className={`${fixedHeight ? 'flex-1' : 'shrink'} min-h-0`}>
+    <View className={`${fixedHeight ? 'flex-1' : 'shrink'} min-h-0 ${insetContent ? 'mx-1' : ''}`}>
       {header}
       {viewport}
     </View>

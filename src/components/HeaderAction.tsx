@@ -14,7 +14,8 @@ export function HeaderAction({
       accessibilityRole="button"
       accessibilityState={{ disabled: !!disabled }}
       disabled={disabled}
-      className={`min-h-11 min-w-11 items-center justify-center px-1 active:opacity-70 ${disabled ? 'opacity-40' : ''}`}
+      hitSlop={4}
+      className={`min-h-11 min-w-11 ${side === 'left' ? 'items-start' : 'items-end'} justify-center active:opacity-70 ${disabled ? 'opacity-40' : ''}`}
     >
       <Text
         numberOfLines={1}
