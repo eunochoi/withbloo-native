@@ -227,6 +227,7 @@ export default function DiaryList() {
       {picker === 'sort' && (
         <RecordSortPicker
           title={t('diary.sortTitle')}
+          showCriteriaSort
           sortLabel={t('diary.dateSort')}
           sort={settings.diarySort}
           onClose={() => setPicker(null)}

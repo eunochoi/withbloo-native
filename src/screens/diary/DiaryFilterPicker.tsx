@@ -63,8 +63,8 @@ export function DiaryFilterPicker({
       }}
       onApply={() => onApply(selectedYear, draftSeasons, draftEmotionGroups)}
     >
-      <View className="gap-4">
-        <Text className="text-lg font-semibold">{t('diary.yearLabel')}</Text>
+      <View className="gap-3">
+        <Text className="text-base font-semibold">{t('diary.yearLabel')}</Text>
         <FormPickerRow
           label={
             selectedYear === null ? t('diary.allYears') : t('home.year', { count: selectedYear })
@@ -74,9 +74,9 @@ export function DiaryFilterPicker({
           onPress={() => setYearOpen(true)}
         />
       </View>
-      <View className="gap-4">
+      <View className="gap-3">
         <View className="flex-row items-baseline justify-between gap-3">
-          <Text className="text-lg font-semibold">{t('diary.seasonLabel')}</Text>
+          <Text className="text-base font-semibold">{t('diary.seasonLabel')}</Text>
           <Text className="min-w-0 shrink text-right text-sm text-theme-text-secondary">
             {selectionSummary(
               draftSeasons.map((season) => t(`diary.${season}`)),
@@ -99,6 +99,7 @@ export function DiaryFilterPicker({
                   <View key={value} className="flex-1 min-w-0">
                     <PickerOption
                       keepUncheckedBorder
+                      softUncheckedBorder
                       compact
                       checkbox
                       selected={selected}
@@ -134,9 +135,9 @@ export function DiaryFilterPicker({
           )
           .join('\n')}
       </InfoNotice>
-      <View className="gap-4">
+      <View className="gap-3">
         <View className="flex-row items-baseline justify-between gap-3">
-          <Text className="text-lg font-semibold">{t('diary.emotionLabel')}</Text>
+          <Text className="text-base font-semibold">{t('diary.emotionLabel')}</Text>
           <Text className="shrink text-sm text-theme-text-secondary">
             {selectionSummary(
               draftEmotionGroups.map((group) => t(`diary.${group}`)),
@@ -152,6 +153,7 @@ export function DiaryFilterPicker({
               <View key={value} className="flex-1 min-w-0">
                 <PickerOption
                   keepUncheckedBorder
+                  softUncheckedBorder
                   compact
                   dense
                   checkbox
@@ -188,6 +190,7 @@ export function DiaryFilterPicker({
               {[null, ...(yearsQuery.data ?? [])].map((value) => (
                 <PickerOption
                   keepUncheckedBorder
+                  softUncheckedBorder
                   key={value ?? 'all'}
                   compact
                   selected={selectedYear === value}

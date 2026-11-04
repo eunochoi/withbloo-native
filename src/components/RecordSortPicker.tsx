@@ -16,6 +16,7 @@ export function RecordSortPicker({
   allowCustom = false,
   ascendingLabel,
   sortLabel,
+  showCriteriaSort = false,
   onClose,
   onApply,
 }: {
@@ -26,6 +27,7 @@ export function RecordSortPicker({
   allowCustom?: boolean;
   ascendingLabel?: string;
   sortLabel?: string;
+  showCriteriaSort?: boolean;
   onClose: () => void;
   onApply: (
     sort: 'ASC' | 'DESC' | 'CUSTOM',
@@ -89,7 +91,7 @@ export function RecordSortPicker({
         />
       )}
     >
-      <View className="gap-7">
+      <View className={showCriteriaSort ? 'gap-5' : 'gap-7'}>
         {prioritySection}
         {recordSort && (
           <View className="gap-3">
@@ -99,6 +101,7 @@ export function RecordSortPicker({
                 <View key={value} className="flex-1">
                   <PickerOption
                     keepUncheckedBorder
+                    softUncheckedBorder
                     compact
                     selected={draftRecordSort === value}
                     accessibilityLabel={t('ui.currentRecord', {
@@ -117,13 +120,14 @@ export function RecordSortPicker({
             </View>
           </View>
         )}
-        <View className="gap-3">
-          <Text className="text-lg font-semibold">{sortLabel ?? t('ui.createdDateSort')}</Text>
+        <View className={`gap-3 ${showCriteriaSort ? 'px-2' : ''}`}>
+          <Text className={`${showCriteriaSort ? 'text-base' : 'text-lg'} font-semibold`}>{sortLabel ?? t('ui.createdDateSort')}</Text>
           <View className="flex-row gap-3">
             {options.map((option) => (
               <View key={option.value} className="flex-1">
                 <PickerOption
                   keepUncheckedBorder
+                  softUncheckedBorder
                   compact
                   selected={draftSort === option.value}
                   accessibilityLabel={option.label}
@@ -142,14 +146,14 @@ export function RecordSortPicker({
             ))}
           </View>
         </View>
-        <View className="gap-1">
+        <View className={`gap-1 ${showCriteriaSort ? 'px-2' : ''}`}>
           <InfoNotice>
             {draftSort === 'CUSTOM'
               ? t('ui.customDescription')
               : recordSort
                 ? t('ui.recordsDescription', { value: draftPriority ? t('ui.priorityPrefix') : '' })
                 : t('ui.sortDescription', {
-                    value: `${draftPriority ? t('ui.importantPrefix') : ''}${(sortLabel ?? t('ui.createdDateSort')).replace(/ 정렬$/, '')}`,
+                    value: `${draftPriority ? t('ui.importantPrefix') : ''}${(sortLabel ?? t('ui.createdDateSort')).replace(/(?:순)? 정렬$/, '')}`,
                   })}
           </InfoNotice>
           {allowCustom && <InfoNotice>{t('ui.sortPriorityConflict')}</InfoNotice>}

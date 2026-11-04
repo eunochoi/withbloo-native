@@ -7,7 +7,7 @@ export const diaryKo = {
   filteredHint: '필터를 바꾸거나 새로운 일기를 작성해 보세요.',
   emptyHint: '오늘의 감정과 생각을 첫 번째 일기로 남겨보세요.',
   dateLabel: '날짜',
-  dateSort: '날짜 정렬',
+  dateSort: '날짜순 정렬',
   sortTitle: '일기 정렬',
   thisYear: '올해',
   filter: '필터',

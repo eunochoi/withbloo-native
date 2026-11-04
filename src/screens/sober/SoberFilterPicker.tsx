@@ -59,7 +59,7 @@ export function SoberFilterPicker({
             thumbColor={colors.surface}
           />
         </View>
-        <View className="gap-4">
+        <View className="gap-3">
           <Text className="text-base font-semibold">{t('sober.minimumPeriod')}</Text>
           <FormPickerRow
             label={recordFilters.find((option) => option.days === draft.minimumDays)!.label}
@@ -80,6 +80,7 @@ export function SoberFilterPicker({
                 {recordFilters.map((option) => (
                   <PickerOption
                     keepUncheckedBorder
+                    softUncheckedBorder
                     key={option.days}
                     compact
                     selected={draft.minimumDays === option.days}

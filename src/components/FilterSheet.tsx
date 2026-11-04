@@ -44,7 +44,7 @@ export function FilterSheet({
       scrollFade
       onClose={onClose}
     >
-      <View className="gap-7">{children}</View>
+      <View className="gap-5">{children}</View>
     </BottomSheetModal>
   );
 }
