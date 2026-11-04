@@ -280,7 +280,7 @@ export async function replaceRecords(
       if (current)
         await tx.runAsync(
           "UPDATE settings SET value = ? WHERE key = 'preferences'",
-          JSON.stringify({ ...parseSettings(JSON.parse(current.value)), habitOrder: [] }),
+          JSON.stringify({ ...parseSettings(JSON.parse(current.value)), habitOrder: [], soberOrder: [] }),
         );
     }
   });

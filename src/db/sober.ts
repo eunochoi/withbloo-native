@@ -55,10 +55,17 @@ export async function getSoberMemoPage(
 export function sortSobers(
   sobers: Sober[],
   settings: Pick<Settings, 'soberSort' | 'soberPriorityFirst'> &
-    Partial<Pick<Settings, 'soberRecordSort'>>,
+    Partial<Pick<Settings, 'soberRecordSort' | 'soberOrder'>>,
   restarts: SoberRestart[] = [],
   now = Date.now(),
 ) {
+  if (settings.soberSort === 'CUSTOM') {
+    const order = new Map((settings.soberOrder ?? []).map((id, index) => [id, index]));
+    return [...sobers].sort((a, b) =>
+      (order.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.id) ?? Number.MAX_SAFE_INTEGER) ||
+      Date.parse(b.created_at) - Date.parse(a.created_at) || a.id - b.id,
+    );
+  }
   const durations = new Map(
     sobers.map((sober) => [
       sober.id,

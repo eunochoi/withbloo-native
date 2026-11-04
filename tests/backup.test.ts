@@ -44,6 +44,8 @@ async function fixture() {
       diarySort: 'ASC',
       habitSort: 'CUSTOM',
       habitOrder: [1],
+      soberSort: 'CUSTOM',
+      soberOrder: [2, 1],
       habitPriorityFirst: true,
       themeMode: 'system',
       themeAccent: 'green',
@@ -84,6 +86,8 @@ test('DB + images + settings survive backup roundtrip and atomic restore', async
   assert.equal(restoredSettings.habitSort, 'CUSTOM');
   assert.equal(restoredSettings.habitPriorityFirst, true);
   assert.deepEqual(restoredSettings.habitOrder, [1]);
+  assert.equal(restoredSettings.soberSort, 'CUSTOM');
+  assert.deepEqual(restoredSettings.soberOrder, [2, 1]);
   assert.deepEqual(rows(target.raw, 'SELECT date FROM habit_completions ORDER BY date'), [
     ['2024-02-29'],
     ['2024-03-01'],

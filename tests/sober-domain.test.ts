@@ -224,7 +224,11 @@ test('Sober settings persist separately and priority grouping honors selected cr
   };
   assert.deepEqual(parseSettings(JSON.parse(JSON.stringify(settings))), settings);
   assert(!('priorityFirst' in parseSettings({ ...settings, priorityFirst: true })));
-  assert.throws(() => parseSettings({ ...settings, soberSort: 'CUSTOM' }));
+  assert.equal(parseSettings({ ...settings, soberSort: 'CUSTOM', soberOrder: [3, 1] }).soberSort, 'CUSTOM');
+  assert.throws(() => parseSettings({ ...settings, soberOrder: [1, 1] }));
+  assert.deepEqual(parseSettings({ soberSort: 'DESC' }).soberOrder, []);
+  assert.deepEqual(sortSobers([ordinary, important, newer], { soberSort: 'CUSTOM', soberPriorityFirst: true, soberOrder: [3, 1] }).map((item) => item.id), [3, 1, 2]);
+  assert.deepEqual(sortSobers([ordinary, important, newer], { soberSort: 'CUSTOM', soberPriorityFirst: false, soberOrder: [] }).map((item) => item.id), [2, 1, 3]);
   assert.throws(() => parseSettings({ ...settings, soberPriorityFirst: 1 }));
 });
 test('all Sober registry entries exist in the selected native icon family', () => {

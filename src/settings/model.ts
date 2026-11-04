@@ -11,7 +11,8 @@ export interface Settings {
   habitSort: 'ASC' | 'DESC' | 'CUSTOM';
   habitPriorityFirst: boolean;
   habitOrder: number[];
-  soberSort: 'ASC' | 'DESC';
+  soberSort: 'ASC' | 'DESC' | 'CUSTOM';
+  soberOrder: number[];
   soberRecordSort: 'ASC' | 'DESC';
   soberPriorityFirst: boolean;
   diaryReminderTime: string | null;
@@ -30,6 +31,7 @@ export const DEFAULT_SETTINGS: Settings = {
   habitPriorityFirst: false,
   habitOrder: [],
   soberSort: 'DESC',
+  soberOrder: [],
   soberRecordSort: 'DESC',
   soberPriorityFirst: false,
   diaryReminderTime: null,
@@ -51,13 +53,17 @@ export function parseSettings(raw: unknown): Settings {
     !['ASC', 'DESC'].includes(settings.diarySort) ||
     !['ASC', 'DESC', 'CUSTOM'].includes(settings.habitSort) ||
     typeof settings.habitPriorityFirst !== 'boolean' ||
-    !['ASC', 'DESC'].includes(settings.soberSort) ||
+    !['ASC', 'DESC', 'CUSTOM'].includes(settings.soberSort) ||
     !['ASC', 'DESC'].includes(settings.soberRecordSort) ||
     typeof settings.soberPriorityFirst !== 'boolean' ||
     [settings.diaryReminderTime, settings.habitReminderTime, settings.soberReminderTime].some(
       (time) =>
         time !== null && (typeof time !== 'string' || !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)),
     ) ||
+    !Array.isArray(settings.soberOrder) ||
+    settings.soberOrder.length > 10000 ||
+    settings.soberOrder.some((id) => !Number.isSafeInteger(id) || id <= 0) ||
+    new Set(settings.soberOrder).size !== settings.soberOrder.length ||
     !Array.isArray(settings.habitOrder) ||
     settings.habitOrder.length > 10000 ||
     settings.habitOrder.some((id) => !Number.isSafeInteger(id) || id <= 0) ||
@@ -77,6 +83,7 @@ export function parseSettings(raw: unknown): Settings {
     habitPriorityFirst: settings.habitPriorityFirst,
     habitOrder: settings.habitOrder,
     soberSort: settings.soberSort,
+    soberOrder: settings.soberOrder,
     soberRecordSort: settings.soberRecordSort,
     soberPriorityFirst: settings.soberPriorityFirst,
     diaryReminderTime: settings.diaryReminderTime,
