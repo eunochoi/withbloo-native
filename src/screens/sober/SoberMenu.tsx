@@ -46,7 +46,7 @@ export function SoberMenu({
         onPress={() => setOpen(true)}
         className="-mr-3.5 h-11 w-8 items-center justify-center"
       />
-      <BottomSheetModal visible={open} title={sober.name} onClose={() => setOpen(false)}>
+      <BottomSheetModal visible={open} title={sober.name} scrollableTitle onClose={() => setOpen(false)}>
         {(close) => (
           <View className="gap-3">
             {showDetail && (

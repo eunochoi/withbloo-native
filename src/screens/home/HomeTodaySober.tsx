@@ -49,6 +49,7 @@ export function HomeTodaySober() {
     <HomeTodayItem
       title={t('navigation.sober')}
       status={status}
+      scrollableStatus={!!sober && !error}
       pending={pending}
       accessibilityLabel={t('home.soberLinkStatus', {
         value: `${status}${days !== null ? `, ${t('home.dayOrdinal', { count: days })}` : ''}`,

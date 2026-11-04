@@ -95,6 +95,7 @@ export default function SoberMemos() {
           <>
             <BottomSheetPage
               title={t('sober.notesName', { value: sober.data.name })}
+              scrollableTitle
               onBeforeClose={onBeforeClose}
               backRoute={backRoute}
               contentKey={`${soberId}:${sort}`}

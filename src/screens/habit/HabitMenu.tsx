@@ -44,7 +44,7 @@ export function HabitMenu({
         onPress={() => setOpen(true)}
         className="-mr-3.5 h-9 w-8 items-center justify-center"
       />
-      <BottomSheetModal visible={open} title={habit.name} onClose={() => setOpen(false)}>
+      <BottomSheetModal visible={open} title={habit.name} scrollableTitle onClose={() => setOpen(false)}>
         {(closePicker) => (
           <View className="gap-3">
             {showDetail && (

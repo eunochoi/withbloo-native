@@ -2,10 +2,12 @@ import { useI18n } from '../../i18n/react';
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import { Text } from '../../components/Text';
+import { ScrollableName } from '../../components/ScrollableName';
 
 export function HomeTodayItem({
   title,
   status,
+  scrollableStatus = false,
   pending,
   disabled,
   accessibilityLabel,
@@ -14,6 +16,7 @@ export function HomeTodayItem({
 }: {
   title: string;
   status: string;
+  scrollableStatus?: boolean;
   pending: boolean;
   disabled?: boolean;
   accessibilityLabel: string;
@@ -43,6 +46,8 @@ export function HomeTodayItem({
       <View className="min-h-5 w-full items-center justify-start">
         {pending ? (
           <View className="h-5 w-3/4 rounded-lg bg-theme-skeleton" />
+        ) : scrollableStatus ? (
+          <ScrollableName className="text-center text-sm leading-5 text-theme-text-secondary">{status}</ScrollableName>
         ) : (
           <Text
             numberOfLines={1}
