@@ -9,7 +9,7 @@ import { HeaderAction } from './HeaderAction';
 import { PickerInfoCard } from './PickerInfoCard';
 import { PickerGridItem } from './PickerGridItem';
 import { Text } from './Text';
-import { UnderlineTabs } from './UnderlineTabs';
+import { DotTabs } from './DotTabs';
 
 export interface IconCategory<Key extends string> {
   id: string;
@@ -68,7 +68,7 @@ export function IconPicker<Key extends string>({
 
   const topContent = (
     <View className="shrink-0 gap-4 pt-8">
-      <UnderlineTabs
+      <DotTabs
         options={categories.map(({ id, label }) => ({
           value: id,
           label,

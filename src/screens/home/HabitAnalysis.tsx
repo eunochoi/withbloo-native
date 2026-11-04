@@ -6,7 +6,7 @@ import { Pressable, View } from 'react-native';
 import { HabitIcon } from '../../components/HabitIcon';
 import { InfoNotice } from '../../components/InfoNotice';
 import { Text } from '../../components/Text';
-import { UnderlineTabs } from '../../components/UnderlineTabs';
+import { DotTabs } from '../../components/DotTabs';
 import type { getHabitStats } from '../../db/stats';
 import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
@@ -32,7 +32,7 @@ export function HabitAnalysis({
         {t('stats.habitYear', { count: year })}
       </AnalysisHeader>
       <HabitFlowAnalysis />
-      <UnderlineTabs
+      <DotTabs
         options={[
           { value: 'top', label: t('stats.topThree') },
           { value: 'bottom', label: t('stats.bottomThree') },

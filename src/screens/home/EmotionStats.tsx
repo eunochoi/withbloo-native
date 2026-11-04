@@ -4,7 +4,7 @@ import { ScrollView, useWindowDimensions, View } from 'react-native';
 import { EmotionImage } from '../../components/EmotionImage';
 import { InfoNotice } from '../../components/InfoNotice';
 import { Text } from '../../components/Text';
-import { UnderlineTabs } from '../../components/UnderlineTabs';
+import { DotTabs } from '../../components/DotTabs';
 import type { getDiaryStats } from '../../db/stats';
 import { EMOTIONS } from '../../domain/constants';
 import { DIARY_EMOTION_GROUPS } from '../../domain/diaryFilters';
@@ -47,7 +47,7 @@ export function EmotionStats({
         <AnalysisHeader title={t('stats.emotionTitle')}>
           {t('stats.yearCount', { title: year, count: total })}
         </AnalysisHeader>
-        <UnderlineTabs
+        <DotTabs
           options={halves.map((label, value) => ({ label, value }))}
           value={half}
           onChange={setHalf}

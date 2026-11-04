@@ -57,7 +57,7 @@ test('shared submit button retains busy/disabled accessibility, loading indicato
 });
 
 test('shared underline tab retains selection, accessibility and the caller selection action', () => {
-  const tab = load('UnderlineTab');
+  const tab = load('DotTab');
   let selected = 'top';
   const bottom = tab({
     selected: false,

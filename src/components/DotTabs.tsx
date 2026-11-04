@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useAppTheme } from '../theme/AppThemeProvider';
-import { UNDERLINE_TAB_LIST_CLASS_NAME } from '../theme/classes';
-import { UnderlineTab } from './UnderlineTab';
+import { DOT_TAB_LIST_CLASS_NAME } from '../theme/classes';
+import { DotTab } from './DotTab';
 
-export function UnderlineTabs<T extends string | number>({
+export function DotTabs<T extends string | number>({
   options,
   value,
   onChange,
@@ -52,7 +52,7 @@ export function UnderlineTabs<T extends string | number>({
           : undefined
       }
     >
-      <UnderlineTab
+      <DotTab
         selected={value === option.value}
         accessibilityLabel={option.accessibilityLabel}
         onPress={() => {
@@ -62,7 +62,7 @@ export function UnderlineTabs<T extends string | number>({
         }}
       >
         {option.label}
-      </UnderlineTab>
+      </DotTab>
     </View>
   ));
   if (!scrollToSelected)
@@ -70,7 +70,7 @@ export function UnderlineTabs<T extends string | number>({
       <View
         accessibilityRole="tablist"
         accessibilityLabel={accessibilityLabel}
-        className={UNDERLINE_TAB_LIST_CLASS_NAME}
+        className={DOT_TAB_LIST_CLASS_NAME}
       >
         {tabs}
       </View>

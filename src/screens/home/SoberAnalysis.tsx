@@ -9,7 +9,7 @@ import { Pressable, View } from 'react-native';
 import { InfoNotice } from '../../components/InfoNotice';
 import { SoberIcon } from '../../components/SoberIcon';
 import { Text } from '../../components/Text';
-import { UnderlineTabs } from '../../components/UnderlineTabs';
+import { DotTabs } from '../../components/DotTabs';
 import type { Sober, SoberRestart } from '../../db/types';
 import { getSoberStreaks } from '../../domain/sober';
 import { useCurrentMinute } from '../../hooks/useCurrentMinute';
@@ -107,7 +107,7 @@ export function SoberAnalysis({ sobers, restarts }: { sobers: Sober[]; restarts:
           )}
         </View>
       </View>
-      <UnderlineTabs
+      <DotTabs
         options={[
           { value: 'top', label: t('stats.longestFirst') },
           { value: 'bottom', label: t('stats.shortestFirst') },

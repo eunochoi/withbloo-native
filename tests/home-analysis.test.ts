@@ -57,8 +57,8 @@ function render(
           };
         if (dependency === 'react-native-svg')
           return { __esModule: true, default: 'Svg', Circle: 'Circle' };
-        if (dependency.endsWith('/UnderlineTabs'))
-          return { UnderlineTabs: ({ options, value, onChange }: any) => ({ type: 'View', props: { children: options.map((option: any) => ({ type: 'UnderlineTab', props: { selected: value === option.value, onPress: () => onChange(option.value), children: option.label } })) } }) };
+        if (dependency.endsWith('/DotTabs'))
+          return { DotTabs: ({ options, value, onChange }: any) => ({ type: 'View', props: { children: options.map((option: any) => ({ type: 'DotTab', props: { selected: value === option.value, onPress: () => onChange(option.value), children: option.label } })) } }) };
         if (dependency.endsWith('/AnalysisHeader'))
           return {
             AnalysisHeader: (headerProps: any) =>
@@ -366,7 +366,7 @@ test('emotion counts follow period filtering without individual percentages or r
   assert(text(firstHalf).includes('2024년 1개'));
   assert(
     nodes(firstHalf).some(
-      (node) => node.type === 'UnderlineTab' && node.props.selected && text(node) === '전반기',
+      (node) => node.type === 'DotTab' && node.props.selected && text(node) === '전반기',
     ),
   );
   const firstHalfCells = nodes(firstHalf).filter(
@@ -843,7 +843,7 @@ test('English emotion statistics retain half-year counts, all emotion cards and 
   assert(text(english).includes('2024 · 3 logs'));
   assert(
     nodes(english).some(
-      (node) => node.type === 'UnderlineTab' && node.props.selected && text(node) === 'First half',
+      (node) => node.type === 'DotTab' && node.props.selected && text(node) === 'First half',
     ),
   );
   assert(!/[가-힣]/.test(text(english)));
@@ -860,7 +860,7 @@ test('English emotion statistics retain half-year counts, all emotion cards and 
   assert(text(second).includes('2024 · 4 logs'));
   assert(
     nodes(second).some(
-      (node) => node.type === 'UnderlineTab' && node.props.selected && text(node) === 'Second half',
+      (node) => node.type === 'DotTab' && node.props.selected && text(node) === 'Second half',
     ),
   );
   assert.equal(JSON.stringify(stats), snapshot);

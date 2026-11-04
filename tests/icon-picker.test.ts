@@ -112,8 +112,8 @@ function picker(kind: 'habit' | 'sober', value: string, colorKey = 'pink') {
           if (name.endsWith('soberIconCategories'))
             return require('../src/screens/sober/soberIconCategories');
           if (name.endsWith('/IconPicker')) return load('src/components/IconPicker.tsx');
-          if (name.endsWith('/UnderlineTabs')) return load('src/components/UnderlineTabs.tsx');
-          if (name.endsWith('/UnderlineTab')) return load('src/components/UnderlineTab.tsx');
+          if (name.endsWith('/DotTabs')) return load('src/components/DotTabs.tsx');
+          if (name.endsWith('/DotTab')) return load('src/components/DotTab.tsx');
           if (name.endsWith('/PickerInfoCard')) return load('src/components/PickerInfoCard.tsx');
           if (name.endsWith('/PickerGridItem')) return load('src/components/PickerGridItem.tsx');
           if (name.endsWith('/PickerOption')) return load('src/components/PickerOption.tsx');

@@ -71,7 +71,7 @@ function section(path: string, name: string, initialProps: Record<string, unknow
           return { useAppTheme: () => ({ colors: {}, rem: 15, iconSizes: {} }) };
         if (dependency.endsWith('hooks/useCurrentMinute'))
           return { useCurrentMinute: () => Date.parse('2024-01-11T00:00:00Z') };
-        if (dependency.endsWith('/UnderlineTab')) return { UnderlineTab: 'UnderlineTab' };
+        if (dependency.endsWith('/DotTab')) return { DotTab: 'DotTab' };
         if (dependency.endsWith('/AnalysisHeader')) return { AnalysisHeader: 'AnalysisHeader' };
         if (dependency.endsWith('/AnalysisSubtitle')) return { AnalysisSubtitle: 'AnalysisSubtitle' };
         if (dependency.endsWith('/ScrollableName')) return { ScrollableName: 'Text' };
@@ -227,7 +227,7 @@ test('sober analysis ranks individual past and current streaks across items', ()
     ),
   );
   longest.nodes
-    .find((node) => node.type === 'UnderlineTab' && node.props.children === '짧게 유지한 순')
+    .find((node) => node.type === 'DotTab' && node.props.children === '짧게 유지한 순')
     .props.onPress();
   const shortest = ui.render();
   assert.deepEqual(durations(shortest.nodes), ['2일 0시간 0분', '3일 0시간 0분', '3일 0시간 0분']);

@@ -10,7 +10,7 @@ import { EmotionImage } from '../../components/EmotionImage';
 import { PickerOption } from '../../components/PickerOption';
 import { PickerInfoCard } from '../../components/PickerInfoCard';
 import { Text } from '../../components/Text';
-import { UnderlineTabs } from '../../components/UnderlineTabs';
+import { DotTabs } from '../../components/DotTabs';
 import { EMOTIONS } from '../../domain/constants';
 import { DIARY_EMOTION_GROUPS, type DiaryEmotionGroup } from '../../domain/diaryFilters';
 import { useAppTheme } from '../../theme/AppThemeProvider';
@@ -84,7 +84,7 @@ export function DiaryEmotionPicker({
       className={`shrink-0 gap-4 ${pinTop ? 'pt-8' : 'pb-1'}`}
       onLayout={(event) => setTopHeight(event.nativeEvent.layout.height)}
     >
-      <UnderlineTabs
+      <DotTabs
         options={categories.map((id) => ({
           value: id,
           label: t(`diary.${id}`),

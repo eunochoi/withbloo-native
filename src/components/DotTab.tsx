@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Pressable, View, type PressableProps } from 'react-native';
 import { Text } from './Text';
 
-export function UnderlineTab({
+export function DotTab({
   selected,
   children,
   ...props
