@@ -15,6 +15,7 @@ import type { Sober, SoberRestart } from '../../db/types';
 import { Text } from '../../components/Text';
 import { Button } from '../../components/Button';
 import { PickerOption } from '../../components/PickerOption';
+import { ScrollableName } from '../../components/ScrollableName';
 import { BottomSheetModal } from '../../components/BottomSheetModal';
 import { defaultWidgetSettings, type SoberWidgetSettings } from './model';
 import { loadWidgetSettings, saveWidgetSettings } from './storage';
@@ -145,6 +146,7 @@ function ConfigurationContent({
               <Text className="text-xl font-semibold">{t('widget.chooseRecord')}</Text>
               <Button
                 label={sober?.name ?? t('widget.noRecords')}
+                scrollableLabel
                 subtle
                 outline
                 disabled={!records.length || saving}
@@ -201,11 +203,11 @@ function ConfigurationContent({
                   close();
                 }}
               >
-                <Text
+                <ScrollableName
                   className={`text-base ${settings?.soberId === item.id ? 'text-theme-accent-deep' : ''}`}
                 >
                   {item.name}
-                </Text>
+                </ScrollableName>
               </PickerOption>
             ))}
           </View>

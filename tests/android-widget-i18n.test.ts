@@ -127,7 +127,7 @@ function configuration(records: any[] = [{ id: 1, name: '나의 기록' }]) {
           if (name.endsWith('/i18n/react')) return mockI18n(() => language);
           if (name in modules) return modules[name];
           const component = name.split('/').at(-1)!;
-          if (['Button', 'Text', 'PickerOption', 'BottomSheetModal'].includes(component))
+          if (['Button', 'Text', 'PickerOption', 'BottomSheetModal', 'ScrollableName'].includes(component))
             return { [component]: component };
           throw new Error(`Unexpected dependency: ${name}`);
         },

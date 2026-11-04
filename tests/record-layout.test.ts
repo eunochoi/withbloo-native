@@ -36,6 +36,7 @@ function load(file: string, modules: Record<string, any> = {}) {
         if (name === './ColorTransition')
           return { ColorView: 'ColorView', ColorKeyboardAvoidingView: 'ColorKeyboardAvoidingView' };
         if (name === './Text') return { Text: 'Text' };
+        if (name === './ScrollableName') return { ScrollableName: 'ScrollableName' };
         if (name === './AppIcon') return { AppIcon: 'AppIcon' };
         if (name === './ScrollEdgeFade') return { ScrollEdgeFade: 'ScrollEdgeFade' };
         throw new Error(`Unexpected import: ${name}`);
@@ -200,4 +201,9 @@ test('optional sheet title action opens its picker and blocks presses while disa
       (node) => node.props.accessibilityRole === 'button',
     ),
   );
+  const longName = '아주 긴 거리두기 이름';
+  const scrollable = nodes(BottomSheetHeader({ title: longName, scrollableTitle: true }))
+    .find((node) => node.type === 'ScrollableName');
+  assert.equal(scrollable.props.children, longName);
+  assert.equal(scrollable.props.heading, true);
 });
