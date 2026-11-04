@@ -568,7 +568,7 @@ test('record toolbar shows saved sorting and priority while keeping add separate
   }).render();
   assert(!custom.content.some((node) => node.type === 'StarIcon'));
   assert.equal(custom.content.find((node) => node.type === 'AppIcon').props.name, 'sort');
-  assert(custom.content.some((node) => node.type === 'Text' && node.props.children === '커스텀'));
+  assert(custom.content.some((node) => node.type === 'Text' && node.props.children === '자유'));
 });
 
 test('filter toolbar preserves the first condition and truncates only later conditions', () => {
@@ -671,8 +671,8 @@ test('toolbar keeps its icon and first condition whole while truncating remainin
     { sort: 'ASC', recordSort: 'ASC', priorityFirst: false, label: '짧은 기록 · 과거' },
     { sort: 'DESC', recordSort: 'ASC', priorityFirst: true, label: '중요 · 짧은 기록' },
     { sort: 'ASC', recordSort: 'ASC', priorityFirst: true, label: '중요 · 짧은 기록 · 과거' },
-    { sort: 'CUSTOM', priorityFirst: false, label: '커스텀' },
-    { sort: 'CUSTOM', priorityFirst: true, label: '커스텀' },
+    { sort: 'CUSTOM', priorityFirst: false, label: '자유' },
+    { sort: 'CUSTOM', priorityFirst: true, label: '자유' },
   ];
   for (const { label, ...props } of cases) {
     const ui = picker('src/components/ToolbarSortButton.tsx', 'ToolbarSortButton', {
