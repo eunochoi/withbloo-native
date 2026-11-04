@@ -17,6 +17,7 @@ export const uiKo = {
   createdDateSort: '생성일 정렬',
   oldest: '과거순',
   newest: '최신순',
+  freeSort: '자유',
   custom: '커스텀',
   priorityFirst: '중요한 항목 먼저',
   priorityShort: '중요',

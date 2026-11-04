@@ -20,7 +20,7 @@ export function ToolbarSortButton({
   const showPriority = sort !== 'CUSTOM' && priorityFirst;
   const displayLabel =
     sort === 'CUSTOM'
-      ? t('ui.custom')
+      ? t('ui.freeSort')
       : [
           showPriority ? t('ui.priorityShort') : null,
           recordSort === 'ASC' ? t('ui.shortRecords') : null,
@@ -30,7 +30,7 @@ export function ToolbarSortButton({
           .join(' · ') || t('ui.sort');
   const label =
     sort === 'CUSTOM'
-      ? t('ui.custom')
+      ? t('ui.freeSort')
       : `${recordSort ? `${t('ui.currentRecord', { value: t(recordSort === 'DESC' ? 'ui.longest' : 'ui.shortest') })} · ` : ''}${sortLabel ?? t('ui.createdDate')} ${t(sort === 'DESC' ? 'ui.newest' : 'ui.oldest')}`;
   return (
     <ToolbarButton

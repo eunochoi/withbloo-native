@@ -45,7 +45,7 @@ import { refreshSoberWidgets } from '../../src/widgets/sober';
 export default function SettingsScreen() {
   const { t } = useI18n();
   const { showNotice } = useNotice();
-  const { colors, rem: appRem, iconSizes, tabContentBottom } = useAppTheme();
+  const { rem: appRem, tabContentBottom } = useAppTheme();
   const fade = useScrollFade();
   const scroll = useRef<ScrollView>(null);
   useScrollToTop(scroll);
@@ -269,23 +269,6 @@ export default function SettingsScreen() {
             dimmed={disabled && activity !== 'settings'}
             onChange={change}
           />
-          <View className="gap-3">
-            <Text accessibilityRole="header" className="text-xl py-2 font-semibold">
-              {t('settings.habitOrder')}
-            </Text>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityState={{ disabled }}
-              disabled={disabled}
-              onPress={() => openModal('/habit/order')}
-              className={`py-2 px-1 flex-row items-center justify-between gap-2 ${disabled ? 'opacity-40' : 'opacity-100'}`}
-            >
-              <Text className="text-base text-theme-text-secondary">
-                {t('settings.customHabitOrder')}
-              </Text>
-              <AppIcon name="low-priority" size={iconSizes.md} color={colors.accent} />
-            </Pressable>
-          </View>
           <LanguageSettingsSection
             value={settings.language}
             disabled={disabled}

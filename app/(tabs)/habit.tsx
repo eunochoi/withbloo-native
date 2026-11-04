@@ -10,7 +10,7 @@ import { EmptyState } from '../../src/components/EmptyState';
 import { useNotice } from '../../src/components/NoticeProvider';
 import { PageTopSection } from '../../src/components/PageTopSection';
 import { QueryError } from '../../src/components/QueryError';
-import { RecordSortPicker } from '../../src/components/RecordSortPicker';
+import { HabitSortPicker } from '../../src/screens/habit/HabitSortPicker';
 import { ScrollEdgeFade } from '../../src/components/ScrollEdgeFade';
 import { StarIcon } from '../../src/components/StarIcon';
 import { TabBottomSpacer } from '../../src/components/TabBottomSpacer';
@@ -47,7 +47,7 @@ export default function HabitList() {
   const today = useToday();
   const scroll = useRef<ScrollView>(null);
   useScrollToTop(scroll);
-  const { settings, updateSettings } = useSettings();
+  const { settings } = useSettings();
   const list = useQuery(habitQueries.list(db));
   const completions = useQuery(habitQueries.completions(db, shiftDate(today, -3), today));
   const mutation = useRecordMutation(
@@ -98,13 +98,6 @@ export default function HabitList() {
       : []),
   ];
   const ready = !!list.data && !!completions.data;
-  const change = (values: Parameters<typeof updateSettings>[0]) => {
-    void updateSettings(values)
-      .then(() => scroll.current?.scrollTo({ y: 0, animated: true }))
-      .catch((error: Error) =>
-        showNotice({ tone: 'error', title: t('habit.settingsFailed'), message: error.message }),
-      );
-  };
   const failed = list.isError || completions.isError;
   const gridEntries =
     ready && sorted.length > 0
@@ -259,17 +252,7 @@ export default function HabitList() {
         />
       )}
       {sortOpen && (
-        <RecordSortPicker
-          title={t('habit.sort')}
-          sort={settings.habitSort}
-          priorityFirst={settings.habitPriorityFirst}
-          allowCustom
-          onClose={() => setSortOpen(false)}
-          onApply={(sort, priorityFirst) => {
-            setSortOpen(false);
-            change({ habitSort: sort, habitPriorityFirst: priorityFirst });
-          }}
-        />
+        <HabitSortPicker visible onClose={() => setSortOpen(false)} />
       )}
     </ColorView>
   );

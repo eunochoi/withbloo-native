@@ -17,6 +17,7 @@ export const uiEn = {
   createdDateSort: 'Created date',
   oldest: 'Oldest first',
   newest: 'Newest first',
+  freeSort: 'Manual',
   custom: 'Custom',
   priorityFirst: 'Important items first',
   priorityShort: 'Top',

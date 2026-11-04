@@ -70,7 +70,7 @@ export const settingsKo = {
   restoredButReloadFailed: '기록은 복원됐어요',
   restartAfterRestore: '화면을 새로 불러오지 못했어요. 앱을 다시 실행해주세요.',
   habitOrder: '습관 정렬',
-  customHabitOrder: '습관 목록 순서 개인화',
+  customHabitOrder: '습관 정렬 방식',
   restoreConfirm: '백업으로 복원할까요?',
   restoreWarning:
     '기록·사진·설정이 백업 내용으로 바뀌어요. 현재 데이터의 안전 백업을 앱 안에 보관하며, 방금 입력한 비밀번호로 암호화해요.',

@@ -45,7 +45,6 @@ const sheetRoutes = [
   'habit/new',
   'habit/[id]/index',
   'habit/[id]/edit',
-  'habit/order',
   'sober/new',
   'sober/[id]/index',
   'sober/[id]/edit',

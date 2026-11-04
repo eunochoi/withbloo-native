@@ -73,7 +73,7 @@ export const settingsEn = {
   restoredButReloadFailed: 'Your records were restored',
   restartAfterRestore: 'Unable to refresh. Restart the app.',
   habitOrder: 'Habit order',
-  customHabitOrder: 'Customize habit order',
+  customHabitOrder: 'Habit sorting',
   restoreConfirm: 'Restore this backup?',
   restoreWarning:
     'This replaces your records, photos, and settings. A safety backup stays in the app, encrypted with the password you just entered.',
