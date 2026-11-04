@@ -455,7 +455,7 @@ test('emotion cards use 35 percent of window width at every supported app text s
       assert(
         strip.props.children.every((item: any) => item.props.style.width === layoutWidth * 0.35),
       );
-      assert.equal(strip.props.contentContainerStyle.paddingHorizontal, layoutWidth * 0.05);
+      assert.equal(strip.props.contentContainerStyle.paddingHorizontal, layoutWidth * 0.05 + rem * 0.25);
       assert.equal(strip.props.onLayout, undefined);
       const image = nodes(card).find((node) => node.type === 'EmotionImage');
       assert.equal(image.props.size, rem * 4);

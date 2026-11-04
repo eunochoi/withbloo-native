@@ -71,7 +71,19 @@ function section(path: string, name: string, initialProps: Record<string, unknow
           return { useAppTheme: () => ({ colors: {}, rem: 15, iconSizes: {} }) };
         if (dependency.endsWith('hooks/useCurrentMinute'))
           return { useCurrentMinute: () => Date.parse('2024-01-11T00:00:00Z') };
-        if (dependency.endsWith('/DotTab')) return { DotTab: 'DotTab' };
+        if (dependency.endsWith('/DotTabs'))
+          return {
+            DotTabs: ({ options, value, onChange }: any) =>
+              jsx('View', {
+                children: options.map((option: any) =>
+                  jsx('DotTab', {
+                    children: option.label,
+                    selected: value === option.value,
+                    onPress: () => onChange(option.value),
+                  }),
+                ),
+              }),
+          };
         if (dependency.endsWith('/AnalysisHeader')) return { AnalysisHeader: 'AnalysisHeader' };
         if (dependency.endsWith('/AnalysisSubtitle')) return { AnalysisSubtitle: 'AnalysisSubtitle' };
         if (dependency.endsWith('/ScrollableName')) return { ScrollableName: 'Text' };

@@ -937,7 +937,8 @@ test('full-bleed content retains header, fixed content and footer insets without
   const [header, body, footer] = surface.props.children;
   assert.equal(header.props.className, 'px-[5%]');
   assert.equal(body.props.children[0].props.className, 'px-[5%]');
-  assert.equal(body.props.children[0].props.children, fixedContent);
+  assert.equal(body.props.children[0].props.children.props.className, 'px-1');
+  assert.equal(body.props.children[0].props.children.props.children, fixedContent);
   assert.equal(footer.props.className, 'pb-4 px-[5%]');
   assert.equal(footer.props.children, 'save');
   assert.equal(h.scroll().props.contentContainerClassName, 'gap-7 py-8');
