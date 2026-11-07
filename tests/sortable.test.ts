@@ -121,10 +121,11 @@ test('photo grid keeps add tile outside draggable data and passes the drop order
   const grid = nodes(tree).find((node) => node.type === 'Grid');
   assert.equal(grid.props.data, props.images);
   assert.equal(grid.props.autoScrollDirection, 'horizontal');
+  assert.equal(grid.props.overDrag, 'none');
   grid.props.onDragStart();
   tree = render('DiaryFormImages', props);
   assert.equal(
-    nodes(tree).find((node) => node.props.accessibilityLabel === '사진 추가').props.disabled,
+    nodes(tree).find((node) => node.props.accessibilityLabel === '이미지 추가').props.disabled,
     true,
   );
   grid.props.onDragEnd({ fromIndex: 0, toIndex: 1 });
