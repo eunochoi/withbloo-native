@@ -1,4 +1,6 @@
 export const diaryKo = {
+  storyTooLong: '이야기는 %{count}자까지 입력할 수 있어요.',
+  storyRequired: '이야기를 입력해주세요.',
   listTitle: '일기 목록',
   listTags: '#감정 #끄적끄적',
   listFailed: '일기 목록을 불러오지 못했어요.',

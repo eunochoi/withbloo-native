@@ -56,6 +56,7 @@ export function DiaryForm({
   const [picker, setPicker] = useState<'emotion' | 'date' | null>(null);
   const [picking, setPicking] = useState(false);
   const [saved, setSaved] = useState(false);
+  const textInput = useRef<TextInput>(null);
   const drafts = useRef<DraftImage[]>([]);
   const mounted = useRef(true);
   const [draftEmotion, setDraftEmotion] = useState<number | null>(null);
@@ -137,8 +138,28 @@ export function DiaryForm({
       scrollEnabled={!dragging}
       headerRight={
         <HeaderAction
-          disabled={busy || dragging || date === null || emotion === null || !text.trim()}
-          onPress={() => mutation.mutate(undefined)}
+          disabled={busy || dragging}
+          onPress={() => {
+            if (date === null || !isDate(date) || date > today) {
+              showNotice({ tone: 'info', title: t('diary.dateRequired') });
+              return;
+            }
+            if (emotion === null || !Number.isInteger(emotion) || emotion < 0 || emotion >= EMOTIONS.length) {
+              showNotice({ tone: 'info', title: t('diary.emotionRequired') });
+              return;
+            }
+            if (!text.trim()) {
+              showNotice({ tone: 'info', title: t('diary.storyRequired') });
+              textInput.current?.focus();
+              return;
+            }
+            if (text.length > DIARY_TEXT_MAX_LENGTH) {
+              showNotice({ tone: 'info', title: t('diary.storyTooLong', { count: DIARY_TEXT_MAX_LENGTH }) });
+              textInput.current?.focus();
+              return;
+            }
+            mutation.mutate(undefined);
+          }}
           label={mutation.isPending ? t('common.saving') : t('common.save')}
         />
       }
@@ -235,6 +256,7 @@ export function DiaryForm({
         </Text>
         <View className="gap-3 p-1">
           <TextInput
+            ref={textInput}
             accessibilityLabel={t('diary.content')}
             multiline
             scrollEnabled

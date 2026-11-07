@@ -1,4 +1,6 @@
 export const diaryEn = {
+  storyTooLong: 'Your story can be up to %{count} characters.',
+  storyRequired: 'Please enter your story.',
   listTitle: 'Diaries',
   listTags: '#Moods #Notes',
   listFailed: 'Could not load your diary.',
