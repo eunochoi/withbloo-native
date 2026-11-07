@@ -1,5 +1,3 @@
-import { formatDisplayDate } from '../i18n/format';
-import { useI18n } from '../i18n/react';
 import { useQuery } from '@tanstack/react-query';
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -17,6 +15,8 @@ import { Text } from '../components/Text';
 import { EMOTIONS } from '../domain/constants';
 import { isDate } from '../domain/date';
 import { DIARY_IMAGE_MAX_COUNT, DIARY_TEXT_MAX_LENGTH } from '../domain/limits';
+import { formatDisplayDate } from '../i18n/format';
+import { useI18n } from '../i18n/react';
 import {
   discardDraftImages,
   mediaUri,
@@ -43,7 +43,7 @@ export function DiaryForm({
   const { t, formatLocale } = useI18n();
 
   const { showNotice } = useNotice();
-  const { colors, rem: appRem, iconSizes } = useAppTheme();
+  const { colors, rem: appRem } = useAppTheme();
   const db = useSQLiteContext();
   const today = useToday();
   const query = useQuery({ ...diaryQueries.byId(db, id ?? 0), enabled: id !== undefined });
@@ -113,10 +113,10 @@ export function DiaryForm({
   const title = date ? formatDisplayDate(date, formatLocale, 'form') : t('diary.datePrompt');
   const onClosed = saved
     ? () =>
-        showNotice({
-          tone: 'success',
-          title: id ? t('diary.edited') : t('diary.saved'),
-        })
+      showNotice({
+        tone: 'success',
+        title: id ? t('diary.edited') : t('diary.saved'),
+      })
     : undefined;
   if (id !== undefined && (query.isPending || query.error || !query.data))
     return (
@@ -169,14 +169,14 @@ export function DiaryForm({
       titleAction={
         id !== undefined || allowDateChange
           ? {
-              accessibilityLabel: date ? t('diary.dateChoice', { title }) : t('diary.chooseDate'),
-              disabled: busy || dragging || picker !== null,
-              showChevron: false,
-              onPress: () => {
-                Keyboard.dismiss();
-                setPicker('date');
-              },
-            }
+            accessibilityLabel: date ? t('diary.dateChoice', { title }) : t('diary.chooseDate'),
+            disabled: busy || dragging || picker !== null,
+            showChevron: false,
+            onPress: () => {
+              Keyboard.dismiss();
+              setPicker('date');
+            },
+          }
           : undefined
       }
       onBeforeClose={() => {
@@ -227,26 +227,22 @@ export function DiaryForm({
             setDraftEmotion(emotion);
             setPicker('emotion');
           }}
-          className="min-h-12 flex-row items-center gap-3 bg-transparent p-1 active:opacity-70"
+          className="min-h-12 flex-row items-center gap-3 active:opacity-70"
         >
-          <View className="h-14 w-14 items-start justify-center">
-            {emotion !== null ? (
-              <EmotionImage emotion={emotion} size={appRem * 3.5} />
-            ) : (
-              <AppIcon name="emoji-emotions" size={appRem * 3.5} color={colors.tertiary} />
-            )}
-          </View>
-          <View className="flex-1 min-w-0 gap-1">
+          <View className="flex-1 min-w-0 gap-3">
             <Text className={SECTION_TITLE_CLASS_NAME}>{t('diary.todayEmotion')}</Text>
-            <Text className="text-sm text-theme-text-secondary">
+            <Text className="px-1 text-base text-theme-text-secondary">
               {emotion !== null ? t(`emotions.${EMOTIONS[emotion].key}`) : t('diary.emotionPrompt')}
             </Text>
           </View>
-          <View className="flex-row items-center gap-0.5">
-            <Text className="text-base text-theme-text-secondary">
-              {emotion !== null ? t('diary.change') : t('diary.choose')}
-            </Text>
-            <AppIcon name="chevron-right" size={iconSizes.md} color={colors.secondary} />
+          <View className="h-16 w-16 items-center justify-center">
+            {emotion !== null ? (
+              <EmotionImage emotion={emotion} size={appRem * 4} />
+            ) : (
+              <View className="h-14 w-14 items-center justify-center rounded-full border border-dashed border-theme-accent">
+                <AppIcon name="add" size={appRem * 1.75} color={colors.accent} />
+              </View>
+            )}
           </View>
         </Pressable>
       </View>
@@ -254,7 +250,7 @@ export function DiaryForm({
         <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
           {t('diary.storyTitle')}
         </Text>
-        <View className="gap-3 p-1">
+        <View className="gap-3 px-1">
           <TextInput
             ref={textInput}
             accessibilityLabel={t('diary.content')}
@@ -265,52 +261,56 @@ export function DiaryForm({
             editable={!busy && picker === null}
             maxLength={DIARY_TEXT_MAX_LENGTH}
             placeholder={t('diary.placeholder')}
-            placeholderTextColor={colors.tertiary}
+            placeholderTextColor={colors.secondary}
             textAlignVertical="top"
-            className={`${FORM_TEXT_INPUT_CLASS_NAME} h-[250px] rounded-lg border border-theme-border p-2`}
+            className={`${FORM_TEXT_INPUT_CLASS_NAME} h-[200px] leading-6`}
           />
           <CharacterCount length={text.length} maxLength={DIARY_TEXT_MAX_LENGTH} />
         </View>
       </View>
       <View className="gap-3">
-        <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>{t('diary.photoTitle')}</Text>
-        <Text className="text-base text-theme-text-secondary">{t('diary.photoHint')}</Text>
-        <Text className="text-xs text-theme-text-secondary">
-          {t('diary.photoLimit', { count: images.length, value: DIARY_IMAGE_MAX_COUNT })}
-        </Text>
-        <DiaryFormImages
-              images={images}
-              busy={busy}
-              picking={picking}
-              onDragging={setDragging}
-              onReorder={onReorder}
-              onRemove={(file) =>
-                setImages((previous) => previous.filter((image) => image.file !== file))
-              }
-              onPick={() => {
-                setPicking(true);
-                void pickImages(DIARY_IMAGE_MAX_COUNT - images.length)
-                  .then((added) => {
-                    if (!mounted.current) {
-                      discardDraftImages(added);
-                      return;
-                    }
-                    drafts.current.push(...added);
-                    setImages((previous) => [...previous, ...added]);
-                  })
-                  .catch((error: Error) => {
-                    if (mounted.current)
-                      showNotice({
-                        tone: 'error',
-                        title: t('diary.photoFailed'),
-                        message: error.message,
-                      });
-                  })
-                  .finally(() => {
-                    if (mounted.current) setPicking(false);
-                  });
-              }}
-        />
+        <View className="flex-row items-baseline gap-2">
+          <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>{t('diary.photoTitle')}</Text>
+          <Text className="text-sm text-theme-text-secondary">
+            {t('diary.photoLimit', { count: images.length, value: DIARY_IMAGE_MAX_COUNT })}
+          </Text>
+        </View>
+        <View className="gap-3 px-1">
+          <Text className="text-base text-theme-text-secondary">{t('diary.photoHint')}</Text>
+          <DiaryFormImages
+            images={images}
+            busy={busy}
+            picking={picking}
+            onDragging={setDragging}
+            onReorder={onReorder}
+            onRemove={(file) =>
+              setImages((previous) => previous.filter((image) => image.file !== file))
+            }
+            onPick={() => {
+              setPicking(true);
+              void pickImages(DIARY_IMAGE_MAX_COUNT - images.length)
+                .then((added) => {
+                  if (!mounted.current) {
+                    discardDraftImages(added);
+                    return;
+                  }
+                  drafts.current.push(...added);
+                  setImages((previous) => [...previous, ...added]);
+                })
+                .catch((error: Error) => {
+                  if (mounted.current)
+                    showNotice({
+                      tone: 'error',
+                      title: t('diary.photoFailed'),
+                      message: error.message,
+                    });
+                })
+                .finally(() => {
+                  if (mounted.current) setPicking(false);
+                });
+            }}
+          />
+        </View>
       </View>
     </RecordFormLayout>
   );
