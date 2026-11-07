@@ -1,4 +1,6 @@
 export const habitEn = {
+  nameTooLong: 'The habit name can be up to %{count} characters.',
+  nameRequired: 'Please enter a habit name.',
   title: 'Habits',
   tags: '#Action #Growth',
   failed: 'Could not load habits.',

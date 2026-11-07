@@ -25,6 +25,7 @@ import {
   type HabitIconKey,
 } from '../domain/constants';
 import { HABIT_NAME_MAX_LENGTH } from '../domain/limits';
+import { assertDateTime } from '../domain/date';
 import { habitQueries, useRecordMutation } from '../queries';
 import { useAppTheme } from '../theme/AppThemeProvider';
 import { FORM_TEXT_INPUT_CLASS_NAME, SECTION_TITLE_CLASS_NAME } from '../theme/classes';
@@ -50,6 +51,7 @@ export function HabitForm({ id }: { id?: number }) {
   );
   const [picker, setPicker] = useState<'priority' | 'icon' | 'color' | 'date' | null>(null);
   const [saved, setSaved] = useState(false);
+  const nameInput = useRef<TextInput>(null);
   const loaded = useRef(false);
   useEffect(() => {
     if (query.data && !loaded.current) {
@@ -125,8 +127,28 @@ export function HabitForm({ id }: { id?: number }) {
       }}
       headerRight={
         <HeaderAction
-          disabled={!name.trim() || mutation.isPending}
-          onPress={() => mutation.mutate(undefined)}
+          disabled={mutation.isPending}
+          onPress={() => {
+            if (!name.trim()) {
+              showNotice({ tone: 'info', title: t('habit.nameRequired') });
+              nameInput.current?.focus();
+              return;
+            }
+            if (name.trim().length > HABIT_NAME_MAX_LENGTH) {
+              showNotice({ tone: 'info', title: t('habit.nameTooLong', { count: HABIT_NAME_MAX_LENGTH }) });
+              nameInput.current?.focus();
+              return;
+            }
+            if (!id) {
+              try {
+                assertDateTime(initialStartedAt, Date.now());
+              } catch (error) {
+                showNotice({ tone: 'error', title: t('habit.processFailed'), message: (error as Error).message });
+                return;
+              }
+            }
+            mutation.mutate(undefined);
+          }}
           label={mutation.isPending ? t('common.saving') : t('common.save')}
         />
       }
@@ -172,6 +194,7 @@ export function HabitForm({ id }: { id?: number }) {
         </Text>
         <View className="gap-3 px-1">
           <TextInput
+            ref={nameInput}
             accessibilityLabel={t('habit.name')}
             value={name}
             onChangeText={setName}

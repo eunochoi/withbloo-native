@@ -1,8 +1,8 @@
-import { useEffect, useState, type ComponentProps } from 'react';
+import { useEffect, useState, type ComponentProps, type Ref } from 'react';
 import { Keyboard, Pressable, TextInput, View } from 'react-native';
 
 // ScrollView lets a different TextInput take focus even when taps should dismiss the keyboard.
-export function FormTextInput({ onFocus, onBlur, ...props }: ComponentProps<typeof TextInput>) {
+export function FormTextInput({ inputRef, onFocus, onBlur, ...props }: ComponentProps<typeof TextInput> & { inputRef?: Ref<TextInput> }) {
   const [keyboardVisible, setKeyboardVisible] = useState(() => Keyboard.isVisible());
   const [focused, setFocused] = useState(false);
 
@@ -18,6 +18,7 @@ export function FormTextInput({ onFocus, onBlur, ...props }: ComponentProps<type
   return (
     <View className="relative w-full">
       <TextInput
+        ref={inputRef}
         {...props}
         onFocus={(event) => {
           setFocused(true);

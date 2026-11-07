@@ -1,4 +1,6 @@
 export const soberKo = {
+  nameTooLong: '이름은 %{count}자까지 입력할 수 있어요.',
+  nameRequired: '거리를 두고 싶은 것을 입력해주세요.',
   title: '거리두기',
   detailTitle: '상세 정보',
   info: '거리두기 상세보기',

@@ -1,4 +1,6 @@
 export const habitKo = {
+  nameTooLong: '습관 이름은 %{count}자까지 입력할 수 있어요.',
+  nameRequired: '습관 이름을 입력해주세요.',
   title: '습관 관리',
   tags: '#실천 #성장',
   failed: '습관 목록을 불러오지 못했어요.',

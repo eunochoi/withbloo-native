@@ -1,4 +1,6 @@
 export const soberEn = {
+  nameTooLong: 'The name can be up to %{count} characters.',
+  nameRequired: 'Please enter what you want to cut back on.',
   title: 'Cut Back',
   detailTitle: 'Details',
   info: 'Cut Back details',

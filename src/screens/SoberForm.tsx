@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
-import { Switch, View } from 'react-native';
+import { Switch, TextInput, View } from 'react-native';
 import { BottomSheetPage } from '../components/BottomSheetPage';
 import { HeaderAction } from '../components/HeaderAction';
 import { CharacterCount } from '../components/CharacterCount';
@@ -23,6 +23,7 @@ import { saveSober } from '../db/sober';
 import { DEFAULT_HABIT_ICON_COLOR, HABIT_ICON_COLORS } from '../domain/constants';
 import { SOBER_DESCRIPTION_MAX_LENGTH, SOBER_NAME_MAX_LENGTH } from '../domain/limits';
 import type { SoberInput } from '../domain/sober';
+import { assertDateTime } from '../domain/date';
 import { soberQueries, useRecordMutation } from '../queries';
 import { useAppTheme } from '../theme/AppThemeProvider';
 import { FORM_TEXT_INPUT_CLASS_NAME, SECTION_TITLE_CLASS_NAME } from '../theme/classes';
@@ -52,6 +53,7 @@ export function SoberForm({ id }: { id?: number }) {
   const { showNotice } = useNotice();
   const [saved, setSaved] = useState(false);
   const saving = useRef(false);
+  const nameInput = useRef<TextInput>(null);
   useEffect(() => {
     if (query.data && !loaded) {
       setDraft(query.data);
@@ -111,9 +113,25 @@ export function SoberForm({ id }: { id?: number }) {
       headerRight={
         <HeaderAction
           label={mutation.isPending ? t('common.saving') : t('common.save')}
-          disabled={!draft.name.trim() || mutation.isPending}
+          disabled={mutation.isPending}
           onPress={() => {
             if (saving.current) return;
+            if (!draft.name.trim()) {
+              showNotice({ tone: 'info', title: t('sober.nameRequired') });
+              nameInput.current?.focus();
+              return;
+            }
+            if (draft.name.trim().length > SOBER_NAME_MAX_LENGTH) {
+              showNotice({ tone: 'info', title: t('sober.nameTooLong', { count: SOBER_NAME_MAX_LENGTH }) });
+              nameInput.current?.focus();
+              return;
+            }
+            try {
+              assertDateTime(draft.initial_started_at, Date.now());
+            } catch (error) {
+              showNotice({ tone: 'error', title: t('sober.saveFailed'), message: (error as Error).message });
+              return;
+            }
             saving.current = true;
             void mutation
               .mutateAsync(undefined)
@@ -179,6 +197,7 @@ export function SoberForm({ id }: { id?: number }) {
         </Text>
         <View className="gap-3 px-1">
           <FormTextInput
+            inputRef={nameInput}
             accessibilityLabel={t('sober.nameInput')}
             value={draft.name}
             onChangeText={(name) => setDraft({ ...draft, name })}
