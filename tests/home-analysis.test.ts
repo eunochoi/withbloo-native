@@ -1,4 +1,3 @@
-import { mockI18n, formatDisplayDate, soberI18n } from './helpers/i18n';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -12,6 +11,7 @@ import {
   getSoberSummary,
   SOBER_DAY_MS,
 } from '../src/domain/sober';
+import { formatDisplayDate, mockI18n, soberI18n } from './helpers/i18n';
 
 const require = createRequire(import.meta.url);
 const ts = require('typescript');
@@ -75,7 +75,7 @@ function render(
           return {
             useState: (initial: unknown) => [
               stateIndex++ === 0 ? (selection ?? initial) : (scenario.layoutWidth ?? initial),
-              () => {},
+              () => { },
             ],
           };
         if (dependency === 'react-native')
@@ -690,7 +690,7 @@ test('habit donut shows actual completion, including empty and full rings', () =
       assert.equal(ring.strokeLinecap, 'round');
       assert(
         Math.abs(ring.strokeDashoffset / ring.strokeDasharray[0] - (1 - completed / total)) <
-          0.000001,
+        0.000001,
       );
     }
     assert(!JSON.stringify(tree).includes('NaN'));
