@@ -24,6 +24,10 @@
         "credentialsSource": "remote"
       }
     },
+    "android-development": {
+      "extends": "preview",
+      "developmentClient": true
+    },
     "ios-simulator": {
       "developmentClient": true,
       "distribution": "internal",

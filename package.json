@@ -12,7 +12,7 @@
     "start:usb": "adb reverse tcp:8081 tcp:8081 && EXPO_NO_TELEMETRY=1 expo start --localhost --android --port 8081",
     "android": "EXPO_NO_TELEMETRY=1 expo run:android",
     "ios": "EXPO_NO_TELEMETRY=1 expo run:ios",
-    "android:dev": "EXPO_NO_TELEMETRY=1 expo run:android --variant debug --app-id com.everstamp.dev",
+    "android:dev": "adb reverse tcp:3000 tcp:3000 && WITHBLOO_ANDROID_DEV_CLIENT=1 EXPO_RUN_PREFER_APP_CONFIG_ID=1 expo start --dev-client",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "check:boundaries": "node scripts/check-boundaries.cjs",
