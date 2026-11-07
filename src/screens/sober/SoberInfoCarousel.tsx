@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
+import { PageIndicator } from '../../components/PageIndicator';
 import { useI18n } from '../../i18n/react';
 
 export function SoberInfoCarousel({
@@ -75,10 +76,7 @@ export function SoberInfoCarousel({
             className="h-8 items-center justify-center px-[3px] active:opacity-65"
             hitSlop={8}
           >
-            <View
-              className={`h-2 rounded-full ${page === index ? 'w-5 opacity-100' : 'w-2 opacity-25'}`}
-              style={{ backgroundColor: color }}
-            />
+            <PageIndicator active={page === index} color={color} />
           </Pressable>
         ))}
       </View>

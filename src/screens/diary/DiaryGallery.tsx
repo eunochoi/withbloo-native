@@ -2,6 +2,7 @@ import { useI18n } from '../../i18n/react';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 import { useRef, useState } from 'react';
 import { FlatList, Image, Pressable, View, useWindowDimensions } from 'react-native';
+import { PageIndicator } from '../../components/PageIndicator';
 import type { DiaryImage } from '../../db/types';
 import { mediaUri } from '../../media';
 
@@ -121,10 +122,7 @@ function DiaryGalleryPages({ images, detail = false, square = false, onPress }: 
           className="flex-row justify-center py-1.5"
         >
           {images.map((image, index) => (
-            <View
-              key={image.id}
-              className={`m-[3px] h-2 ios:curve-continuous rounded-theme ${page === index ? 'bg-theme-accent w-5' : 'bg-theme-accent/25 w-2'}`}
-            />
+            <PageIndicator key={image.id} active={page === index} className="m-[3px]" />
           ))}
         </View>
       )}
