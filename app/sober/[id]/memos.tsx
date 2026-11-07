@@ -29,7 +29,7 @@ export default function SoberMemos() {
   const soberId = Number(id);
   const validId = Number.isSafeInteger(soberId) && soberId > 0;
   const db = useSQLiteContext();
-  const { colors, iconSizes } = useAppTheme();
+  const { colors, iconSizes, rem } = useAppTheme();
   const [sort, setSort] = useState<'ASC' | 'DESC'>('DESC');
   const [sorting, setSorting] = useState(false);
   const fetchingNext = useRef(false);
@@ -70,9 +70,10 @@ export default function SoberMemos() {
       onRetry={() => void list.refetch()}
     />
   ) : (
-    <View className="min-h-48 items-center justify-center gap-3">
-      <Text className="text-center text-base">{t('sober.notesEmpty')}</Text>
-      <Text className="text-center text-sm text-theme-text-secondary">
+    <View className="min-h-48 items-center justify-center gap-4 pt-8">
+      <AppIcon name="history" size={rem * 2.5} color={colors.textSecondary} />
+      <Text className="text-center text-lg font-semibold">{t('sober.notesEmpty')}</Text>
+      <Text className="text-center text-base leading-relaxed text-theme-text-secondary">
         {t('sober.notesEmptyHint')}
       </Text>
     </View>
@@ -111,7 +112,7 @@ export default function SoberMemos() {
                   initialNumToRender={8}
                   maxToRenderPerBatch={8}
                   windowSize={5}
-                  ListHeaderComponent={
+                  ListHeaderComponent={rows.length > 0 ? (
                     <View className="gap-3 pb-6">
                       <Pressable
                         accessibilityRole="button"
@@ -127,7 +128,7 @@ export default function SoberMemos() {
                         </Text>
                       </Pressable>
                     </View>
-                  }
+                  ) : null}
                   renderItem={({ item, index }) => (
                     <View className="gap-3 pb-3">
                       {item.firstOfDate && (
@@ -138,7 +139,7 @@ export default function SoberMemos() {
                           {formatDisplayDate(item.date, formatLocale, 'long')}
                         </Text>
                       )}
-                      <SoberRestartCard record={item.record} pending={pending} onMenu={onMenu} />
+                      <SoberRestartCard record={item.record} pending={pending} onMenu={onMenu} emptyMemoLabel={t('sober.emptyRestartMemo')} />
                     </View>
                   )}
                   ListEmptyComponent={empty}

@@ -14,6 +14,7 @@ import { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight';
 import { CaretUpIcon } from 'phosphor-react-native/src/icons/CaretUp';
 import { ChartBarIcon } from 'phosphor-react-native/src/icons/ChartBar';
 import { ChartLineIcon } from 'phosphor-react-native/src/icons/ChartLine';
+import { ClockCounterClockwiseIcon } from 'phosphor-react-native/src/icons/ClockCounterClockwise';
 import { CheckIcon } from 'phosphor-react-native/src/icons/Check';
 import { CheckSquareIcon } from 'phosphor-react-native/src/icons/CheckSquare';
 import { CircleHalfIcon } from 'phosphor-react-native/src/icons/CircleHalf';
@@ -77,6 +78,7 @@ const APP_ICONS = {
   'drag-indicator': DotsSixVerticalIcon,
   'lock-outline': LockKeyIcon,
   'restart-alt': ArrowCounterClockwiseIcon,
+  history: ClockCounterClockwiseIcon,
   'info-outline': InfoIcon,
   info: InfoIcon,
   'privacy-tip': ShieldCheckIcon,
