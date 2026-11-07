@@ -2,7 +2,7 @@ import { formatSoberGoal } from '../../i18n/sober';
 import { useI18n } from '../../i18n/react';
 import { useState } from 'react';
 import { TextInput, View } from 'react-native';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { PickerAction } from '../../components/PickerAction';
 import { PickerOption } from '../../components/PickerOption';
 import { HeaderAction } from '../../components/HeaderAction';

@@ -6,7 +6,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { BottomSheetPage } from '../../../src/components/BottomSheetPage';
+import { BottomSheetPage } from '../../../src/components/bottom-sheet/BottomSheetPage';
 import { Button } from '../../../src/components/Button';
 import { QueryState } from '../../../src/components/QueryState';
 import { Text } from '../../../src/components/Text';

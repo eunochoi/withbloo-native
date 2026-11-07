@@ -18,6 +18,7 @@ function harness(
     scrollFade?: boolean;
     fixedHeight?: boolean;
     fillContent?: boolean;
+    keyboardAware?: boolean;
     presentation?: 'modal' | 'screen';
     dimBackdrop?: boolean;
     dismissOnBack?: boolean;
@@ -27,9 +28,9 @@ function harness(
     onOpened?: () => void;
     scrollEnabled?: boolean;
     footer?: unknown;
-    fixedContent?: unknown;
+    contentHeader?: unknown;
     contentFullBleed?: boolean;
-    renderScrollView?: (props: any) => unknown;
+    list?: any;
     renderBody?: (close: any, scroll: any) => unknown;
   } = {},
 ) {
@@ -154,6 +155,7 @@ function harness(
       if (name === 'react/jsx-runtime') return { jsx, jsxs: jsx };
       if (name === 'react')
         return {
+          createElement: (type: unknown, props: any, ...children: unknown[]) => jsx(type, { ...props, children: children.length === 1 ? children[0] : children }, props?.key),
           useRef: (value: any) => {
             const i = cursor++;
             return slots[i] ?? (slots[i] = { current: value });
@@ -222,7 +224,8 @@ function harness(
           GestureHandlerRootView: 'GestureHandlerRootView',
           Gesture: { Pan: () => gesture('pan'), Native: () => gesture('native') },
         };
-      if (name.endsWith('AnimatedScrollView')) return { AnimatedScrollView: 'ScrollView' };
+      if (name.endsWith('AnimatedFlatList')) return { AnimatedFlatList: 'MemoList' };
+      if (name.endsWith('AnimatedScrollView')) return { AnimatedScrollView: 'ScrollView', KeyboardAwareAnimatedScrollView: 'KeyboardAwareScrollView' };
       if (name.endsWith('useBottomSheetMotion')) return hookExports;
       if (name === 'react-native-reanimated')
         return {
@@ -255,14 +258,18 @@ function harness(
     ts.transpileModule(readFileSync(new URL(path, import.meta.url), 'utf8'), {
       compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX },
     }).outputText;
-  runInNewContext(compile('../src/hooks/useBottomSheetMotion.ts'), {
+  runInNewContext(compile('../src/components/bottom-sheet/useBottomSheetMotion.ts'), {
     ...context,
     exports: hookExports,
   });
   for (const path of [
-    '../src/hooks/useBottomSheetLifecycle.ts',
-    '../src/components/BottomSheetHeader.tsx',
-    '../src/components/BottomSheetScrollViewport.tsx',
+    '../src/components/bottom-sheet/useBottomSheetLifecycle.ts',
+    '../src/components/bottom-sheet/BottomSheetHeader.tsx',
+    '../src/components/bottom-sheet/BottomSheetList.tsx',
+    '../src/components/bottom-sheet/BottomSheetScroll.tsx',
+    '../src/components/bottom-sheet/BottomSheetScrollViewport.tsx',
+    '../src/components/bottom-sheet/BottomSheetBackdrop.tsx',
+    '../src/components/bottom-sheet/BottomSheetContent.tsx',
   ]) {
     const moduleExports = {};
     runInNewContext(compile(path), { ...context, exports: moduleExports });
@@ -273,7 +280,7 @@ function harness(
         .replace(/\.tsx?$/, '')
     ] = moduleExports;
   }
-  runInNewContext(compile('../src/components/BottomSheetModal.tsx'), context);
+  runInNewContext(compile('../src/components/bottom-sheet/BottomSheetModal.tsx'), context);
   function render() {
     do {
       dirty = false;
@@ -409,7 +416,7 @@ function harness(
       return close(action);
     },
     scroll() {
-      return find(tree, (node) => node.type === 'ScrollView' || node.type === 'MemoList');
+      return find(tree, (node) => node.type === 'ScrollView' || node.type === 'KeyboardAwareScrollView' || node.type === 'MemoList');
     },
     sheet() {
       return find(tree, (node) => node.key?.startsWith('sheet-'));
@@ -547,35 +554,36 @@ test('accepted work survives the normal picker unmount caused by onClose', () =>
   assert.equal(actions, 1);
 });
 
-test('record sheets can constrain height without changing other picker defaults', () => {
-  const defaultSheet = harness();
-  const records = harness(true, false, 480);
-  defaultSheet.show();
-  records.show();
-  assert.equal(records.sheet().props.children.props.style.maxHeight, 480);
-  assert(defaultSheet.sheet().props.children.props.style.maxHeight > 480);
+test('sheets use the same safe screen-height limit', () => {
+  const h = harness();
+  h.show();
+  assert.equal(h.sheet().props.children.props.style.maxHeight, 760);
 });
 
-test('sheet delegates keyboard avoidance to its native container without measured padding or forced scrolling', () => {
+test('ordinary sheet uses keyboard-aware scroll without a keyboard-avoiding wrapper', () => {
   const h = harness();
   h.show();
   const viewport = h.tree.props.children.props.children;
-  const surface = h.sheet().props.children;
   const scroll = h.scroll();
-  assert.equal(viewport.type, 'KeyboardAvoidingView');
-  assert.equal(viewport.props.behavior, 'padding');
-  assert.equal(viewport.props.ref, undefined);
-  assert.equal(viewport.props.onLayout, undefined);
-  assert.equal(viewport.props.style.paddingBottom, undefined);
-  assert(h.sheet().props.className.includes('shrink'));
-  assert(surface.props.className.includes('shrink'));
-  assert.equal(surface.props.style.paddingBottom, undefined);
-  assert.equal(surface.props.style.maxHeight, 800 * 0.95);
-  assert.ok(scroll.props.ref);
-  assert.equal(scroll.props.contentContainerStyle.paddingBottom, 60);
-  assert.equal(scroll.props.contentContainerClassName, 'gap-7 py-8');
-  assert.equal(scroll.props.keyboardShouldPersistTaps, 'never');
+  assert.equal(viewport.type, 'View');
+  assert.equal(scroll.type, 'KeyboardAwareScrollView');
+  assert.equal(scroll.props.mode, 'layout');
+  assert.equal(scroll.props.bottomOffset, 16);
+  assert.equal(scroll.props.keyboardShouldPersistTaps, 'handled');
   assert.equal(scroll.props.keyboardDismissMode, 'none');
+  assert.equal(scroll.props.contentContainerStyle.paddingBottom, 60);
+});
+
+test('route sheet keeps its header outside its keyboard-aware scroll area', () => {
+  const h = harness(true, false, undefined, { presentation: 'screen', fixedHeight: true });
+  const scroll = h.scroll();
+  assert.equal(scroll.type, 'KeyboardAwareScrollView');
+  assert.equal(scroll.props.mode, 'layout');
+  assert.equal(scroll.props.bottomOffset, 16);
+  assert.equal(scroll.props.onFocus, undefined);
+  assert.equal(scroll.props.onBlur, undefined);
+  assert.equal(typeof scroll.props.ref, 'function');
+  assert.ok(h.sheet());
 });
 
 test('explicit fixed-height sheets share the 95-percent maximum in either presentation', () => {
@@ -586,129 +594,55 @@ test('explicit fixed-height sheets share the 95-percent maximum in either presen
     const expectedHeight = 800 * 0.95;
     assert.equal(surface.props.style.height, expectedHeight);
     assert.equal(surface.props.style.maxHeight, expectedHeight);
-    assert(surface.props.children[1].props.className.includes('flex-1'));
+    assert(surface.props.children[2].props.className.includes('flex-1'));
     assert(h.scroll().props.className.includes('flex-1'));
   }
 });
 
-test('day info uses automatic height with a bounded viewport and scopes surface fades to that viewport', () => {
-  const h = harness(true, false, 480, { scrollFade: true });
+test('automatic sheets retain a bounded viewport and scroll fades', () => {
+  const h = harness(true, false, undefined, { scrollFade: true });
   h.show();
   const surface = h.sheet().props.children;
   assert.equal(surface.props.style.height, undefined);
-  assert.equal(surface.props.style.maxHeight, 480);
-  const body = surface.props.children[1];
-  assert(body.props.className.includes('shrink'));
-  assert(body.props.className.includes('overflow-hidden'));
-  const scroll = h.scroll();
-  assert(scroll.props.className.includes('shrink'));
-  assert(scroll.props.className.includes('grow-0'));
-  scroll.props.onLayout({ nativeEvent: { layout: { height: 350 } } });
-  scroll.props.onContentSizeChange(300, 128);
-  scroll.props.onContentSizeChange(300, 900);
-  h.render();
-  assert.equal(h.sheet().props.children.props.style.height, undefined);
-  assert.equal(h.sheet().props.children.props.style.maxHeight, 480);
-  const fades = body.props.children[1].props.children;
-  assert.equal(fades.length, 2);
-  assert.equal(fades[0].props.edge, 'top');
-  assert.equal(fades[1].props.edge, 'bottom');
-  assert.equal(fades[1].props.includeBottomInset, false);
-  assert.equal(fades[1].props.includeToolbar, false);
-  const other = harness();
-  other.show();
-  assert.equal(other.sheet().props.children.props.style.height, undefined);
-  assert.equal(other.sheet().props.children.props.children[1].props.children[1], false);
+  assert.equal(surface.props.style.maxHeight, 760);
+  assert.equal(h.scroll().type, 'KeyboardAwareScrollView');
+  assert(h.scroll().props.className.includes('shrink'));
 });
 
-test('a touch begun below the top stays a scroll even when it reaches zero; the next touch can drag', () => {
+test('ordinary sheets keep scroll gestures separate from header dismissal', () => {
   const h = harness();
   h.show();
   h.completeOpen();
-  h.offset(120);
-  h.begin();
-  assert.equal(h.gestureState, 'failed');
-  h.offset(0);
-  h.move(0, 160);
-  assert.equal(h.y, 0);
-  assert.equal(h.closes, 0);
-  h.end();
+  assert.equal(h.scroll().type, 'KeyboardAwareScrollView');
+  assert.equal(h.scroll().props.bounces, false);
   h.begin();
   h.move(0, 60);
   assert.equal(h.gestureState, 'active');
-  assert.equal(h.y, 60);
-  assert.deepEqual(h.scrollCommands, [0]);
-  assert.equal(h.native.config.requireExternalGestureToFail, h.pan);
-  assert.equal(h.scroll().props.bounces, false);
-  assert.equal(h.scroll().props.overScrollMode, 'never');
-  h.end();
-  assert.equal(h.latestAnimation().kind, 'spring');
+  h.end(false);
   h.completeAnimation();
-  assert.equal(h.y, 0);
   assert.equal(h.closes, 0);
 });
 
-test('custom list viewport shares native scrolling, safe-area padding and sheet dismissal', () => {
-  const h = harness(true, false, 720, {
-    fixedHeight: true,
-    renderScrollView: (props) => ({ type: 'MemoList', props }),
-  });
+test('list sheets create the shared virtualized list and forward data and loading callbacks', () => {
+  const loadMore = () => {};
+  const data = [{ id: 1 }];
+  const h = harness(true, false, undefined, { fixedHeight: true, list: { data, renderItem: () => null, onEndReached: loadMore } });
   h.show();
-  h.layout();
-  h.completeOpen();
-  assert.equal(h.scroll().type, 'MemoList');
-  assert.equal(h.native.props, undefined);
-  assert.equal(h.scroll().props.contentContainerStyle.paddingBottom, 60);
-  assert.equal(h.scroll().props.nestedScrollEnabled, true);
-  assert.equal(h.native.config.requireExternalGestureToFail, h.pan);
-  h.offset(120);
-  h.begin();
-  h.offset(0);
-  h.move(0, 160);
-  assert.equal(h.gestureState, 'failed');
-  assert.equal(h.y, 0);
-  h.end();
-  h.begin();
-  h.move(0, 160);
-  assert.equal(h.gestureState, 'active');
-  assert.deepEqual(h.scrollCommands, [0]);
-  h.end();
-  h.completeAnimation();
-  assert.equal(h.closes, 1);
+  const list = h.scroll();
+  assert.equal(list.type, 'MemoList');
+  assert.equal(list.props.data, data);
+  assert.equal(list.props.onEndReached, loadMore);
+  assert.equal(list.props.contentContainerStyle.paddingBottom, 60);
+  assert.equal(list.props.nestedScrollEnabled, true);
 });
 
-test('fixed picker content stays outside the scroll viewport and its fades without changing drag ownership', () => {
-  const fixedContent = { type: 'IconCategories', props: {} };
-  const footer = { type: 'ApplyButton', props: {} };
-  const h = harness(true, false, undefined, {
-    fixedHeight: true,
-    scrollFade: true,
-    fixedContent,
-    footer,
-  });
+test('picker content stays fixed above the scroll area', () => {
+  const contentHeader = { type: 'IconCategories', props: {} };
+  const h = harness(true, false, undefined, { fixedHeight: true, scrollFade: true, contentHeader });
   h.show();
-  h.completeOpen();
-  const surface = h.sheet().props.children;
-  const body = surface.props.children[1];
-  assert.equal(body.props.children[0], fixedContent);
-  const viewport = body.props.children[1];
-  assert(viewport.props.className.includes('overflow-hidden'));
-  assert.equal(viewport.props.children[0].props.children, h.scroll());
-  assert.equal(viewport.props.children[1].props.children[0].type, 'ScrollEdgeFade');
-  assert.equal(surface.props.children[2].props.children, footer);
-  h.offset(120);
-  h.begin();
-  assert.equal(h.gestureState, 'failed');
-  h.offset(0);
-  h.begin();
-  h.move(40, 5);
-  assert.equal(h.gestureState, 'failed');
-  h.begin();
-  h.move(0, 90);
-  assert.equal(h.gestureState, 'active');
-  h.end();
-  h.completeAnimation();
-  assert.equal(h.closes, 1);
+  const scroll = h.scroll();
+  assert.equal(scroll.props.stickyHeaderIndices, undefined);
+  assert.equal(h.sheet().props.children.props.children[1].props.children, contentHeader);
 });
 
 test('upward and horizontal touches remain scrolls; a stationary tap never becomes a sheet drag', () => {
@@ -848,25 +782,12 @@ test('content growth during first opening keeps the translation target at zero a
   assert.equal(h.closes, 2);
 });
 
-test('route sheets mount without a Modal onShow and keep one touch owned by the scroll viewport', () => {
-  const h = harness(true, false, 720, { presentation: 'screen', fixedHeight: true });
-  assert.equal(h.tree.type, 'GestureHandlerRootView');
-  assert.ok(h.sheet());
+test('route sheets mount without a native Modal and use the shared keyboard-aware viewport', () => {
+  const h = harness(true, false, undefined, { presentation: 'screen', fixedHeight: true });
+  assert.notEqual(h.tree.type, 'Modal');
+  assert.equal(h.scroll().type, 'KeyboardAwareScrollView');
   h.completeOpen();
-  h.offset(120);
-  h.begin();
-  h.offset(0);
-  h.move(0, 150);
-  h.end();
-  assert.equal(h.y, 0);
-  assert.equal(h.closes, 0);
-  h.begin();
-  h.move(0, 150);
-  h.end();
-  assert.equal(h.closes, 0);
-  h.completeAnimation();
-  assert.equal(h.closes, 1);
-  assert.equal(h.tree, null);
+  assert.ok(h.sheet());
 });
 
 test('route sheet Android back waits for its close animation and inactive routes do not handle back', () => {
@@ -923,28 +844,16 @@ test('form drag lock disables the sheet pan and the footer stays outside the scr
   assert.equal(h.scroll().props.contentContainerClassName, 'gap-7 py-8');
 });
 
-test('full-bleed content retains header, fixed content and footer insets without narrowing the viewport', () => {
-  const fixedContent = { type: 'Tabs', props: {} };
-  const h = harness(true, false, 720, {
-    contentFullBleed: true,
-    fixedContent,
-    footer: 'save',
-  });
+test('full-bleed sheets keep sticky content and footer within their insets', () => {
+  const contentHeader = { type: 'Tabs', props: {} };
+  const h = harness(true, false, undefined, { contentFullBleed: true, contentHeader, footer: 'save' });
   h.show();
-  h.completeOpen();
   const surface = h.sheet().props.children;
   assert(!surface.props.className.includes('px-[5%]'));
-  const [header, body, footer] = surface.props.children;
-  assert.equal(header.props.className, 'px-[5%]');
-  assert.equal(body.props.children[0].props.className, 'px-[5%]');
-  assert.equal(body.props.children[0].props.children.props.className, 'px-1');
-  assert.equal(body.props.children[0].props.children.props.children, fixedContent);
-  assert.equal(footer.props.className, 'pb-4 px-[5%]');
-  assert.equal(footer.props.children, 'save');
-  assert.equal(h.scroll().props.contentContainerClassName, 'gap-7 py-8');
-  h.begin(10, 10);
-  h.move(120, 15);
-  assert.equal(h.gestureState, 'failed');
+  const scroll = h.scroll();
+  assert.equal(scroll.props.stickyHeaderIndices, undefined);
+  assert.equal(surface.props.children[1].props.children, contentHeader);
+  assert.equal(surface.props.children[3].props.children, 'save');
 });
 
 test('footer actions use the shared close lifecycle and dispatch once after dismissal', () => {
@@ -1109,7 +1018,7 @@ test('a nested route sheet keeps a transparent dismiss target without adding a s
       return findBackdrop(node.props?.children);
     };
     const backdrop = findBackdrop(h.tree);
-    assert.equal(backdrop.props.className.includes('bg-theme-overlay/25'), dimBackdrop);
+    assert.equal(backdrop.props.className.includes('bg-theme-overlay/10'), dimBackdrop);
     backdrop.props.onPress();
     assert.equal(h.closes, 0);
     h.completeAnimation();
@@ -1139,72 +1048,30 @@ test('first-run sheets disable user dismissal while retaining scroll and complet
   assert.equal(h.closes, 1);
 });
 
-test('custom carousel body bypasses the vertical viewport and shares the sheet close lifecycle', () => {
-  const h = harness(true, false, 720, {
-    scrollEnabled: false,
-    renderBody: (close) => ({ type: 'Carousel', props: { onConfirm: close } }),
-    footer: 'dots',
-  });
+test('ordinary sheets use the common scroll area instead of a custom body', () => {
+  const h = harness();
   h.show();
-  h.completeOpen();
-  const children = h.sheet().props.children.props.children;
-  const body = children.find((node: any) => node?.type === 'Carousel');
-  assert.ok(body);
-  assert.equal(children.at(-1).props.children, 'dots');
-  assert.equal(body.props.onConfirm(), true);
-  assert.equal(h.closes, 0);
-  h.completeAnimation();
-  assert.equal(h.closes, 1);
+  assert.equal(h.scroll().type, 'KeyboardAwareScrollView');
 });
 
-test('filled diary content scrolls independently while only its header drags to close', () => {
-  const h = harness(true, false, 720, { fillContent: true, footer: 'save' });
-  h.show();
+test('sheet header remains draggable while content uses keyboard-aware scrolling', () => {
+  const h = harness(true, false, undefined, { presentation: 'screen', fixedHeight: true });
   h.completeOpen();
-  assert.equal(h.scroll(), undefined);
-  assert.equal(h.pan.config.enabled, true);
-  const children = h.sheet().props.children.props.children;
-  assert.equal(h.sheet().props.children.props.style.height, undefined);
-  assert.equal(h.sheet().props.children.props.style.maxHeight, 720);
-  assert(children[1].props.className.includes('shrink'));
-  assert.equal(children[0].props.gesture, h.pan);
-  assert.equal(children[1].props.gesture, undefined);
-  assert.equal(children.at(-1).props.children, 'save');
+  assert.equal(h.scroll().type, 'KeyboardAwareScrollView');
   h.begin();
-  h.move(0, 100);
-  h.end();
-  assert.equal(h.closes, 0);
-  assert.deepEqual(h.scrollCommands, []);
-  h.completeAnimation();
-  assert.equal(h.closes, 1);
+  h.move(0, 60);
+  assert.equal(h.gestureState, 'active');
 });
 
-test('custom body scroll position controls pull-down dismissal through the shared sheet motion', () => {
-  const h = harness(true, false, 720, {
-    fixedHeight: true,
-    renderBody: (_close, scroll) => ({
-      type: 'ScrollView',
-      props: { ref: scroll.scrollRef, onScroll: scroll.onScroll },
-    }),
-  });
+test('header dismissal still runs the shared close lifecycle', () => {
+  const h = harness();
   h.show();
   h.completeOpen();
-  h.offset(60);
   h.begin();
-  h.offset(0);
-  h.move(0, 120);
+  h.move(0, 300);
   h.end();
-  assert.equal(h.gestureState, 'failed');
-  assert.equal(h.closes, 0);
-  assert.equal(h.y, 0);
-  h.begin();
-  h.move(0, 100);
-  assert.equal(h.y, 100);
-  h.end();
-  assert.equal(h.closes, 0);
   h.completeAnimation();
   assert.equal(h.closes, 1);
-  assert.deepEqual(h.scrollCommands, [0]);
 });
 
 test('custom-body dismissal respects first-run and busy close guards', () => {

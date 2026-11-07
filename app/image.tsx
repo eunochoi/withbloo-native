@@ -1,7 +1,7 @@
 import { useI18n } from '../src/i18n/react';
 import { Image, useWindowDimensions } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { BottomSheetPage } from '../src/components/BottomSheetPage';
+import { BottomSheetPage } from '../src/components/bottom-sheet/BottomSheetPage';
 import { mediaUri, validFileName } from '../src/media';
 import { Text } from '../src/components/Text';
 export default function ImageScreen() {

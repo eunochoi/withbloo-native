@@ -5,7 +5,7 @@ import { usePreventRemove } from 'expo-router/react-navigation';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
 import { TextInput, View } from 'react-native';
-import { BottomSheetPage } from '../components/BottomSheetPage';
+import { BottomSheetPage } from '../components/bottom-sheet/BottomSheetPage';
 import { CharacterCount } from '../components/CharacterCount';
 import { DateTimePicker } from '../components/DateTimePicker';
 import { FormPickerRow } from '../components/FormPickerRow';

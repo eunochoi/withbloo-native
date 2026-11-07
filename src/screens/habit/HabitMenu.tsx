@@ -9,7 +9,7 @@ import { deleteHabit } from '../../db/habit';
 import type { Habit } from '../../db/types';
 import { useRecordMutation } from '../../queries';
 import { ConfirmModal } from '../../components/ConfirmModal';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { PickerAction } from '../../components/PickerAction';
 
 export function HabitMenu({

@@ -94,14 +94,27 @@ function picker(value: number | null, allowDeselect = false) {
       },
       onApply: (next: number | null) => applied.push(next),
     });
-    const scroll = shell.props.renderScrollView({
-      onContentSizeChange: (width: number, height: number) => sizes.push([width, height]),
-    });
-    const footer = shell.props.footer((after?: () => void) => {
+    const scroll = { type: 'ScrollView', key: shell.props.contentKey, props: {
+      children: [null, shell.props.children],
+      onContentSizeChange: (width: number, height: number) => {
+        sizes.push([width, height]);
+        shell.props.onContentSizeChange(width, height);
+      },
+    } };
+    const footer = shell.props.headerRight((after?: () => void) => {
       closed++;
       deferred = after;
     });
-    const content = nodes([shell.props.fixedContent, scroll, footer]);
+    const tabs = nodes(shell.props.contentHeader).find((node) => node.type === 'DotTabs');
+    const choices = tabs.props.options.map((option: any) => ({
+      type: 'PickerOption',
+      props: {
+        accessibilityLabel: option.accessibilityLabel,
+        selected: option.value === tabs.props.value,
+        onPress: () => tabs.props.onChange(option.value),
+      },
+    }));
+    const content = [...choices, ...nodes([shell.props.contentHeader, scroll, footer])];
     return { shell, scroll, footer, content };
   }
   return {
@@ -160,7 +173,8 @@ test('new diary starts in positive with readable cards and requires a selection'
     assert(
       nodes(card).some(
         (node) =>
-          node.props.children === EMOTIONS[id].description &&
+          typeof node.props.children === 'string' &&
+          node.props.className?.includes('text-sm') &&
           node.props.numberOfLines === undefined,
       ),
     );
@@ -187,7 +201,7 @@ test('every existing emotion reopens in its category and confirms its original s
       assert.equal(ui.emotion(id).props.selected, true);
       ui.confirm();
       assert.equal(ui.closed, 1);
-      assert.deepEqual(ui.applied, []);
+      assert.deepEqual(ui.applied, [id]);
       ui.finishClose();
       assert.deepEqual(ui.applied, [id]);
     }
@@ -226,39 +240,22 @@ test('normal selection stays selected on a second tap while optional deselection
   const optional = picker(9, true);
   optional.emotion(9).props.onPress();
   assert.equal(optional.emotion(9).props.selected, false);
-  assert.equal(optional.render().footer.props.label, '적용하기');
+  assert.equal(optional.render().footer.props.label, '적용');
   optional.confirm();
   optional.finishClose();
   assert.deepEqual(optional.applied, [null]);
 });
 
-test('narrow screens and large fonts use one column and keep the footer outside the scroll area', () => {
+test('large fonts preserve sticky categories and two emotion columns', () => {
   const ui = picker(3);
-  const initialIconSize = nodes(ui.emotion(3)).find((node) => node.type === 'EmotionImage').props
-    .size;
-  const top = ui.render().shell.props.fixedContent;
-  top.props.onLayout({ nativeEvent: { layout: { height: 180 } } });
-  assert(ui.render().shell.props.fixedContent);
-  const originalKey = ui.render().scroll.key;
   ui.dimensions.height = 500;
   ui.dimensions.fontScale = 1.5;
   ui.theme.rem = 16;
-  let view = ui.render();
-  assert.equal(view.shell.props.fixedContent, undefined);
-  assert.notEqual(view.scroll.key, originalKey);
-  assert.equal(view.scroll.props.children[1].props.children.length, 4);
-  assert(!nodes(view.scroll).some((node) => node.type === 'Button'));
+  const view = ui.render();
+  assert(view.shell.props.contentHeader);
+  assert.equal(view.scroll.props.children[1].props.children.length, 2);
   assert.equal(ui.emotion(3).props.selected, true);
-  assert.equal(
-    nodes(ui.emotion(3)).find((node) => node.type === 'EmotionImage').props.size,
-    (initialIconSize * 16) / 15,
-  );
-  ui.dimensions.fontScale = 1;
-  view.scroll.props.children[1].props.onLayout({ nativeEvent: { layout: { y: 180, width: 240 } } });
-  view = ui.render();
-  assert.equal(view.scroll.props.children[1].props.children.length, 4);
   ui.confirm();
-  ui.finishClose();
   assert.deepEqual(ui.applied, [3]);
 });
 
@@ -298,7 +295,7 @@ test('emotion picker translates names and descriptions while preserving selectio
   ui.setLanguage('ko');
   assert.equal(ui.emotion(11).props.selected, true);
   ui.confirm();
-  assert.deepEqual(ui.applied, []);
+  assert.deepEqual(ui.applied, [11]);
   ui.finishClose();
   assert.deepEqual(ui.applied, [11]);
 });

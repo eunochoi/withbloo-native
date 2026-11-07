@@ -63,7 +63,7 @@ test('time picker rejects invalid input, stays open on failure and closes after 
     'react-native': { View: 'View', TextInput: 'TextInput' },
     'react/jsx-runtime': { jsx, jsxs: jsx },
     '../../components/FormTextInput': { FormTextInput: 'TextInput' },
-    '../../components/BottomSheetModal': { BottomSheetModal: 'Modal' },
+    '../../components/bottom-sheet/BottomSheetModal': { BottomSheetModal: 'Modal' },
     '../../components/Button': { Button: 'Button' },
     '../../components/HeaderAction': { HeaderAction: 'HeaderAction' },
     '../../components/Text': { Text: 'Text' },

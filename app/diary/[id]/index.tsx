@@ -6,7 +6,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { View } from 'react-native';
 import { AppIcon } from '../../../src/components/AppIcon';
-import { BottomSheetPage } from '../../../src/components/BottomSheetPage';
+import { BottomSheetPage } from '../../../src/components/bottom-sheet/BottomSheetPage';
 import { EmotionImage } from '../../../src/components/EmotionImage';
 import { HabitIcon } from '../../../src/components/HabitIcon';
 import { QueryState } from '../../../src/components/QueryState';

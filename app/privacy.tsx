@@ -1,6 +1,6 @@
 import { useI18n } from '../src/i18n/react';
 import { SECTION_TITLE_CLASS_NAME, BODY_TEXT_CLASS_NAME } from '../src/theme/classes';
-import { BottomSheetPage } from '../src/components/BottomSheetPage';
+import { BottomSheetPage } from '../src/components/bottom-sheet/BottomSheetPage';
 import { View } from 'react-native';
 import { Text } from '../src/components/Text';
 import { PRIVACY_SECTIONS } from '../src/privacy/content';

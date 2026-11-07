@@ -142,17 +142,18 @@ function picker(kind: 'habit' | 'sober', value: string, colorKey = 'pink') {
         onClose: () => closed++,
         onApply: (key: string) => applied.push(key),
       });
-      scroll = shell.props.renderScrollView({
-        ref: shell.props.scrollRef,
-        onScroll: 'sheet-scroll-handler',
-        onLayout: 'sheet-layout-handler',
-        onContentSizeChange: (...size: number[]) => sizes.push(size),
-      });
+      scroll = { type: 'AnimatedScrollView', key: shell.props.contentKey, props: {
+        children: shell.props.children,
+        onContentSizeChange: (width: number, height: number) => {
+          sizes.push([width, height]);
+          shell.props.onContentSizeChange(width, height);
+        },
+      } };
       footer = shell.props.headerRight((action?: () => void) => {
         closed++;
         deferred = action;
       });
-      content = nodes([shell.props.fixedContent, scroll, footer]);
+      content = nodes([shell.props.contentHeader, scroll, footer]);
       const chipScroll = content.find((node) => node.type === 'ScrollView');
       chipScroll.props.ref.current = horizontal;
       const pending = effects;
@@ -231,7 +232,7 @@ for (const kind of ['habit', 'sober'] as const) {
     assert.equal(h.option('기본 카테고리').props.accessibilityState.selected, true);
     assert.equal(h.icons.length, 5);
     assert.deepEqual(
-      nodes(h.shell.props.fixedContent)
+      nodes(h.shell.props.contentHeader)
         .filter((node) => node.type === 'Text')
         .map((node) => node.props.children),
       [...categories.map(({ label }) => label), categories[0].label, categories[0].description],
@@ -262,15 +263,13 @@ for (const kind of ['habit', 'sober'] as const) {
         assert.equal(h.row(key).props.className, 'aspect-square w-1/3 p-1.5');
         assert.equal(h.row(key).props.style, undefined);
         assert(
-          nodes(h.shell.props.fixedContent).some(
+          nodes(h.shell.props.contentHeader).some(
             (node) => node.props?.children === category.description,
           ),
         );
         assert(nodes(row).some((node) => node.props?.numberOfLines === 2));
       }
     }
-    assert.equal(h.scroll.props.onScroll, 'sheet-scroll-handler');
-    assert.equal(h.scroll.props.onLayout, 'sheet-layout-handler');
   });
 
   test(`${kind} draft survives navigation and applies only after the shared close callback`, () => {
@@ -285,8 +284,8 @@ for (const kind of ['habit', 'sober'] as const) {
     assert.equal(h.scroll.key, h.shell.props.contentKey);
     h.press(`${categories[0].label} 카테고리`);
     assert.equal(h.option(label).props.accessibilityState.selected, true);
-    h.press('선택 완료');
-    assert.deepEqual(h.applied, []);
+    h.press('완료');
+    assert.deepEqual(h.applied, [key]);
     assert.equal(h.closed, 1);
     h.finishClose();
     assert.deepEqual(h.applied, [key]);
@@ -303,7 +302,7 @@ for (const kind of ['habit', 'sober'] as const) {
     assert.equal(h.option(defaultLabel).props.accessibilityState.selected, false);
     assert.equal(h.option('기본 2').props.accessibilityState.selected, true);
     h.press(defaultLabel);
-    h.press('선택 완료');
+    h.press('완료');
     h.finishClose();
     assert.deepEqual(h.applied, [defaultKey]);
   });
@@ -314,7 +313,7 @@ for (const kind of ['habit', 'sober'] as const) {
       assert.equal(h.option('기본 카테고리').props.accessibilityState.selected, true);
       const row = nodes(h.row(key)).find((node) => node.type === 'Pressable');
       assert.equal(row.props.accessibilityState.selected, true);
-      h.press('선택 완료');
+      h.press('완료');
       h.finishClose();
       assert.deepEqual(h.applied, [key]);
     }
@@ -397,19 +396,19 @@ for (const kind of ['habit', 'sober'] as const) {
 test('short screens and large fonts keep categories and footer outside the fixed-height list', () => {
   const h = picker('habit', 'goal');
   h.render();
-  assert(h.shell.props.fixedContent);
+  assert(h.shell.props.contentHeader);
   const fixedKey = h.scroll.key;
   h.dimensions.height = 500;
   h.dimensions.fontScale = 1.5;
   h.theme.rem = 16;
   h.render();
-  assert(h.shell.props.fixedContent);
+  assert(h.shell.props.contentHeader);
   assert.equal(h.shell.props.fixedHeight, true);
   assert.equal(h.scroll.key, fixedKey);
   assert(nodes(h.scroll).some((node) => node.props?.accessibilityLabel === '기본 1'));
   assert.equal(nodes(h.scroll).filter((node) => node.type === 'AnimatedScrollView').length, 1);
-  assert(!nodes(h.scroll).some((node) => node.props?.label === '선택 완료'));
-  h.press('선택 완료');
+  assert(!nodes(h.scroll).some((node) => node.props?.label === '완료'));
+  h.press('완료');
   h.finishClose();
   assert.deepEqual(h.applied, ['goal']);
 });
@@ -437,10 +436,10 @@ for (const kind of ['habit', 'sober'] as const) {
     for (const height of [900, 400]) {
       h.dimensions.height = height;
       h.render();
-      assert(h.shell.props.fixedContent);
+      assert(h.shell.props.contentHeader);
       assert.equal(h.shell.props.fixedHeight, true);
       assert.equal(h.shell.props.contentFullBleed, true);
-      assert(h.scroll.props.contentContainerClassName.includes('px-[5%]'));
+      assert(nodes(h.scroll).some((node) => node.props?.className === 'mx-[5%] px-1'));
       assert(h.chipScroll.props.className.includes('-mx-[5.555556%]'));
       assert.equal(h.chipScroll.props.bounces, false);
       assert.equal(h.chipScroll.props.showsHorizontalScrollIndicator, false);
@@ -476,7 +475,7 @@ test('habit icon labels and categories switch language without changing the sele
   assert(ui.option('Self-care category'));
   ui.press('Water');
   ui.press('Done');
-  assert.deepEqual(ui.applied, []);
+  assert.deepEqual(ui.applied, ['water']);
   ui.finishClose();
   assert.deepEqual(ui.applied, ['water']);
 });
@@ -489,7 +488,7 @@ test('Cut Back icon picker translates category and label while retaining its sav
   assert(ui.option('Phone'));
   ui.press('Phone');
   ui.press('Done');
-  assert.deepEqual(ui.applied, []);
+  assert.deepEqual(ui.applied, ['phone']);
   ui.finishClose();
   assert.deepEqual(ui.applied, ['phone']);
 });

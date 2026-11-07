@@ -158,7 +158,7 @@ function harness() {
   owner = 'provider';
   navigation.ModalNavigationProvider({ children: null });
   const controller = navigation.useModalTransition();
-  const { BottomSheetPage } = load('../src/components/BottomSheetPage.tsx');
+  const { BottomSheetPage } = load('../src/components/bottom-sheet/BottomSheetPage.tsx');
   const { HabitBox } = load('../src/screens/habit/HabitBox.tsx');
   const rootKey = state.routes[0].key;
   return {
@@ -212,6 +212,23 @@ function harness() {
     },
   };
 }
+
+test('only the focused route sheet activates its notice host', () => {
+  const h = harness();
+  h.hooks().openModal('/habit/1');
+  h.flush();
+  const first = h.state().routes[h.state().index].key;
+  const page = h.page();
+  page.onOpening();
+  page.onOpened();
+  assert.equal(h.page({}, first).noticeHostActive, true);
+
+  h.hooks().openModal('/diary/2');
+  h.flush();
+  const second = h.state().routes[h.state().index].key;
+  assert.equal(h.page({}, first).noticeHostActive, false);
+  assert.equal(h.page({}, second).noticeHostActive, true);
+});
 
 test('habit card rapid taps open one information sheet while completion remains independent', () => {
   const h = harness();

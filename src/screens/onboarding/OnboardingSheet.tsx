@@ -1,14 +1,13 @@
 import { useI18n } from '../../i18n/react';
 import { useEffect, useRef, useState } from 'react';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
-import { AnimatedScrollView } from '../../components/AnimatedScrollView';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { Button } from '../../components/Button';
 import { PageIndicator } from '../../components/PageIndicator';
 import { Text } from '../../components/Text';
 import { View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useAppTheme } from '../../theme/AppThemeProvider';
-import type { CloseBottomSheet } from '../../hooks/useBottomSheetLifecycle';
+import type { CloseBottomSheet } from '../../components/bottom-sheet/useBottomSheetLifecycle';
 import { completeOnboarding, hasCompletedOnboarding } from '../../onboarding/storage';
 import type { Settings } from '../../settings/model';
 import { useSettings } from '../../settings/SettingsProvider';
@@ -108,17 +107,7 @@ export function OnboardingSheet({
       dismissible={!firstRun}
       onClose={onClose}
       onBeforeClose={() => allowClose.current && !saving.current}
-      renderScrollView={(props) => (
-        <AnimatedScrollView {...props} key={page} contentContainerClassName="grow">
-          <Animated.View
-            className="grow"
-            entering={reducedMotion ? undefined : FadeIn.duration(200)}
-            exiting={reducedMotion ? undefined : FadeOut.duration(200)}
-          >
-            <Page settings={settings} busy={busy} onChange={change} />
-          </Animated.View>
-        </AnimatedScrollView>
-      )}
+      contentContainerClassName="grow"
       footer={(close) => (
         <View className="w-full max-w-lg self-center gap-2 px-1 pt-4">
           <View className="flex-row justify-center gap-1.5" accessible accessibilityRole="progressbar" accessibilityValue={{ min: 1, max: pages.length, now: page + 1 }}>
@@ -167,6 +156,14 @@ export function OnboardingSheet({
           </View>
         </View>
       )}
-    />
+    >
+      <Animated.View
+        className="grow"
+        entering={reducedMotion ? undefined : FadeIn.duration(200)}
+        exiting={reducedMotion ? undefined : FadeOut.duration(200)}
+      >
+        <Page settings={settings} busy={busy} onChange={change} />
+      </Animated.View>
+    </BottomSheetModal>
   );
 }

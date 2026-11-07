@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, BackHandler, Keyboard, type ScrollView } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
-import tokens from '../theme/tokens.json';
+import tokens from '../../theme/tokens.json';
 import { useBottomSheetMotion } from './useBottomSheetMotion';
 
 export type CloseBottomSheet = (afterClose?: () => void) => boolean;

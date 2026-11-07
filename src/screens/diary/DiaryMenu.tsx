@@ -11,7 +11,7 @@ import type { Diary } from '../../db/types';
 import { cleanupImages } from '../../media';
 import { useRecordMutation } from '../../queries';
 import { ConfirmModal } from '../../components/ConfirmModal';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { PickerAction } from '../../components/PickerAction';
 
 export function DiaryMenu({

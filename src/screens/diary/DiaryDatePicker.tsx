@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useState } from 'react';
 import { View } from 'react-native';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { HeaderAction } from '../../components/HeaderAction';
 import { QueryError } from '../../components/QueryError';
 import { isDate } from '../../domain/date';

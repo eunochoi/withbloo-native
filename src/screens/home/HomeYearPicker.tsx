@@ -2,7 +2,7 @@ import { useI18n } from '../../i18n/react';
 import { useState } from 'react';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
 import type { UseQueryResult } from '@tanstack/react-query';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { PickerOption } from '../../components/PickerOption';
 import { HeaderAction } from '../../components/HeaderAction';
 import { QueryError } from '../../components/QueryError';

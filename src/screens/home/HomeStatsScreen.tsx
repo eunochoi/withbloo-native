@@ -4,7 +4,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { AppIcon } from '../../components/AppIcon';
-import { BottomSheetPage } from '../../components/BottomSheetPage';
+import { BottomSheetPage } from '../../components/bottom-sheet/BottomSheetPage';
 import { QueryError } from '../../components/QueryError';
 import { Text } from '../../components/Text';
 import { soberQueries, statsQueries } from '../../queries';

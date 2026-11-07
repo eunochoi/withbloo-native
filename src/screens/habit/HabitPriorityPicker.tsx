@@ -1,7 +1,7 @@
 import { useI18n } from '../../i18n/react';
 import { useState } from 'react';
 import { View } from 'react-native';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { HeaderAction } from '../../components/HeaderAction';
 import { InfoNotice } from '../../components/InfoNotice';
 import { PickerOption } from '../../components/PickerOption';

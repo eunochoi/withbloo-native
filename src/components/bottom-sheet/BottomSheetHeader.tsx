@@ -1,16 +1,15 @@
-import { useI18n } from '../i18n/react';
+import { useI18n } from '../../i18n/react';
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
-import { useAppTheme } from '../theme/AppThemeProvider';
-import { AppIcon } from './AppIcon';
-import { Text } from './Text';
-import { ScrollableName } from './ScrollableName';
+import { useAppTheme } from '../../theme/AppThemeProvider';
+import { AppIcon } from '../AppIcon';
+import { Text } from '../Text';
+import { ScrollableName } from '../ScrollableName';
 
 export function BottomSheetHeader({
   title,
   scrollableTitle = false,
   handleColor,
-  titleIcon,
   titleAction,
   headerLeft,
   headerRight,
@@ -21,7 +20,6 @@ export function BottomSheetHeader({
   title?: string;
   scrollableTitle?: boolean;
   handleColor?: string;
-  titleIcon?: ReactNode;
   titleAction?: {
     onPress: () => void;
     accessibilityLabel: string;
@@ -54,13 +52,12 @@ export function BottomSheetHeader({
           />
         </Pressable>
       )}
-      {(title || titleIcon || menuAction || headerLeft || headerRight) && (
+      {(title || menuAction || headerLeft || headerRight) && (
         <View
           className={`relative self-stretch flex-row items-center gap-2 py-1 ${headerLeft || headerRight ? 'px-20' : ''}`}
         >
           {menuAction && <View className="w-11 shrink-0" />}
           <View className="flex-1 min-w-0 flex-row items-center justify-center gap-2">
-            {titleIcon}
             {titleAction ? (
               <Pressable
                 accessibilityRole="button"
@@ -97,7 +94,10 @@ export function BottomSheetHeader({
               </Pressable>
             ) : scrollableTitle && title ? (
               <View className="min-w-0 flex-1">
-                <ScrollableName heading className="text-center text-xl font-semibold tracking-tight">
+                <ScrollableName
+                  heading
+                  className="text-center text-xl font-semibold tracking-tight"
+                >
                   {title}
                 </ScrollableName>
               </View>

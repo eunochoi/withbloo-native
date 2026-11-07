@@ -81,7 +81,7 @@ function harness() {
   }
   return {
     load,
-    component: (name: string) => load(`src/components/${name}.tsx`, name),
+    component: (name: string) => load(`src/components/${name === 'BottomSheetHeader' ? 'bottom-sheet/' : ''}${name}.tsx`, name),
     setLanguage: (value: 'ko' | 'en') => {
       language = value;
     },

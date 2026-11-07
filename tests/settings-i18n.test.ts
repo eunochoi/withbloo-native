@@ -88,7 +88,7 @@ test('backup guidance and destination choices switch languages while preserving 
   assert(nodes(render(), 'Text').some((node) => node.props.children === '백업 / 복원'));
 
   const destinations = harness('BackupDestinationPicker', {
-    '../../components/BottomSheetModal': { BottomSheetModal: 'Modal' },
+    '../../components/bottom-sheet/BottomSheetModal': { BottomSheetModal: 'Modal' },
     '../../components/PickerAction': { PickerAction: 'Action' },
   });
   destinations.setLanguage('en');
@@ -193,7 +193,7 @@ test('English time picker labels and validation stay English when rejecting inva
       },
     },
     'react-native': { View: 'View', TextInput: 'Input' },
-    '../../components/BottomSheetModal': { BottomSheetModal: 'Modal' },
+    '../../components/bottom-sheet/BottomSheetModal': { BottomSheetModal: 'Modal' },
     '../../components/Button': { Button: 'Button' },
   });
   ui.setLanguage('en');
@@ -301,7 +301,7 @@ test('automatic backup switch follows configured, paused and busy states and ope
     '../../backup/operation': { backupBusy: () => busy, subscribeBackupActivity: () => {} },
     '../../backup/errors': { backupErrorMessage: String },
     '../../components/Button': { Button: 'Button' },
-    '../../components/BottomSheetModal': { BottomSheetModal: 'Modal' },
+    '../../components/bottom-sheet/BottomSheetModal': { BottomSheetModal: 'Modal' },
     './BackupPasswordSheet': { BackupPasswordSheet: 'Password' },
   });
   const render = () => ui.component({ disabled: false });

@@ -2,7 +2,7 @@ import { useI18n } from '../i18n/react';
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
-import { BottomSheetModal } from './BottomSheetModal';
+import { BottomSheetModal } from './bottom-sheet/BottomSheetModal';
 import { HeaderAction } from './HeaderAction';
 
 export function FilterSheet({

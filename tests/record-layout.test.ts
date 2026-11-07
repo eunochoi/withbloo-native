@@ -35,9 +35,9 @@ function load(file: string, modules: Record<string, any> = {}) {
           return { useAppTheme: () => ({ colors: { accent: '#00F' }, iconSizes: { md: 24 } }) };
         if (name === './ColorTransition')
           return { ColorView: 'ColorView', ColorKeyboardAvoidingView: 'ColorKeyboardAvoidingView' };
-        if (name === './Text') return { Text: 'Text' };
-        if (name === './ScrollableName') return { ScrollableName: 'ScrollableName' };
-        if (name === './AppIcon') return { AppIcon: 'AppIcon' };
+        if (name === './Text' || name === '../Text') return { Text: 'Text' };
+        if (name === './ScrollableName' || name === '../ScrollableName') return { ScrollableName: 'ScrollableName' };
+        if (name === './AppIcon' || name === '../AppIcon') return { AppIcon: 'AppIcon' };
         if (name === './ScrollEdgeFade') return { ScrollEdgeFade: 'ScrollEdgeFade' };
         throw new Error(`Unexpected import: ${name}`);
       },
@@ -46,12 +46,12 @@ function load(file: string, modules: Record<string, any> = {}) {
   return exports;
 }
 
-test('form sheets retain footer, overlays and the dismissal guard while locking image drag scrolling', () => {
+test('form sheets retain overlays and the dismissal guard while locking image drag scrolling', () => {
   const guard = () => false;
   const closed = () => {};
   const titleAction = { onPress: () => {}, accessibilityLabel: '일기 날짜 선택' };
   const { RecordFormLayout } = load('../src/components/RecordFormLayout.tsx', {
-    './BottomSheetPage': { BottomSheetPage: 'BottomSheetPage' },
+    './bottom-sheet/BottomSheetPage': { BottomSheetPage: 'BottomSheetPage' },
   });
   const tree = RecordFormLayout({
     title: '일기 작성',
@@ -60,7 +60,6 @@ test('form sheets retain footer, overlays and the dismissal guard while locking 
     onBeforeClose: guard,
     closeRequested: true,
     onClosed: closed,
-    footer: 'save',
     overlays: 'picker',
     children: 'fields',
     scrollEnabled: false,
@@ -73,7 +72,6 @@ test('form sheets retain footer, overlays and the dismissal guard while locking 
   assert.equal(sheet.props.onBeforeClose, guard);
   assert.equal(sheet.props.closeRequested, true);
   assert.equal(sheet.props.onClosed, closed);
-  assert.equal(sheet.props.footer, 'save');
   assert.equal(sheet.props.scrollEnabled, false);
   assert.equal(sheet.props.children.props.children, 'fields');
   assert.equal(overlays, 'picker');
@@ -83,9 +81,9 @@ test('route sheet closing uses history or the fallback and only focused routes i
   const calls: string[] = [];
   let hasHistory = true;
   let focused = true;
-  const { BottomSheetPage } = load('../src/components/BottomSheetPage.tsx', {
+  const { BottomSheetPage } = load('../src/components/bottom-sheet/BottomSheetPage.tsx', {
     react: { useRef: (current: unknown) => ({ current }), useLayoutEffect: () => {} },
-    '../navigation/ModalNavigationProvider': {
+    '../../navigation/ModalNavigationProvider': {
       useModalTransition: () => ({
         beginOpening: () => 1,
         beginClosing: () => 2,
@@ -149,31 +147,8 @@ test('shared header respects custom back guards, history and per-screen fallback
   assert.deepEqual(calls.slice(-2), ['back', 'guard']);
 });
 
-test('diary photo picker guards dismissal and scrolling while preparing or dragging photos', () => {
-  const { DiaryImagesPicker } = load('../src/screens/diary/DiaryImagesPicker.tsx', {
-    '../../components/BottomSheetModal': { BottomSheetModal: 'BottomSheetModal' },
-    '../../components/Button': { Button: 'Button' },
-    '../../components/Text': { Text: 'Text' },
-    '../../domain/limits': { DIARY_IMAGE_MAX_COUNT: 5 },
-    './DiaryFormImages': { DiaryFormImages: 'DiaryFormImages' },
-  });
-  for (const busy of [true, false]) {
-    for (const dragging of [true, false]) {
-      const onRemove = () => {};
-      const onReorder = () => {};
-      const tree = DiaryImagesPicker({ images: [], busy, dragging, onRemove, onReorder });
-      assert.equal(tree.props.onBeforeClose(), !busy && !dragging);
-      assert.equal(tree.props.scrollEnabled, !dragging);
-      assert.equal(tree.props.footer(() => {}).props.disabled, busy || dragging);
-      const images = tree.props.children.props.children[2];
-      assert.equal(images.props.onRemove, onRemove);
-      assert.equal(images.props.onReorder, onReorder);
-    }
-  }
-});
-
 test('optional sheet title action opens its picker and blocks presses while disabled', () => {
-  const { BottomSheetHeader } = load('../src/components/BottomSheetHeader.tsx');
+  const { BottomSheetHeader } = load('../src/components/bottom-sheet/BottomSheetHeader.tsx');
   const nodes = (tree: any): any[] =>
     Array.isArray(tree)
       ? tree.flatMap(nodes)

@@ -3,8 +3,7 @@ import { useRef, useState, type ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useAnimatedRef } from 'react-native-reanimated';
 import { useAppTheme } from '../theme/AppThemeProvider';
-import { AnimatedScrollView } from './AnimatedScrollView';
-import { BottomSheetModal } from './BottomSheetModal';
+import { BottomSheetModal } from './bottom-sheet/BottomSheetModal';
 import { HeaderAction } from './HeaderAction';
 import { PickerInfoCard } from './PickerInfoCard';
 import { PickerGridItem } from './PickerGridItem';
@@ -67,7 +66,7 @@ export function IconPicker<Key extends string>({
   }
 
   const topContent = (
-    <View className="shrink-0 gap-4 pt-8">
+    <View className="shrink-0 gap-4 pt-8 pb-4">
       <DotTabs
         options={categories.map(({ id, label }) => ({
           value: id,
@@ -110,61 +109,14 @@ export function IconPicker<Key extends string>({
       onClose={onClose}
       scrollRef={scrollRef}
       contentKey={contentKey}
-      fixedContent={topContent}
+      contentHeader={topContent}
+      contentContainerClassName="gap-3 pb-8"
+      onContentSizeChange={revealInitialSelection}
       onOpened={() => {
         opened.current = true;
         revealInitialSelection();
       }}
-      renderScrollView={(scrollProps) => (
-        <AnimatedScrollView
-          {...scrollProps}
-          key={contentKey}
-          contentContainerClassName="gap-3 px-[5%] pt-2.5 pb-8"
-          onContentSizeChange={(width, contentHeight) => {
-            if (typeof scrollProps.onContentSizeChange === 'function') {
-              scrollProps.onContentSizeChange(width, contentHeight);
-            }
-            revealInitialSelection();
-          }}
-        >
-          <View className="mx-1">
-            <View
-              className="-mx-1.5 flex-row flex-wrap"
-              onLayout={(event) => {
-                gridY.current = event.nativeEvent.layout.y;
-                revealInitialSelection();
-              }}
-            >
-              {category.keys.map((key) => {
-                const label = options.find((option) => option.key === key)!.label;
-                return (
-                  <View
-                    key={key}
-                    className="aspect-square w-1/3 p-1.5"
-                    onLayout={(event) => {
-                      if (key === value && initialScrollPending.current) {
-                        initialRowY.current = event.nativeEvent.layout.y;
-                        revealInitialSelection();
-                      }
-                    }}
-                  >
-                    <PickerGridItem
-                      selected={draft === key}
-                      label={label}
-                      onPress={() => {
-                        initialScrollPending.current = false;
-                        setDraft(key);
-                      }}
-                    >
-                      {renderIcon(key)}
-                    </PickerGridItem>
-                  </View>
-                );
-              })}
-            </View>
-          </View>
-        </AnimatedScrollView>
-      )}
+
       headerRight={(close) => (
         <HeaderAction
           label={t('common.done')}
@@ -174,6 +126,43 @@ export function IconPicker<Key extends string>({
           }}
         />
       )}
-    />
+    >
+      <View className="mx-[5%] px-1">
+        <View
+          className="-mx-1.5 flex-row flex-wrap"
+          onLayout={(event) => {
+            gridY.current = event.nativeEvent.layout.y;
+            revealInitialSelection();
+          }}
+        >
+          {category.keys.map((key) => {
+            const label = options.find((option) => option.key === key)!.label;
+            return (
+              <View
+                key={key}
+                className="aspect-square w-1/3 p-1.5"
+                onLayout={(event) => {
+                  if (key === value && initialScrollPending.current) {
+                    initialRowY.current = event.nativeEvent.layout.y;
+                    revealInitialSelection();
+                  }
+                }}
+              >
+                <PickerGridItem
+                  selected={draft === key}
+                  label={label}
+                  onPress={() => {
+                    initialScrollPending.current = false;
+                    setDraft(key);
+                  }}
+                >
+                  {renderIcon(key)}
+                </PickerGridItem>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+    </BottomSheetModal>
   );
 }

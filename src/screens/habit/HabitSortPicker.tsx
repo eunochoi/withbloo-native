@@ -4,7 +4,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useEffect, useState } from 'react';
 import { Pressable, Switch, View, type ScrollView } from 'react-native';
 import { useAnimatedRef } from 'react-native-reanimated';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { HeaderAction } from '../../components/HeaderAction';
 import { useNotice } from '../../components/NoticeProvider';
 import { QueryState } from '../../components/QueryState';

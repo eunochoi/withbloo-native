@@ -4,7 +4,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Keyboard, Pressable, TextInput, View } from 'react-native';
 import { AppIcon } from '../components/AppIcon';
-import { BottomSheetPage } from '../components/BottomSheetPage';
+import { BottomSheetPage } from '../components/bottom-sheet/BottomSheetPage';
 import { CharacterCount } from '../components/CharacterCount';
 import { EmotionImage } from '../components/EmotionImage';
 import { HeaderAction } from '../components/HeaderAction';

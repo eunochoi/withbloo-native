@@ -1,5 +1,5 @@
 import { useRef, useState, type ComponentProps } from 'react';
-import { BottomSheetModal } from './BottomSheetModal';
+import { BottomSheetModal } from './bottom-sheet/BottomSheetModal';
 import { View } from 'react-native';
 import { useI18n } from '../i18n/react';
 import { PickerAction } from './PickerAction';

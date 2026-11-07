@@ -1,7 +1,7 @@
 import type { ReactNode, ComponentProps } from 'react';
 import type { Href } from 'expo-router';
 import { View } from 'react-native';
-import { BottomSheetPage } from './BottomSheetPage';
+import { BottomSheetPage } from './bottom-sheet/BottomSheetPage';
 
 export function RecordFormLayout({
   title,
@@ -14,7 +14,6 @@ export function RecordFormLayout({
   overlays,
   children,
   scrollEnabled = true,
-  fillContent = false,
 }: {
   title: string;
   titleAction?: ComponentProps<typeof BottomSheetPage>['titleAction'];
@@ -26,7 +25,6 @@ export function RecordFormLayout({
   overlays?: ReactNode;
   children: ReactNode;
   scrollEnabled?: boolean;
-  fillContent?: boolean;
 }) {
   return (
     <>
@@ -39,9 +37,8 @@ export function RecordFormLayout({
         closeRequested={closeRequested}
         onClosed={onClosed}
         scrollEnabled={scrollEnabled}
-        fillContent={fillContent}
       >
-        <View className={fillContent ? 'flex-1 min-h-0 justify-between' : 'gap-6'}>{children}</View>
+        <View className="gap-6">{children}</View>
       </BottomSheetPage>
       {overlays}
     </>

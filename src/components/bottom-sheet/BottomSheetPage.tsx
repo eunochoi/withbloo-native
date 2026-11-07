@@ -4,7 +4,7 @@ import { useRouter, type Href } from 'expo-router';
 import { useIsFocused, useNavigationState, useRoute } from 'expo-router/react-navigation';
 import { View } from 'react-native';
 import { BottomSheetModal } from './BottomSheetModal';
-import { useModalTransition } from '../navigation/ModalNavigationProvider';
+import { useModalTransition } from '../../navigation/ModalNavigationProvider';
 
 type Props = Omit<
   ComponentProps<typeof BottomSheetModal>,
@@ -12,7 +12,6 @@ type Props = Omit<
   | 'presentation'
   | 'dismissOnBack'
   | 'onClose'
-  | 'maxHeight'
   | 'fixedHeight'
   | 'onOpening'
   | 'onOpened'
@@ -62,6 +61,7 @@ export function BottomSheetPage({
         {...props}
         visible={!closeRequested}
         presentation="screen"
+        noticeHostActive={focused}
         dimBackdrop={!hasParentSheet}
         dismissOnBack={focused}
         scrollFade={scrollFade}

@@ -8,7 +8,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useMemo } from 'react';
 import { View } from 'react-native';
-import { BottomSheetPage } from '../../../src/components/BottomSheetPage';
+import { BottomSheetPage } from '../../../src/components/bottom-sheet/BottomSheetPage';
 import { HabitIcon } from '../../../src/components/HabitIcon';
 import { InfoNotice } from '../../../src/components/InfoNotice';
 import { QueryState } from '../../../src/components/QueryState';

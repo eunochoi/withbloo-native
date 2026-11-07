@@ -4,11 +4,9 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, View, type FlatList } from 'react-native';
-import type { AnimatedRef } from 'react-native-reanimated';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import { AppIcon } from '../../../src/components/AppIcon';
-import { AnimatedFlatList } from '../../../src/components/AnimatedFlatList';
-import { BottomSheetPage } from '../../../src/components/BottomSheetPage';
+import { BottomSheetPage } from '../../../src/components/bottom-sheet/BottomSheetPage';
 import { QueryError } from '../../../src/components/QueryError';
 import { QueryState } from '../../../src/components/QueryState';
 import { RecordSortPicker } from '../../../src/components/RecordSortPicker';
@@ -100,36 +98,34 @@ export default function SoberMemos() {
               onBeforeClose={onBeforeClose}
               backRoute={backRoute}
               contentKey={`${soberId}:${sort}`}
-              renderScrollView={({ ref, ...viewport }) => (
-                <AnimatedFlatList<MemoRow>
-                  {...viewport}
-                  key={`${soberId}:${sort}`}
-                  ref={ref as unknown as AnimatedRef<FlatList>}
-                  data={rows}
-                  keyExtractor={(item) => String(item.record.id)}
-                  contentContainerClassName="py-8"
-                  removeClippedSubviews={false}
-                  initialNumToRender={8}
-                  maxToRenderPerBatch={8}
-                  windowSize={5}
-                  ListHeaderComponent={rows.length > 0 ? (
-                    <View className="gap-3 pb-6">
-                      <Pressable
-                        accessibilityRole="button"
-                        accessibilityLabel={t('sober.notesSortLabel', {
-                          value: sort === 'DESC' ? t('ui.newest') : t('ui.oldest'),
-                        })}
-                        onPress={() => setSorting(true)}
-                        className="min-h-11 self-end flex-row items-center gap-1"
-                      >
-                        <AppIcon name="sort" size={iconSizes.sm} color={colors.accent} />
-                        <Text className="text-sm text-theme-accent">
-                          {sort === 'DESC' ? t('ui.newest') : t('ui.oldest')}
-                        </Text>
-                      </Pressable>
-                    </View>
-                  ) : null}
-                  renderItem={({ item, index }) => (
+              list={{
+                data: rows,
+                keyExtractor: (item: unknown) => String((item as MemoRow).record.id),
+                contentContainerClassName: 'py-8',
+                removeClippedSubviews: false,
+                initialNumToRender: 8,
+                maxToRenderPerBatch: 8,
+                windowSize: 5,
+                ListHeaderComponent: rows.length > 0 ? (
+                  <View className="gap-3 pb-6">
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={t('sober.notesSortLabel', {
+                        value: sort === 'DESC' ? t('ui.newest') : t('ui.oldest'),
+                      })}
+                      onPress={() => setSorting(true)}
+                      className="min-h-11 self-end flex-row items-center gap-1"
+                    >
+                      <AppIcon name="sort" size={iconSizes.sm} color={colors.accent} />
+                      <Text className="text-sm text-theme-accent">
+                        {sort === 'DESC' ? t('ui.newest') : t('ui.oldest')}
+                      </Text>
+                    </Pressable>
+                  </View>
+                ) : null,
+                renderItem: ({ item: row, index }) => {
+                  const item = row as MemoRow;
+                  return (
                     <View className="gap-3 pb-3">
                       {item.firstOfDate && (
                         <Text
@@ -141,37 +137,37 @@ export default function SoberMemos() {
                       )}
                       <SoberRestartCard record={item.record} pending={pending} onMenu={onMenu} emptyMemoLabel={t('sober.emptyRestartMemo')} />
                     </View>
-                  )}
-                  ListEmptyComponent={empty}
-                  ListFooterComponent={
-                    <View className="items-center gap-3">
-                      {list.isFetchingNextPage && (
-                        <ActivityIndicator
-                          color={colors.accent}
-                          accessibilityLabel={t('sober.notesMoreLoading')}
-                        />
-                      )}
-                      {list.isError && list.data && (
-                        <QueryError
-                          message={
-                            list.isFetchNextPageError
-                              ? t('sober.nextNotesFailed')
-                              : t('sober.refreshNotesFailed')
-                          }
-                          onRetry={() => {
-                            if (list.isFetchNextPageError) loadMore();
-                            else void list.refetch();
-                          }}
-                        />
-                      )}
-                    </View>
-                  }
-                  onEndReached={() => {
-                    if (!list.isError) loadMore();
-                  }}
-                  onEndReachedThreshold={0.4}
-                />
-              )}
+                  );
+                },
+                ListEmptyComponent: empty,
+                ListFooterComponent: (
+                  <View className="items-center gap-3">
+                    {list.isFetchingNextPage && (
+                      <ActivityIndicator
+                        color={colors.accent}
+                        accessibilityLabel={t('sober.notesMoreLoading')}
+                      />
+                    )}
+                    {list.isError && list.data && (
+                      <QueryError
+                        message={
+                          list.isFetchNextPageError
+                            ? t('sober.nextNotesFailed')
+                            : t('sober.refreshNotesFailed')
+                        }
+                        onRetry={() => {
+                          if (list.isFetchNextPageError) loadMore();
+                          else void list.refetch();
+                        }}
+                      />
+                    )}
+                  </View>
+                ),
+                onEndReached: () => {
+                  if (!list.isError) loadMore();
+                },
+                onEndReachedThreshold: 0.4,
+              }}
             />
             {sorting && (
               <RecordSortPicker

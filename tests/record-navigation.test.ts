@@ -169,7 +169,7 @@ function form(kind: string, router: unknown, isNew = false) {
   const pageExports: Record<string, Function> = {};
   runInNewContext(
     ts.transpileModule(
-      readFileSync(new URL('../src/components/BottomSheetPage.tsx', import.meta.url), 'utf8'),
+      readFileSync(new URL('../src/components/bottom-sheet/BottomSheetPage.tsx', import.meta.url), 'utf8'),
       { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX } },
     ).outputText,
     {

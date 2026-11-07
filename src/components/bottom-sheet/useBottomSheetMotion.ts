@@ -13,7 +13,7 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
-import tokens from '../theme/tokens.json';
+import tokens from '../../theme/tokens.json';
 
 type Phase = 'opening' | 'idle' | 'dragging' | 'returning' | 'closing';
 

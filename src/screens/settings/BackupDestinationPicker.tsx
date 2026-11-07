@@ -1,6 +1,6 @@
 import { useI18n } from '../../i18n/react';
 import { View } from 'react-native';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { PickerAction } from '../../components/PickerAction';
 
 export function BackupDestinationPicker({

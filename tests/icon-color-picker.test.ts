@@ -56,20 +56,16 @@ test('color picker combines theme and fourteen colors in equal-height three-colu
       onApply: (key: string) => applied.push(key),
       onClose() {},
     });
-    const list = shell.props.renderScrollView({ ref() {}, onScroll: 'sheet-scroll' });
-    list.props.children = list.props.data.map((item: string) => list.props.renderItem({ item }));
-    return { ...shell, props: { ...shell.props, children: list } };
+    return shell;
   };
   let tree = render();
   const options = () => nodes(tree).filter((node) => node.type === 'PickerGridItem');
   const grid = tree.props.children;
-  assert.equal(grid.props.numColumns, 3);
+  assert(grid.props.className.includes('flex-wrap'));
   assert.equal(tree.props.fixedHeight, true);
-  assert.equal(grid.props.data.length, 15);
-  assert.equal(grid.props.columnWrapperClassName, 'gap-3');
-  assert(grid.props.contentContainerClassName.includes('gap-3'));
-  assert.equal(grid.props.onScroll, 'sheet-scroll');
-  assert(grid.props.children.every((node: any) => node.props.className === 'flex-1 min-w-0'));
+  assert.equal(grid.props.children.length, 15);
+  assert(tree.props.contentContainerClassName.includes('gap-3'));
+  assert(grid.props.children.every((node: any) => node.props.className === 'w-1/3 min-w-0 px-1.5'));
   assert.equal(options().length, 15);
   assert.equal(options()[0].props.label, '기본');
   assert.equal(options()[0].props.selected, true);
@@ -87,10 +83,10 @@ test('color picker combines theme and fourteen colors in equal-height three-colu
     true,
   );
   assert.deepEqual(applied, []);
-  const preview = nodes(tree.props.fixedContent).filter((node) => node.type === 'HabitIcon');
+  const preview = nodes(tree.props.contentHeader).filter((node) => node.type === 'HabitIcon');
   assert.deepEqual(preview.map((node) => node.props.name), ['water', 'walking', 'reading']);
   assert(preview.every((node) => node.props.colorKey === 'mocha'));
-  const soberPreview = nodes(render('sober').props.fixedContent).filter((node) => node.type === 'SoberIcon');
+  const soberPreview = nodes(render('sober').props.contentHeader).filter((node) => node.type === 'SoberIcon');
   assert.deepEqual(soberPreview.map((node) => node.props.name), ['phone', 'coffee', 'shopping']);
   assert(soberPreview.every((node) => node.props.colorKey === 'mocha'));
   tree.props.headerRight(() => {}).props.onPress();

@@ -2,9 +2,7 @@ import { useI18n } from '../../i18n/react';
 import { useRef, useState } from 'react';
 import { View, useWindowDimensions, type ScrollView } from 'react-native';
 import { useAnimatedRef } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AnimatedScrollView } from '../../components/AnimatedScrollView';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { HeaderAction } from '../../components/HeaderAction';
 import { EmotionImage } from '../../components/EmotionImage';
 import { PickerOption } from '../../components/PickerOption';
@@ -36,8 +34,7 @@ export function DiaryEmotionPicker({
   const { t } = useI18n();
 
   const { rem: appRem } = useAppTheme();
-  const { width, height, fontScale } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
+  const { fontScale } = useWindowDimensions();
   const [draft, setDraft] = useState(value);
   const [categoryId, setCategoryId] = useState<DiaryEmotionGroup>(
     () =>
@@ -49,15 +46,11 @@ export function DiaryEmotionPicker({
   );
   const category = DIARY_EMOTION_GROUPS[categoryId];
   const emotionIds: readonly number[] = category.emotions;
-  const [gridWidth, setGridWidth] = useState(Math.max(0, width - appRem * 4));
-  const [topHeight, setTopHeight] = useState(0);
-  const columns = gridWidth >= appRem * 20 * fontScale + appRem * 0.75 ? 2 : 1;
+  const columns = 2;
   const rows = Array.from({ length: Math.ceil(emotionIds.length / columns) }, (_, row) =>
     emotionIds.slice(row * columns, (row + 1) * columns),
   );
-  const sheetHeight = Math.min(height * 0.95, height - insets.top);
-  const pinTop = sheetHeight - insets.bottom - topHeight >= appRem * 20 * fontScale;
-  const contentKey = `${categoryId}-${columns}-${pinTop ? 'fixed' : 'scroll'}`;
+  const contentKey = `${categoryId}-${columns}`;
   const scrollRef = useAnimatedRef<ScrollView>();
   const opened = useRef(false);
   const initialScrollPending = useRef(true);
@@ -81,8 +74,7 @@ export function DiaryEmotionPicker({
 
   const topContent = (
     <View
-      className={`shrink-0 gap-4 ${pinTop ? 'pt-8' : 'pb-1'}`}
-      onLayout={(event) => setTopHeight(event.nativeEvent.layout.height)}
+      className="shrink-0 gap-4 pt-8 pb-4"
     >
       <DotTabs
         options={categories.map((id) => ({
@@ -128,83 +120,13 @@ export function DiaryEmotionPicker({
       onClose={onClose}
       scrollRef={scrollRef}
       contentKey={contentKey}
-      fixedContent={pinTop ? topContent : undefined}
+      contentHeader={topContent}
+      contentContainerClassName="gap-3 pb-8"
+      onContentSizeChange={revealInitialSelection}
       onOpened={() => {
         opened.current = true;
         revealInitialSelection();
       }}
-      renderScrollView={(scrollProps) => (
-        <AnimatedScrollView
-          {...scrollProps}
-          key={contentKey}
-          contentContainerClassName={`gap-3 pb-8 ${pinTop ? 'pt-4' : 'pt-8'}`}
-          onContentSizeChange={(width, contentHeight) => {
-            if (typeof scrollProps.onContentSizeChange === 'function') {
-              scrollProps.onContentSizeChange(width, contentHeight);
-            }
-            revealInitialSelection();
-          }}
-        >
-          {!pinTop && topContent}
-          <View
-            className="gap-3"
-            onLayout={(event) => {
-              gridY.current = event.nativeEvent.layout.y;
-              setGridWidth(event.nativeEvent.layout.width);
-              revealInitialSelection();
-            }}
-          >
-            {rows.map((row) => (
-              <View
-                key={row.join('-')}
-                className="flex-row gap-3"
-                onLayout={(event) => {
-                  if (value !== null && row.includes(value) && initialScrollPending.current) {
-                    initialRowY.current = event.nativeEvent.layout.y;
-                    revealInitialSelection();
-                  }
-                }}
-              >
-                {row.map((id) => {
-                  const emotion = EMOTIONS[id];
-                  const selected = draft === id;
-                  return (
-                    <View key={emotion.key} className="flex-1 min-w-0">
-                      <PickerOption
-                        selected={selected}
-                        accessibilityLabel={t('diary.emotionSummary', {
-                          title: t(`emotions.${emotion.key}`),
-                          value: t(`emotions.${emotion.key}Description`).replace(/\n/g, ' '),
-                        })}
-                        className={`grow w-full gap-2 rounded-2xl border px-4 py-6 ${selected ? 'border-theme-accent' : 'border-transparent'}`}
-                        onPress={() => {
-                          initialScrollPending.current = false;
-                          setDraft(allowDeselect && selected ? null : id);
-                        }}
-                      >
-                        <EmotionImage emotion={id} size={appRem * 4} />
-                        <Text
-                          className={`text-base text-center font-semibold ${selected ? 'text-theme-accent' : 'text-theme-text-primary'}`}
-                        >
-                          {t(`emotions.${emotion.key}`)}
-                        </Text>
-                        <Text
-                          className="w-full text-center text-sm leading-5 tracking-tight text-theme-text-secondary"
-                          lineBreakStrategyIOS="hangul-word"
-                          textBreakStrategy="balanced"
-                        >
-                          {t(`emotions.${emotion.key}Description`)}
-                        </Text>
-                      </PickerOption>
-                    </View>
-                  );
-                })}
-                {row.length < columns && <View className="flex-1" />}
-              </View>
-            ))}
-          </View>
-        </AnimatedScrollView>
-      )}
       headerRight={(closePicker) => (
         <HeaderAction
           label={allowDeselect ? t('common.apply') : t('common.done')}
@@ -215,6 +137,63 @@ export function DiaryEmotionPicker({
           }}
         />
       )}
-    />
+    >
+      <View
+        className="gap-3"
+        onLayout={(event) => {
+          gridY.current = event.nativeEvent.layout.y;
+          revealInitialSelection();
+        }}
+      >
+        {rows.map((row) => (
+          <View
+            key={row.join('-')}
+            className="flex-row gap-3"
+            onLayout={(event) => {
+              if (value !== null && row.includes(value) && initialScrollPending.current) {
+                initialRowY.current = event.nativeEvent.layout.y;
+                revealInitialSelection();
+              }
+            }}
+          >
+            {row.map((id) => {
+              const emotion = EMOTIONS[id];
+              const selected = draft === id;
+              return (
+                <View key={emotion.key} className="flex-1 min-w-0">
+                  <PickerOption
+                    selected={selected}
+                    accessibilityLabel={t('diary.emotionSummary', {
+                      title: t(`emotions.${emotion.key}`),
+                      value: t(`emotions.${emotion.key}Description`).replace(/\n/g, ' '),
+                    })}
+                    className={`grow w-full gap-2 rounded-2xl border px-4 py-6 ${selected ? 'border-theme-accent' : 'border-transparent'}`}
+                    onPress={() => {
+                      initialScrollPending.current = false;
+                      setDraft(allowDeselect && selected ? null : id);
+                    }}
+                  >
+                    <EmotionImage emotion={id} size={appRem * 4} />
+                    <Text
+                      className={`text-base text-center font-semibold ${selected ? 'text-theme-accent' : 'text-theme-text-primary'}`}
+                    >
+                      {t(`emotions.${emotion.key}`)}
+                    </Text>
+                    <Text
+                      className="w-full text-center text-sm leading-5 tracking-tight text-theme-text-secondary"
+                      lineBreakStrategyIOS="hangul-word"
+                      textBreakStrategy="balanced"
+                    >
+                      {t(`emotions.${emotion.key}Description`)}
+                    </Text>
+                  </PickerOption>
+                </View>
+              );
+            })}
+            {row.length < columns && <View className="flex-1" />}
+          </View>
+        ))}
+      </View>
+    </BottomSheetModal>
   );
 }

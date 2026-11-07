@@ -3,7 +3,7 @@ import { useI18n } from '../../i18n/react';
 import { useQuery } from '@tanstack/react-query';
 import { useSQLiteContext } from 'expo-sqlite';
 import { ActivityIndicator, View } from 'react-native';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { InfoNotice } from '../../components/InfoNotice';
 import { QueryError } from '../../components/QueryError';
 import { Text } from '../../components/Text';

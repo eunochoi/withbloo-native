@@ -17,7 +17,7 @@ for (const file of source) {
   // Only these public links may open TOOK in an external browser; no embedded web/account code.
   const externalLinkFiles = [
     'app/(tabs)/setting.tsx',
-    'src/screens/onboarding/OnboardingSheet.tsx',
+    'src/screens/onboarding/StartPage.tsx',
   ];
   const boundaryText = externalLinkFiles.includes(path.relative(root, file))
     ? text.replace(/Linking\.openURL\('https:\/\/to-ok\.me'\)/g, 'Linking.openURL(externalWeb)')
@@ -31,16 +31,16 @@ assert(!routes.some((file) => /intro|login|account|@panel/.test(path.relative(ro
 assert(fs.existsSync(path.join(root, 'app/(tabs)/index.tsx')));
 const privacy = fs.readFileSync(path.join(root, 'app/privacy.tsx'), 'utf8');
 assert(privacy.includes('<BottomSheetPage') && privacy.includes('<Text'));
-const sheetPage = fs.readFileSync(path.join(root, 'src/components/BottomSheetPage.tsx'), 'utf8');
-const sheetModal = fs.readFileSync(path.join(root, 'src/components/BottomSheetModal.tsx'), 'utf8');
+const sheetPage = fs.readFileSync(path.join(root, 'src/components/bottom-sheet/BottomSheetPage.tsx'), 'utf8');
+const sheetModal = fs.readFileSync(path.join(root, 'src/components/bottom-sheet/BottomSheetModal.tsx'), 'utf8');
 const sheetViewport = fs.readFileSync(
-  path.join(root, 'src/components/BottomSheetScrollViewport.tsx'),
+  path.join(root, 'src/components/bottom-sheet/BottomSheetContent.tsx'),
   'utf8',
 );
 assert(
   sheetPage.includes('<BottomSheetModal') &&
-    sheetModal.includes('<BottomSheetScrollViewport') &&
-    sheetViewport.includes('<AnimatedScrollView'),
+    sheetModal.includes('<BottomSheetContent') &&
+    sheetViewport.includes('<BottomSheetScrollViewport'),
 );
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
 assert(!pkg.dependencies['react-native-webview']);

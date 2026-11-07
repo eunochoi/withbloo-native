@@ -3,7 +3,7 @@ import { useI18n } from '../i18n/react';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { dateTimeDraft, parseDateTime } from '../domain/date';
-import { BottomSheetModal } from './BottomSheetModal';
+import { BottomSheetModal } from './bottom-sheet/BottomSheetModal';
 import { HeaderAction } from './HeaderAction';
 import { DateTimeFields } from './DateTimeFields';
 import { InfoNotice } from './InfoNotice';

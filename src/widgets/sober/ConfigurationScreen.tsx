@@ -16,7 +16,7 @@ import { Text } from '../../components/Text';
 import { Button } from '../../components/Button';
 import { PickerOption } from '../../components/PickerOption';
 import { ScrollableName } from '../../components/ScrollableName';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { defaultWidgetSettings, type SoberWidgetSettings } from './model';
 import { loadWidgetSettings, saveWidgetSettings } from './storage';
 import { renderSoberWidget } from './task';

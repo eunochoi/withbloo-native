@@ -3,11 +3,11 @@ import { translateErrorMessage } from '../../i18n/errors';
 import { useI18n } from '../../i18n/react';
 import { useRef, useState } from 'react';
 import { View } from 'react-native';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { Button } from '../../components/Button';
 import { HeaderAction } from '../../components/HeaderAction';
 import { Text } from '../../components/Text';
-import type { CloseBottomSheet } from '../../hooks/useBottomSheetLifecycle';
+import type { CloseBottomSheet } from '../../components/bottom-sheet/useBottomSheetLifecycle';
 
 const TIME_INPUT_CONTAINER_CLASS_NAME =
   'h-12 w-16 justify-center ios:curve-continuous rounded-2xl border border-theme-border';

@@ -2,7 +2,7 @@ import { useI18n } from '../../i18n/react';
 import { InfoNotice } from '../../components/InfoNotice';
 import { useState } from 'react';
 import { Switch, View } from 'react-native';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { FormPickerRow } from '../../components/FormPickerRow';
 import { FilterSheet } from '../../components/FilterSheet';
 import { PickerOption } from '../../components/PickerOption';

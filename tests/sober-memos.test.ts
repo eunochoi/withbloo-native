@@ -184,16 +184,10 @@ function screen() {
     cursor = 0;
     return exports.default();
   };
-  const viewport: any = {
-    ref: {},
-    onScroll: () => {},
-    onLayout: () => {},
-    contentContainerStyle: { paddingBottom: 60 },
+  const flat = () => {
+    const page = nodes(render()).find((node) => node.type === 'BottomSheetPage');
+    return { props: page.props.list, key: page.props.contentKey };
   };
-  const flat = () =>
-    nodes(render())
-      .find((node) => node.type === 'BottomSheetPage')
-      .props.renderScrollView(viewport);
   return {
     list,
     sober,
@@ -201,7 +195,6 @@ function screen() {
     queries,
     render,
     flat,
-    viewport,
     setId: (value: string) => {
       id = value;
     },
@@ -220,10 +213,6 @@ test('memo route merges dates across pages and sorts without replacing its paren
     },
   ];
   const flat = ui.flat();
-  assert.equal(flat.type, 'AnimatedFlatList');
-  assert.equal(flat.props.onScroll, ui.viewport.onScroll);
-  assert.equal(flat.props.ref, ui.viewport.ref);
-  assert.equal(flat.props.contentContainerStyle, ui.viewport.contentContainerStyle);
   assert.deepEqual(
     Array.from(flat.props.data, (row: any) => row.firstOfDate),
     [true, false, true],

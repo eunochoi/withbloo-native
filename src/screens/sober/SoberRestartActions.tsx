@@ -3,7 +3,7 @@ import { usePreventRemove } from 'expo-router/react-navigation';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useRef, useState, type ReactNode } from 'react';
 import { View } from 'react-native';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { useNotice } from '../../components/NoticeProvider';
 import { PickerAction } from '../../components/PickerAction';

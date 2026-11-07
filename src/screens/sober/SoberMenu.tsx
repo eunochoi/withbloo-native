@@ -7,7 +7,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import type { Sober } from '../../db/types';
 import { deleteSober } from '../../db/sober';
 import { useRecordMutation } from '../../queries';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { PickerAction } from '../../components/PickerAction';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { useNotice } from '../../components/NoticeProvider';

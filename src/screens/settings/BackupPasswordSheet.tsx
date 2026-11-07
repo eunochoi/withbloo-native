@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { validatePassword } from '../../backup/container';
 import { backupErrorMessage } from '../../backup/errors';
-import { BottomSheetModal } from '../../components/BottomSheetModal';
+import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { HeaderAction } from '../../components/HeaderAction';
 import { InfoNotice } from '../../components/InfoNotice';
 import { Text } from '../../components/Text';

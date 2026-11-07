@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useLocalSearchParams } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
-import { BottomSheetPage } from '../../../../src/components/BottomSheetPage';
+import { BottomSheetPage } from '../../../../src/components/bottom-sheet/BottomSheetPage';
 import { QueryState } from '../../../../src/components/QueryState';
 import { Text } from '../../../../src/components/Text';
 import { getSoberAchievements } from '../../../../src/domain/sober';

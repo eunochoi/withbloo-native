@@ -1,15 +1,15 @@
-import { mockI18n, formatDisplayDate, soberI18n } from './helpers/i18n';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { runInNewContext } from 'node:vm';
 import test from 'node:test';
+import { runInNewContext } from 'node:vm';
 import {
-  getSoberAchievements,
-  getSoberSummary,
   formatSoberDuration,
   formatSoberGoal,
+  getSoberAchievements,
+  getSoberSummary,
 } from '../src/domain/sober';
+import { formatDisplayDate, mockI18n, soberI18n } from './helpers/i18n';
 
 const require = createRequire(import.meta.url);
 const ts = require('typescript');
@@ -86,9 +86,9 @@ function scenario(file = '../app/sober/[id]/index.tsx') {
           if (name === 'expo-router')
             return {
               useLocalSearchParams: () => ({ id: '1', date: '2026-10-04' }),
-              useRouter: () => ({ push() {}, replace() {} }),
+              useRouter: () => ({ push() { }, replace() { } }),
             };
-          if (name === 'expo-router/react-navigation') return { usePreventRemove() {} };
+          if (name === 'expo-router/react-navigation') return { usePreventRemove() { } };
           if (name.endsWith('/db/sober'))
             return {
               deleteSoberRestart: async (_db: unknown, id: number, owner: number) =>
@@ -187,7 +187,7 @@ test('memo launcher pushes a route above sober detail without closing its sheet'
   const ui = scenario();
   const nodes = ui.render();
   const button = nodes.find(
-    (node) => node.type === 'Button' && node.props.label === '기록보기',
+    (node) => node.type === 'Button' && node.props.label === '기록 모아보기',
   );
   assert.equal(button.props.subtle, true);
   button.props.onPress();

@@ -2,7 +2,7 @@ import { formatDisplayDate } from '../../src/i18n/format';
 import { useI18n } from '../../src/i18n/react';
 import { useLocalSearchParams } from 'expo-router';
 import { View } from 'react-native';
-import { BottomSheetPage } from '../../src/components/BottomSheetPage';
+import { BottomSheetPage } from '../../src/components/bottom-sheet/BottomSheetPage';
 import { isDate } from '../../src/domain/date';
 import { useToday } from '../../src/queries';
 import { DayInfo } from '../../src/screens/calendar/DayInfo';

@@ -109,7 +109,7 @@ function sheetHarness(platform = 'android') {
       },
     },
     '../../i18n/react': mockI18n(),
-    '../../components/BottomSheetModal': { BottomSheetModal: 'Sheet' },
+    '../../components/bottom-sheet/BottomSheetModal': { BottomSheetModal: 'Sheet' },
     '../../components/Button': { Button: 'Button' },
     '../../components/PageIndicator': { PageIndicator: 'PageIndicator' },
     '../../components/Text': { Text: 'Text' },
@@ -154,7 +154,7 @@ function sheetHarness(platform = 'android') {
   };
   const render = (firstRun = true) => {
     root = h.render(() => module.OnboardingSheet({ firstRun, onClose: () => {} }));
-    const body = root.props.renderScrollView({});
+    const body = { props: { children: root.props.children } };
     const footer = root.props.footer(close);
     return {
       root,
@@ -223,7 +223,7 @@ test('both platforms show the same six pages with surface fades and button-only 
       assert.equal(root.props.contentKey, index);
       assert.equal(root.props.scrollFade, true);
       assert.equal(root.props.contentFullBleed, true);
-      assert.equal(body.type, 'ScrollView');
+      assert.equal(root.props.contentContainerClassName, 'grow');
       assert.equal(nodes(footer, 'Pressable').length, 0);
       if (index < 5) buttons.at(-1).props.onPress();
     }

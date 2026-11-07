@@ -3,7 +3,7 @@ import { InfoNotice } from './InfoNotice';
 import { useState } from 'react';
 import { Switch, View } from 'react-native';
 import { useAppTheme } from '../theme/AppThemeProvider';
-import { BottomSheetModal } from './BottomSheetModal';
+import { BottomSheetModal } from './bottom-sheet/BottomSheetModal';
 import { HeaderAction } from './HeaderAction';
 import { PickerOption } from './PickerOption';
 import { Text } from './Text';
