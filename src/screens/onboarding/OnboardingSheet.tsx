@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BottomSheetModal } from '../../components/BottomSheetModal';
 import { AnimatedScrollView } from '../../components/AnimatedScrollView';
 import { Button } from '../../components/Button';
+import { PageIndicator } from '../../components/PageIndicator';
 import { Text } from '../../components/Text';
 import { View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
@@ -120,6 +121,9 @@ export function OnboardingSheet({
       )}
       footer={(close) => (
         <View className="w-full max-w-lg self-center gap-2 px-1 pt-4">
+          <View className="flex-row justify-center gap-1.5" accessible accessibilityRole="progressbar" accessibilityValue={{ min: 1, max: pages.length, now: page + 1 }}>
+            {pages.map((_, index) => <PageIndicator key={index} active={page === index} />)}
+          </View>
           {!!error && (
             <Text accessibilityRole="alert" className="text-[14px] text-theme-danger">
               {error}

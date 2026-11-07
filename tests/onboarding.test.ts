@@ -111,6 +111,7 @@ function sheetHarness(platform = 'android') {
     '../../i18n/react': mockI18n(),
     '../../components/BottomSheetModal': { BottomSheetModal: 'Sheet' },
     '../../components/Button': { Button: 'Button' },
+    '../../components/PageIndicator': { PageIndicator: 'PageIndicator' },
     '../../components/Text': { Text: 'Text' },
     '../../components/NoticeProvider': {
       useNotice: () => ({ showNotice: (notice: any) => notices.push(notice) }),
