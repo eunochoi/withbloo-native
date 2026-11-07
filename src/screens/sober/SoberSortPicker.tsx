@@ -17,12 +17,11 @@ import { soberQueries } from '../../queries';
 import { SoberManualSortList } from './SoberManualSortList';
 import { useSettings } from '../../settings/SettingsProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
-import { useSortSectionScroll } from '../../hooks/useSortSectionScroll';
 
 export function SoberSortPicker({ visible, onClose, onApplied }: { visible: boolean; onClose: () => void; onApplied?: () => void }) {
   const { t } = useI18n();
   const { showNotice } = useNotice();
-  const { colors, rem, reducedMotion } = useAppTheme();
+  const { colors } = useAppTheme();
   const scrollRef = useAnimatedRef<ScrollView>();
   const db = useSQLiteContext();
   const { settings, updateSettings } = useSettings();
@@ -34,9 +33,6 @@ export function SoberSortPicker({ visible, onClose, onApplied }: { visible: bool
   const [standardSort, setStandardSort] = useState<'ASC' | 'DESC'>(settings.soberSort === 'CUSTOM' ? 'DESC' : settings.soberSort);
   const [saving, setSaving] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const [, setResetDefault] = useState(false);
-  const [, setUserSortSelected] = useState(false);
-  const sections = useSortSectionScroll({ visible, initialCustom: settings.soberSort === 'CUSTOM', ready: order !== null || query.isError, scrollRef, rem, reducedMotion });
   const initial = query.data
     ? sortSobers(query.data, { ...settings, soberSort: 'CUSTOM' }).map((sober) => sober.id)
     : [];
@@ -51,8 +47,6 @@ export function SoberSortPicker({ visible, onClose, onApplied }: { visible: bool
       setStandardSort(settings.soberSort === 'CUSTOM' ? 'DESC' : settings.soberSort);
       setPriority(settings.soberPriorityFirst);
       setRecords(settings.soberRecordSort);
-      setResetDefault(false);
-      setUserSortSelected(false);
     }
   }, [visible, settings.soberSort]);
   useEffect(() => {
@@ -79,7 +73,6 @@ export function SoberSortPicker({ visible, onClose, onApplied }: { visible: bool
       title={t('sober.sort')}
       onClose={onClose}
       scrollRef={scrollRef}
-      onOpened={sections.onOpened}
       scrollFade
       scrollEnabled={!dragging}
       onBeforeClose={() => {
@@ -97,7 +90,6 @@ export function SoberSortPicker({ visible, onClose, onApplied }: { visible: bool
           onPress={() => {
             if (sort === 'CUSTOM') {
               setOrder(defaults);
-              setResetDefault(true);
             } else {
               setSort('DESC');
               setStandardSort('DESC');
@@ -130,7 +122,7 @@ export function SoberSortPicker({ visible, onClose, onApplied }: { visible: bool
     >
       <View accessibilityRole="radiogroup" accessibilityLabel={t('sober.sort')}>
         <View className="gap-5 pb-8">
-          <Pressable accessibilityRole="radio" accessibilityState={{ checked: sort !== 'CUSTOM' }} onPress={() => { setSort(standardSort); setUserSortSelected(false); sections.cancelInitialScroll(); }} className="flex-row items-center gap-2">
+          <Pressable accessibilityRole="radio" accessibilityState={{ checked: sort !== 'CUSTOM' }} onPress={() => setSort(standardSort)} className="flex-row items-center gap-2">
             <View className="h-5 w-5 items-center justify-center rounded-full border border-theme-accent">
               {sort !== 'CUSTOM' && <View className="h-3 w-3 rounded-full bg-theme-accent" />}
             </View>
@@ -168,8 +160,8 @@ export function SoberSortPicker({ visible, onClose, onApplied }: { visible: bool
             <InfoNotice>{t('ui.recordsDescription', { value: priority ? t('ui.priorityPrefix') : '' })}</InfoNotice>
           </View>
         </View>
-        <View onLayout={sections.onCustomLayout} className="gap-5 border-t border-theme-border/30 pt-8">
-          <Pressable accessibilityRole="radio" accessibilityState={{ checked: sort === 'CUSTOM' }} onPress={() => { setSort('CUSTOM'); setUserSortSelected(true); sections.cancelInitialScroll(); }} className="flex-row items-center gap-2">
+        <View className="gap-5 border-t border-theme-border/30 pt-8">
+          <Pressable accessibilityRole="radio" accessibilityState={{ checked: sort === 'CUSTOM' }} onPress={() => { setSort('CUSTOM'); }} className="flex-row items-center gap-2">
             <View className="h-5 w-5 items-center justify-center rounded-full border border-theme-accent">
               {sort === 'CUSTOM' && <View className="h-3 w-3 rounded-full bg-theme-accent" />}
             </View>

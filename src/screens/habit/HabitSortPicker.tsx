@@ -17,12 +17,11 @@ import { habitQueries } from '../../queries';
 import { HabitManualSortList } from './HabitManualSortList';
 import { useSettings } from '../../settings/SettingsProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
-import { useSortSectionScroll } from '../../hooks/useSortSectionScroll';
 
 export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const { t } = useI18n();
   const { showNotice } = useNotice();
-  const { colors, rem, reducedMotion } = useAppTheme();
+  const { colors } = useAppTheme();
   const scrollRef = useAnimatedRef<ScrollView>();
   const db = useSQLiteContext();
   const { settings, updateSettings } = useSettings();
@@ -33,9 +32,6 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
   const [standardSort, setStandardSort] = useState<'ASC' | 'DESC'>(settings.habitSort === 'CUSTOM' ? 'DESC' : settings.habitSort);
   const [saving, setSaving] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const [, setResetDefault] = useState(false);
-  const [, setUserSortSelected] = useState(false);
-  const sections = useSortSectionScroll({ visible, initialCustom: settings.habitSort === 'CUSTOM', ready: order !== null || query.isError, scrollRef, rem, reducedMotion });
   const initial = query.data
     ? sortHabits(query.data, { ...settings, habitSort: 'CUSTOM' }).map((habit) => habit.id)
     : [];
@@ -52,8 +48,6 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
       setSort(settings.habitSort);
       setStandardSort(settings.habitSort === 'CUSTOM' ? 'DESC' : settings.habitSort);
       setPriority(settings.habitPriorityFirst);
-      setResetDefault(false);
-      setUserSortSelected(false);
     }
   }, [visible, settings.habitSort]);
   const move = useCallback(
@@ -77,7 +71,6 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
       title={t('habit.sort')}
       onClose={onClose}
       scrollRef={scrollRef}
-      onOpened={sections.onOpened}
       scrollFade
       scrollEnabled={!dragging}
       onBeforeClose={() => {
@@ -95,7 +88,6 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
           onPress={() => {
             if (sort === 'CUSTOM') {
               setOrder(defaults);
-              setResetDefault(true);
             } else {
               setSort('DESC');
               setStandardSort('DESC');
@@ -126,7 +118,7 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
     >
       <View accessibilityRole="radiogroup" accessibilityLabel={t('habit.sort')}>
         <View className="gap-5 pb-8">
-          <Pressable accessibilityRole="radio" accessibilityState={{ checked: sort !== 'CUSTOM' }} onPress={() => { setSort(standardSort); setUserSortSelected(false); sections.cancelInitialScroll(); }} className="flex-row items-center gap-2">
+          <Pressable accessibilityRole="radio" accessibilityState={{ checked: sort !== 'CUSTOM' }} onPress={() => setSort(standardSort)} className="flex-row items-center gap-2">
             <View className="h-5 w-5 items-center justify-center rounded-full border border-theme-accent">
               {sort !== 'CUSTOM' && <View className="h-3 w-3 rounded-full bg-theme-accent" />}
             </View>
@@ -152,8 +144,8 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
             <InfoNotice>{t('ui.sortDescription', { value: `${priority ? t('ui.importantPrefix') : ''}${t('ui.createdDate')}` })}</InfoNotice>
           </View>
         </View>
-        <View onLayout={sections.onCustomLayout} className="gap-5 border-t border-theme-border/30 pt-8">
-          <Pressable accessibilityRole="radio" accessibilityState={{ checked: sort === 'CUSTOM' }} onPress={() => { setSort('CUSTOM'); setUserSortSelected(true); sections.cancelInitialScroll(); }} className="flex-row items-center gap-2">
+        <View className="gap-5 border-t border-theme-border/30 pt-8">
+          <Pressable accessibilityRole="radio" accessibilityState={{ checked: sort === 'CUSTOM' }} onPress={() => { setSort('CUSTOM'); }} className="flex-row items-center gap-2">
             <View className="h-5 w-5 items-center justify-center rounded-full border border-theme-accent">
               {sort === 'CUSTOM' && <View className="h-3 w-3 rounded-full bg-theme-accent" />}
             </View>

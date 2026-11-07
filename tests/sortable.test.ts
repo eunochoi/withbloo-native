@@ -91,7 +91,6 @@ function renderer(path: string, states: any[], saved: any[] = [], active = { val
         if (name.endsWith('/db/sober')) return { sortSobers: (items: any[]) => items };
         if (name.endsWith('/queries')) return { habitQueries: { list: () => ({}) }, soberQueries: { list: () => ({}) } };
         if (name.endsWith('useScrollFade')) return { useScrollFade: () => ({}) };
-        if (name.endsWith('useSortSectionScroll')) return { useSortSectionScroll: () => ({ onOpened: () => {}, onCustomLayout: () => {}, cancelInitialScroll: () => {} }) };
         if (name.endsWith('sortable/order')) return { moveItem };
         if (name.endsWith('domain/constants')) return { DIARY_IMAGE_MAX_COUNT: 5 };
         const component = name.split('/').at(-1)!;
