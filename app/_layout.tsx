@@ -10,6 +10,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { AppState, Platform, Pressable, Text as NativeText, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SQLiteProvider, type SQLiteDatabase, type SQLiteOpenOptions } from 'expo-sqlite';
 import * as SplashScreen from 'expo-splash-screen';
 import * as SystemUI from 'expo-system-ui';
@@ -201,9 +202,11 @@ export default function RootLayout() {
                 <SettingsProvider onError={onError}>
                   <AppThemeProvider>
                     <GestureHandlerRootView style={{ flex: 1 }}>
-                      <NoticeProvider>
-                        <Navigation onReady={onNavigationReady} />
-                      </NoticeProvider>
+                      <KeyboardProvider>
+                        <NoticeProvider>
+                          <Navigation onReady={onNavigationReady} />
+                        </NoticeProvider>
+                      </KeyboardProvider>
                     </GestureHandlerRootView>
                   </AppThemeProvider>
                 </SettingsProvider>
