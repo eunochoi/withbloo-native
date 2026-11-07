@@ -13,7 +13,7 @@ export const homeKo = {
   loadFailed: '불러오기 실패',
   noRecord: '기록 없음',
   diaryTitle: '오늘의 일기',
-  diaryStatus: "'%{value}' 기록 남김",
+  diaryStatus: "'%{value}' 일기",
   diaryLink: '오늘의 일기 이동, %{value}',
   habitTitle: '오늘의 습관',
   addHabit: '습관을 추가해 보세요',

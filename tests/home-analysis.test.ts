@@ -221,7 +221,7 @@ test('recorded diary shows its actual emotion artwork and opens the diary', () =
   assert.equal(artwork.props.iconStyle, 'basic');
   assert(!text(tree).includes('확인하기'));
   const description = nodes(tree).find(
-    (node) => node.type === 'Text' && text(node) === "'기쁨' 기록 남김",
+    (node) => node.type === 'Text' && text(node) === "'기쁨' 일기",
   );
   assert.equal(description.props.numberOfLines, 1);
   assert.equal(description.props.adjustsFontSizeToFit, true);
