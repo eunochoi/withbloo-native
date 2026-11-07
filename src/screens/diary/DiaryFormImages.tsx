@@ -101,7 +101,7 @@ export function DiaryFormImages({
   const [dragging, setDragging] = useState(false);
   return (
     <AnimatedScrollView ref={scrollRef} horizontal showsHorizontalScrollIndicator={false}>
-      <View className="flex-row gap-3 pt-2">
+      <View className="flex-row gap-3">
         {images.length > 0 && (
           <Sortable.Grid
             data={images}
@@ -110,6 +110,7 @@ export function DiaryFormImages({
             rowHeight={appRem * 7}
             columnGap={appRem * 0.75}
             customHandle
+            overDrag="none"
             sortEnabled={!busy}
             scrollableRef={scrollRef}
             autoScrollDirection="horizontal"
