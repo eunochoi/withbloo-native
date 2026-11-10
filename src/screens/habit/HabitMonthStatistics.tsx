@@ -104,7 +104,7 @@ export function HabitMonthStatistics({
           unavailable={unavailable}
         />
         {habit.priority === 0 && (
-          <InfoNotice accent={accent} numberOfLines={0} adjustsFontSizeToFit={false}>
+          <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
             {t('habit.intervalNotice')}
           </InfoNotice>
         )}

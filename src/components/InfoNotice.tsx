@@ -1,4 +1,3 @@
-import type { itemAccentColors } from '../theme/colors';
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { twMerge } from 'tailwind-merge';
@@ -8,7 +7,6 @@ import { Text } from './Text';
 
 export function InfoNotice({
   children,
-  accent,
   className,
   textClassName,
   autoLineHeight = false,
@@ -16,7 +14,6 @@ export function InfoNotice({
   numberOfLines = 1,
 }: {
   children: ReactNode;
-  accent?: ReturnType<typeof itemAccentColors>;
   className?: string;
   textClassName?: string;
   autoLineHeight?: boolean;
@@ -30,13 +27,12 @@ export function InfoNotice({
         <AppIcon
           name="info-outline"
           size={appRem}
-          color={accent?.color ?? colors.accent}
+          color={colors.accent}
           accessible={false}
         />
       </View>
       <Text
         autoLineHeight={autoLineHeight}
-        style={accent ? { color: accent.text } : undefined}
         numberOfLines={numberOfLines}
         adjustsFontSizeToFit={adjustsFontSizeToFit}
         className={twMerge(

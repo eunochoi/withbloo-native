@@ -73,7 +73,7 @@ export default function HabitDetail() {
                 unavailable={records.isPending || records.isError}
               />
               <View className="px-1 gap-2">
-                <InfoNotice accent={accent} numberOfLines={0} adjustsFontSizeToFit={false}>
+                <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
                   {t('habit.started', {
                     value: formatDisplayDate(
                       habit.initial_started_at,
@@ -84,10 +84,10 @@ export default function HabitDetail() {
                 </InfoNotice>
                 {habit.priority > 0 && (
                   <>
-                    <InfoNotice accent={accent} numberOfLines={0} adjustsFontSizeToFit={false}>
+                    <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
                       {t('habit.eligibleNotice')}
                     </InfoNotice>
-                    <InfoNotice accent={accent} numberOfLines={0} adjustsFontSizeToFit={false}>
+                    <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
                       {t('habit.rateNotice')}
                     </InfoNotice>
                   </>
