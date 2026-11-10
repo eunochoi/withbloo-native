@@ -35,11 +35,9 @@ import { ImageAttachmentsHeader } from '../components/ImageAttachmentsHeader';
 export function DiaryForm({
   id,
   initialDate,
-  allowDateChange = false,
 }: {
   id?: number;
   initialDate?: string;
-  allowDateChange?: boolean;
 }) {
   const { t, formatLocale } = useI18n();
 
@@ -49,7 +47,7 @@ export function DiaryForm({
   const today = useToday();
   const query = useQuery({ ...diaryQueries.byId(db, id ?? 0), enabled: id !== undefined });
   const [date, setDate] = useState<string | null>(
-    isDate(initialDate) && initialDate <= today ? initialDate : allowDateChange ? null : today,
+    isDate(initialDate) && initialDate <= today ? initialDate : null,
   );
   const [text, setText] = useState('');
   const [emotion, setEmotion] = useState<number | null>(null);
@@ -111,7 +109,6 @@ export function DiaryForm({
       return next;
     });
   }, []);
-  const title = date ? formatDisplayDate(date, formatLocale, 'form') : t('diary.datePrompt');
   const onClosed = saved
     ? () =>
       showNotice({
@@ -166,20 +163,7 @@ export function DiaryForm({
       }
       closeRequested={saved && !mutation.isPending}
       onClosed={onClosed}
-      title={title}
-      titleAction={
-        id !== undefined || allowDateChange
-          ? {
-            accessibilityLabel: date ? t('diary.dateChoice', { title }) : t('diary.chooseDate'),
-            disabled: busy || dragging || picker !== null,
-            showChevron: false,
-            onPress: () => {
-              Keyboard.dismiss();
-              setPicker('date');
-            },
-          }
-          : undefined
-      }
+      title={id !== undefined ? t('diary.editTitle') : t('diary.createTitle')}
       onBeforeClose={() => {
         if (dragging) return false;
         if (!busy) return true;
@@ -192,7 +176,7 @@ export function DiaryForm({
       }}
       overlays={
         <>
-          {(id !== undefined || allowDateChange) && picker === 'date' && (
+          {picker === 'date' && (
             <DiaryDatePicker
               value={date}
               diaryId={id}
@@ -220,6 +204,26 @@ export function DiaryForm({
       <View className="shrink-0">
         <Pressable
           accessibilityRole="button"
+          accessibilityLabel={date ? t('diary.dateChoice', { title: formatDisplayDate(date, formatLocale, 'date') }) : t('diary.chooseDate')}
+          accessibilityState={{ expanded: picker === 'date', disabled: busy || dragging }}
+          disabled={busy || dragging || picker !== null}
+          onPress={() => { Keyboard.dismiss(); setPicker('date'); }}
+          className="min-h-12 flex-row items-center gap-3 active:opacity-70"
+        >
+          <View className="flex-1 min-w-0 gap-3">
+            <Text className={SECTION_TITLE_CLASS_NAME}>{t('diary.dateLabel')}</Text>
+            <Text className="px-1 text-base text-theme-text-secondary">
+              {date ? formatDisplayDate(date, formatLocale, 'date') : t('diary.datePrompt')}
+            </Text>
+          </View>
+          <View className="h-16 w-16 items-center justify-center">
+            <AppIcon name="date-outline" size={appRem * 2.5} color={colors.accent} />
+          </View>
+        </Pressable>
+      </View>
+      <View className="shrink-0">
+        <Pressable
+          accessibilityRole="button"
           accessibilityLabel={t('diary.chooseTodayEmotion')}
           accessibilityState={{ expanded: picker === 'emotion', disabled: busy }}
           disabled={busy}
@@ -240,9 +244,7 @@ export function DiaryForm({
             {emotion !== null ? (
               <EmotionImage emotion={emotion} size={appRem * 4} />
             ) : (
-              <View className="h-14 w-14 items-center justify-center rounded-full border border-dashed border-theme-accent">
-                <AppIcon name="add" size={appRem * 1.75} color={colors.accent} />
-              </View>
+              <AppIcon name="emotion-outline" size={appRem * 2.5} color={colors.accent} />
             )}
           </View>
         </Pressable>

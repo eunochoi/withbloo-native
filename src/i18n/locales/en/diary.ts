@@ -70,6 +70,7 @@ export const diaryEn = {
   datePrompt: 'Choose a date',
   edited: 'Entry updated',
   saved: 'Entry saved',
+  createTitle: 'Write diary entry',
   editTitle: 'Edit diary entry',
   saving: 'Saving...',
   saveEdited: 'Save changes',

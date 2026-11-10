@@ -171,7 +171,7 @@ export default function DiaryList() {
                 <ToolbarAddButton
                   label={t('diary.add')}
                   onPress={() =>
-                    openModal({ pathname: '/diary/new', params: { allowDateChange: 'true' } })
+                    openModal({ pathname: '/diary/new' })
                   }
                 />
               </Toolbar>

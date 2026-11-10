@@ -64,6 +64,7 @@ const APP_ICONS = {
   image: ImageIcon,
   calendar: CalendarDotsIcon,
   date: CalendarBlankIcon,
+  'date-outline': CalendarBlankIcon,
   today: CalendarDotIcon,
   habit: CheckSquareIcon,
   settings: GearIcon,
@@ -88,6 +89,7 @@ const APP_ICONS = {
   'play-circle-outline': PlayCircleIcon,
   description: FileTextIcon,
   'emoji-emotions': SmileyIcon,
+  'emotion-outline': SmileyIcon,
   'filter-list': FunnelSimpleIcon,
   'more-vert': DotsThreeVerticalIcon,
   palette: PaletteIcon,
@@ -123,7 +125,7 @@ export function AppIcon({
     'habit-flow',
   ].includes(name);
   return (
-    <Icon {...props} weight={name === 'drag-indicator' ? 'regular' : bold ? 'bold' : 'fill'} />
+    <Icon {...props} weight={name === 'drag-indicator' || name === 'date-outline' || name === 'emotion-outline' ? 'regular' : bold ? 'bold' : 'fill'} />
   );
 }
 

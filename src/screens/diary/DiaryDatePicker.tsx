@@ -2,14 +2,14 @@ import { useI18n } from '../../i18n/react';
 import { InfoNotice } from '../../components/InfoNotice';
 import { useQuery } from '@tanstack/react-query';
 import { useSQLiteContext } from 'expo-sqlite';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
 import { HeaderAction } from '../../components/HeaderAction';
 import { QueryError } from '../../components/QueryError';
 import { isDate } from '../../domain/date';
 import { diaryQueries, useToday } from '../../queries';
-import { DatePickerCalendar } from '../calendar/DatePickerCalendar';
+import { DateSelectionForm } from '../../components/DateSelectionForm';
 
 export function DiaryDatePicker({
   value,
@@ -22,7 +22,7 @@ export function DiaryDatePicker({
   onClose: () => void;
   onApply: (date: string) => void;
 }) {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
 
   const db = useSQLiteContext();
   const today = useToday();
@@ -34,9 +34,14 @@ export function DiaryDatePicker({
     enabled: draft !== null,
   });
   const occupied = !!existing.data && existing.data.id !== diaryId;
+  const notice = useRef(t('diary.chooseDateHint'));
+  if (draft === null) notice.current = t('diary.chooseDateHint');
+  else if (!existing.isFetching && !existing.isPending && !existing.isError)
+    notice.current = t(occupied ? 'diary.dateOccupied' : 'diary.datePreserved');
   const disabled =
     draft === null ||
     existing.isPending ||
+    existing.isFetching ||
     existing.isError ||
     occupied ||
     !isDate(draft) ||
@@ -45,20 +50,8 @@ export function DiaryDatePicker({
     <BottomSheetModal
       visible
       fixedHeight
-      title={t('diary.chooseDate')}
+      title={language.startsWith('ko') ? '날짜 선택' : 'Select date'}
       onClose={onClose}
-      headerLeft={
-        <HeaderAction
-          side="left"
-          label={t('calendar.today')}
-          accessibilityLabel={t('diary.chooseToday')}
-          accessibilityHint={t('diary.chooseTodayHint')}
-          onPress={() => {
-            setDraft(today);
-            setMonth(today.slice(0, 7));
-          }}
-        />
-      }
       headerButton={(close) => (
         <HeaderAction
           label={t('common.done')}
@@ -73,7 +66,7 @@ export function DiaryDatePicker({
       )}
     >
       <View className="gap-4">
-        <DatePickerCalendar
+        <DateSelectionForm
           month={month}
           today={today}
           selected={draft ?? ''}
@@ -97,15 +90,7 @@ export function DiaryDatePicker({
             onRetry={() => void existing.refetch()}
           />
         ) : (
-          <InfoNotice>
-            {draft === null
-              ? t('diary.chooseDateHint')
-              : existing.isPending
-                ? t('diary.checkingDate')
-                : occupied
-                  ? t('diary.dateOccupied')
-                  : t('diary.datePreserved')}
-          </InfoNotice>
+          <InfoNotice>{notice.current}</InfoNotice>
         )}
       </View>
     </BottomSheetModal>
