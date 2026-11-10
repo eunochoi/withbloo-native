@@ -26,7 +26,7 @@ export interface DraftImage {
 export async function initializeMedia(db: SQLiteDatabase) {
   mediaDirectory.create({ intermediates: true, idempotent: true });
   const referenced = new Set(
-    (await db.getAllAsync<{ file_name: string }>('SELECT file_name FROM diary_images')).map(
+    (await db.getAllAsync<{ file_name: string }>('SELECT file_name FROM diary_images UNION SELECT file_name FROM habit_record_images UNION SELECT file_name FROM sober_record_images')).map(
       (row) => row.file_name,
     ),
   );
@@ -96,7 +96,7 @@ export function discardDraftImages(images: DraftImage[]) {
 export const cleanupImages = (db: SQLiteDatabase, files: string[]) =>
   withWriteLock(async () => {
     for (const name of files) {
-      if (await db.getFirstAsync('SELECT id FROM diary_images WHERE file_name = ?', name)) continue;
+      if (await db.getFirstAsync('SELECT id FROM diary_images WHERE file_name = ? UNION SELECT id FROM habit_record_images WHERE file_name = ? UNION SELECT id FROM sober_record_images WHERE file_name = ?', name, name, name)) continue;
       try {
         const file = mediaFile(name);
         if (file.exists) file.delete();

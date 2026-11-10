@@ -17,9 +17,11 @@ export const getSoberById = (db: SQLiteDatabase, id: number) =>
   db.getFirstAsync<Sober>('SELECT * FROM sobers WHERE id = ?', id);
 export const getSoberRestarts = (db: SQLiteDatabase, soberId?: number) =>
   soberId === undefined
-    ? db.getAllAsync<SoberRestart>('SELECT * FROM sober_restarts ORDER BY restarted_at, id')
+    ? db.getAllAsync<SoberRestart>(
+        "SELECT id, sober_id, recorded_at AS restarted_at, text AS memo, created_at, updated_at, 'RESTART' AS type FROM sober_records WHERE is_restart = 1 ORDER BY recorded_at, id",
+      )
     : db.getAllAsync<SoberRestart>(
-        'SELECT * FROM sober_restarts WHERE sober_id = ? ORDER BY restarted_at, id',
+        "SELECT id, sober_id, recorded_at AS restarted_at, text AS memo, created_at, updated_at, 'RESTART' AS type FROM sober_records WHERE sober_id = ? AND is_restart = 1 ORDER BY recorded_at, id",
         soberId,
       );
 export const SOBER_MEMO_PAGE_SIZE = 20;
@@ -34,10 +36,10 @@ export async function getSoberMemoPage(
     throw new Error('메모 기록 조회 조건을 확인해주세요.');
   const comparison = sort === 'ASC' ? '>' : '<';
   const records = await db.getAllAsync<SoberRestart>(
-    `SELECT * FROM sober_restarts
-     WHERE sober_id = ?
-     ${cursor ? `AND (restarted_at ${comparison} ? OR (restarted_at = ? AND id ${comparison} ?))` : ''}
-     ORDER BY restarted_at ${sort}, id ${sort} LIMIT ?`,
+    `SELECT id, sober_id, recorded_at AS restarted_at, text AS memo, created_at, updated_at, 'RESTART' AS type FROM sober_records
+     WHERE sober_id = ? AND is_restart = 1
+     ${cursor ? `AND (recorded_at ${comparison} ? OR (recorded_at = ? AND id ${comparison} ?))` : ''}
+     ORDER BY recorded_at ${sort}, id ${sort} LIMIT ?`,
     soberId,
     ...(cursor ? [cursor.restarted_at, cursor.restarted_at, cursor.id] : []),
     SOBER_MEMO_PAGE_SIZE + 1,
@@ -61,9 +63,12 @@ export function sortSobers(
 ) {
   if (settings.soberSort === 'CUSTOM') {
     const order = new Map((settings.soberOrder ?? []).map((id, index) => [id, index]));
-    return [...sobers].sort((a, b) =>
-      (order.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.id) ?? Number.MAX_SAFE_INTEGER) ||
-      Date.parse(b.created_at) - Date.parse(a.created_at) || a.id - b.id,
+    return [...sobers].sort(
+      (a, b) =>
+        (order.get(a.id) ?? Number.MAX_SAFE_INTEGER) -
+          (order.get(b.id) ?? Number.MAX_SAFE_INTEGER) ||
+        Date.parse(b.created_at) - Date.parse(a.created_at) ||
+        a.id - b.id,
     );
   }
   const durations = new Map(
@@ -156,7 +161,7 @@ export function saveSoberRestart(db: SQLiteDatabase, input: SoberRestartInput, n
       const timestamp = new Date(now).toISOString();
       if (id) {
         const result = await db.runAsync(
-          'UPDATE sober_restarts SET restarted_at = ?, memo = ?, updated_at = ? WHERE id = ? AND sober_id = ?',
+          "UPDATE sober_records SET recorded_at = ?, text = ?, updated_at = ? WHERE id = ? AND sober_id = ? AND is_restart = 1",
           input.restarted_at,
           input.memo?.trim() || null,
           timestamp,
@@ -167,7 +172,7 @@ export function saveSoberRestart(db: SQLiteDatabase, input: SoberRestartInput, n
       } else
         id = (
           await db.runAsync(
-            'INSERT INTO sober_restarts (sober_id, restarted_at, memo, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
+            'INSERT INTO sober_records (sober_id, recorded_at, text, created_at, updated_at, is_restart) VALUES (?, ?, ?, ?, ?, 1)',
             input.sober_id,
             input.restarted_at,
             input.memo?.trim() || null,
@@ -181,5 +186,5 @@ export function saveSoberRestart(db: SQLiteDatabase, input: SoberRestartInput, n
 }
 export const deleteSoberRestart = (db: SQLiteDatabase, id: number, soberId: number) =>
   withRecordWriteLock(() =>
-    db.runAsync('DELETE FROM sober_restarts WHERE id = ? AND sober_id = ?', id, soberId),
+    db.runAsync('DELETE FROM sober_records WHERE id = ? AND sober_id = ?', id, soberId),
   );

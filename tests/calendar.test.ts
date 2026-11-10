@@ -7,6 +7,7 @@ import type { Completion, Habit } from '../src/db/types';
 const habit = (id: number, createdDate: string, priority = 0): Habit => ({
   id,
   name: `습관 ${id}`,
+  description: null,
   icon_key: 'goal',
   icon_color: 'blue',
   priority,

@@ -36,7 +36,7 @@ import { writeBackupArchive, type BackupSource } from '../src/backup/stream';
 const require = createRequire(import.meta.url);
 const ts = require('typescript');
 const photo = new Uint8Array([255, 216, 255, 7]);
-const tables = ['diaries', 'habits', 'habit_completions', 'sobers', 'sober_restarts', 'settings'];
+const tables = ['diaries', 'habits', 'habit_completions', 'sobers', 'sober_records', 'settings'];
 
 // Run the real restore coordinator with disk files and SQL; only native APIs are adapted.
 function restoreHarness(root: string, failCopyAt = 0) {

@@ -60,7 +60,7 @@ export async function createEncryptedBackup(
       const database = await db.serializeAsync();
       if (database.length > MAX_DATABASE_BYTES) throw new Error('BLOO_TOO_LARGE');
       const images = await db.getAllAsync<{ file_name: string }>(
-        'SELECT file_name FROM diary_images',
+        'SELECT file_name FROM diary_images UNION SELECT file_name FROM habit_record_images UNION SELECT file_name FROM sober_record_images',
       );
       let total = database.length;
       for (const image of images) {
@@ -328,9 +328,10 @@ export function restoreBackup(
         snapshot.closeAsync(),
       );
       const oldFiles = await db.getAllAsync<{ file_name: string }>(
-        'SELECT file_name FROM diary_images',
+        'SELECT file_name FROM diary_images UNION SELECT file_name FROM habit_record_images UNION SELECT file_name FROM sober_record_images',
       );
-      const mediaBytes = records.images.reduce(
+      const allImages = [...records.images, ...(records.activityImages ?? [])];
+      const mediaBytes = allImages.reduce(
         (size, image) => size + new File(staging, `media/${image.file_name}`).size,
         0,
       );
@@ -340,7 +341,7 @@ export function restoreBackup(
         );
       const names = new Map<string, string>();
       const prefix = `restore-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      for (const [index, image] of records.images.entries()) {
+      for (const [index, image] of allImages.entries()) {
         const name = `${prefix}-${index}.jpg`;
         const destination = mediaFile(name);
         created.push(name);

@@ -1,16 +1,13 @@
 import { DEFAULT_HABIT_ICON_COLOR, EMOTIONS } from '../domain/constants';
 import {
   DIARY_TEXT_MAX_LENGTH,
-  HABIT_NAME_MAX_LENGTH,
   DIARY_IMAGE_MAX_COUNT,
-  SOBER_NAME_MAX_LENGTH,
-  SOBER_DESCRIPTION_MAX_LENGTH,
   SOBER_MEMO_MAX_LENGTH,
   SOBER_MAX_GOAL_DAYS,
 } from '../domain/limits';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-export const SCHEMA_VERSION = 8;
+export const SCHEMA_VERSION = 13;
 const DIARY_COLUMNS = `
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   date TEXT NOT NULL UNIQUE CHECK(length(date) = 10),
@@ -19,14 +16,15 @@ const DIARY_COLUMNS = `
   created_at TEXT NOT NULL, updated_at TEXT NOT NULL`;
 const HABIT_COLUMNS = `
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL UNIQUE CHECK(length(trim(name)) BETWEEN 1 AND ${HABIT_NAME_MAX_LENGTH}),
+  name TEXT NOT NULL UNIQUE CHECK(length(trim(name)) BETWEEN 1 AND 30),
+  description TEXT CHECK(description IS NULL OR length(description) <= 100),
   priority INTEGER NOT NULL CHECK(priority BETWEEN 0 AND 3),
   icon_key TEXT NOT NULL, icon_color TEXT NOT NULL DEFAULT '${DEFAULT_HABIT_ICON_COLOR}', initial_started_at TEXT NOT NULL,
   created_at TEXT NOT NULL, updated_at TEXT NOT NULL`;
 const SOBER_COLUMNS = `
  id INTEGER PRIMARY KEY AUTOINCREMENT,
- name TEXT NOT NULL UNIQUE CHECK(length(trim(name)) BETWEEN 1 AND ${SOBER_NAME_MAX_LENGTH}),
- description TEXT CHECK(description IS NULL OR length(description) <= ${SOBER_DESCRIPTION_MAX_LENGTH}),
+ name TEXT NOT NULL UNIQUE CHECK(length(trim(name)) BETWEEN 1 AND 30),
+ description TEXT CHECK(description IS NULL OR length(description) <= 100),
  icon_key TEXT NOT NULL,
  icon_color TEXT NOT NULL DEFAULT '${DEFAULT_HABIT_ICON_COLOR}',
  is_priority INTEGER NOT NULL DEFAULT 0 CHECK(is_priority IN (0, 1)),
@@ -35,6 +33,31 @@ const SOBER_COLUMNS = `
  goal_days INTEGER,
  created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
  CHECK((goal_mode = 'AUTO' AND goal_days IS NULL) OR (goal_mode = 'MANUAL' AND goal_days IS NOT NULL AND goal_days BETWEEN 1 AND ${SOBER_MAX_GOAL_DAYS}))
+`;
+const RECORD_SCHEMA = `
+CREATE TABLE IF NOT EXISTS habit_memos (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ habit_id INTEGER NOT NULL REFERENCES habits(id) ON DELETE CASCADE,
+ recorded_at TEXT NOT NULL,
+ memo TEXT NOT NULL CHECK(length(trim(memo)) BETWEEN 1 AND 500),
+ created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS habit_memo_images (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ habit_memo_id INTEGER NOT NULL REFERENCES habit_memos(id) ON DELETE CASCADE,
+ file_name TEXT NOT NULL UNIQUE,
+ position INTEGER NOT NULL CHECK(position BETWEEN 0 AND 4),
+ UNIQUE(habit_memo_id, position)
+);
+CREATE TABLE IF NOT EXISTS sober_record_images (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ sober_record_id INTEGER NOT NULL REFERENCES sober_restarts(id) ON DELETE CASCADE,
+ file_name TEXT NOT NULL UNIQUE,
+ position INTEGER NOT NULL CHECK(position BETWEEN 0 AND 4),
+ UNIQUE(sober_record_id, position)
+);
+CREATE INDEX IF NOT EXISTS habit_memo_time ON habit_memos(habit_id, recorded_at, id);
+CREATE INDEX IF NOT EXISTS sober_record_type_time ON sober_restarts(sober_id, type, restarted_at, id);
 `;
 const SCHEMA = `
 CREATE TABLE diaries (${DIARY_COLUMNS}
@@ -61,6 +84,7 @@ CREATE TABLE sobers (${SOBER_COLUMNS}
 CREATE TABLE sober_restarts (
  id INTEGER PRIMARY KEY AUTOINCREMENT,
  sober_id INTEGER NOT NULL REFERENCES sobers(id) ON DELETE CASCADE,
+ type TEXT NOT NULL DEFAULT 'RESTART' CHECK(type IN ('MEMO', 'RESTART')),
  restarted_at TEXT NOT NULL,
  memo TEXT CHECK(memo IS NULL OR length(memo) <= ${SOBER_MEMO_MAX_LENGTH}),
  created_at TEXT NOT NULL, updated_at TEXT NOT NULL
@@ -75,7 +99,7 @@ export async function initializeDatabase(db: SQLiteDatabase) {
   const version =
     (await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version'))?.user_version ?? 0;
   if (version === SCHEMA_VERSION) return;
-  if (version !== 0 && version !== 5 && version !== 6 && version !== 7)
+  if (version !== 0 && version !== 5 && version !== 6 && version !== 7 && version !== 8 && version !== 9 && version !== 10 && version !== 11 && version !== 12)
     throw new Error('지원하지 않는 DB 버전입니다.');
   // Rebuild CHECK constraints while preserving ids, sequences and child records.
   // Disable foreign keys before BEGIN to prevent cascading photo/completion deletion.
@@ -85,8 +109,8 @@ export async function initializeDatabase(db: SQLiteDatabase) {
       if (version !== 0) {
         await db.execAsync(`
           CREATE TABLE habits_next (${HABIT_COLUMNS});
-          INSERT INTO habits_next (id, name, priority, icon_key, icon_color, initial_started_at, created_at, updated_at)
-            SELECT id, name, priority, icon_key, icon_color, initial_started_at, created_at, updated_at FROM habits;
+          INSERT INTO habits_next (id, name, description, priority, icon_key, icon_color, initial_started_at, created_at, updated_at)
+            SELECT id, name, ${version >= 9 ? 'description' : 'NULL'}, priority, icon_key, icon_color, initial_started_at, created_at, updated_at FROM habits;
           INSERT INTO sqlite_sequence(name, seq) SELECT 'habits_next', seq FROM sqlite_sequence WHERE name = 'habits' AND NOT EXISTS (SELECT 1 FROM sqlite_sequence WHERE name = 'habits_next');
           UPDATE sqlite_sequence SET seq = MAX(seq, COALESCE((SELECT seq FROM sqlite_sequence WHERE name = 'habits'), 0)) WHERE name = 'habits_next';
           DROP TABLE habits;
@@ -119,6 +143,30 @@ export async function initializeDatabase(db: SQLiteDatabase) {
       } else if ((await db.getAllAsync('PRAGMA foreign_key_check')).length) {
         throw new Error('기록의 연결을 확인하지 못했습니다.');
       }
+      const columns = await db.getAllAsync<{ name: string }>('PRAGMA table_info(sober_restarts)');
+      if (!columns.some((column) => column.name === 'type'))
+        await db.execAsync("ALTER TABLE sober_restarts ADD COLUMN type TEXT NOT NULL DEFAULT 'RESTART' CHECK(type IN ('MEMO', 'RESTART'));");
+      await db.execAsync(RECORD_SCHEMA);
+      await db.execAsync(`
+        ALTER TABLE habit_memos RENAME TO habit_records;
+        ALTER TABLE habit_records RENAME COLUMN memo TO text;
+        ALTER TABLE habit_memo_images RENAME TO habit_record_images;
+        ALTER TABLE habit_record_images RENAME COLUMN habit_memo_id TO habit_record_id;
+        DROP INDEX IF EXISTS habit_memo_time;
+        CREATE INDEX IF NOT EXISTS habit_record_time ON habit_records(habit_id, recorded_at, id);
+        ALTER TABLE sober_restarts RENAME TO sober_records;
+        DROP INDEX IF EXISTS sober_record_type_time;
+        DROP INDEX IF EXISTS sober_restart_time;
+        ALTER TABLE sober_records ADD COLUMN is_restart INTEGER NOT NULL DEFAULT 0 CHECK(is_restart IN (0, 1));
+        UPDATE sober_records SET is_restart = CASE WHEN type = 'RESTART' THEN 1 ELSE 0 END;
+        ALTER TABLE sober_records DROP COLUMN type;
+        ALTER TABLE sober_records RENAME COLUMN restarted_at TO recorded_at;
+        ALTER TABLE sober_records RENAME COLUMN memo TO text;
+        CREATE INDEX IF NOT EXISTS sober_record_time ON sober_records(sober_id, recorded_at);
+        CREATE INDEX sober_record_restart_time ON sober_records(sober_id, is_restart, recorded_at, id);
+      `);
+      if ((await db.getAllAsync('PRAGMA foreign_key_check')).length)
+        throw new Error('기록의 연결을 확인하지 못했습니다.');
       await db.execAsync(`PRAGMA user_version = ${SCHEMA_VERSION};`);
     });
   } finally {

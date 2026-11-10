@@ -24,6 +24,7 @@ async function legacyDatabase() {
         )
         .join(';') + '; PRAGMA user_version = 5; PRAGMA foreign_keys = ON;',
     );
+    await legacy.db.execAsync(`DROP TABLE habit_record_images; DROP TABLE sober_record_images; DROP TABLE habit_records; DROP INDEX sober_record_restart_time; ALTER TABLE sober_records DROP COLUMN is_restart; ALTER TABLE sober_records RENAME COLUMN recorded_at TO restarted_at; ALTER TABLE sober_records RENAME COLUMN text TO memo; ALTER TABLE sober_records RENAME TO sober_restarts;`);
     for (const priority of [0, 1, 2]) {
       const id = await saveHabit(legacy.db, {
         name: `습관 ${priority}`,

@@ -23,6 +23,7 @@ export interface DiaryDetail extends Diary {
 export interface Habit {
   id: number;
   name: string;
+  description: string | null;
   priority: number;
   icon_key: HabitIconKey;
   icon_color: HabitIconColorKey;
@@ -56,10 +57,23 @@ export interface Sober {
   updated_at: string;
 }
 export interface SoberRestart {
+  type?: 'MEMO' | 'RESTART';
   id: number;
   sober_id: number;
   restarted_at: string;
   memo: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface HabitMemo {
+  id: number;
+  habit_id: number;
+  recorded_at: string;
+  memo: string;
+  created_at: string;
+  updated_at: string;
+}
+export interface SoberRecord extends SoberRestart {
+  type: 'MEMO' | 'RESTART';
 }

@@ -179,17 +179,6 @@ export function SoberForm({ id }: { id?: number }) {
         </>
       }
     >
-      <View className="flex-row items-center justify-between gap-3">
-        <Text className={SECTION_TITLE_CLASS_NAME}>{t('sober.important')}</Text>
-        <Switch
-          accessibilityLabel={t('sober.important')}
-          disabled={mutation.isPending}
-          value={draft.is_priority === 1}
-          onValueChange={(value) => setDraft({ ...draft, is_priority: value ? 1 : 0 })}
-          trackColor={{ false: colors.border, true: colors.accent }}
-          thumbColor={colors.surface}
-        />
-      </View>
       <View className="gap-3">
         <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
           {t('sober.nameTitle')}
@@ -208,6 +197,41 @@ export function SoberForm({ id }: { id?: number }) {
           />
           <CharacterCount length={draft.name.length} maxLength={SOBER_NAME_MAX_LENGTH} />
         </View>
+      </View>
+      <View className="gap-3">
+        <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
+          {t('sober.descriptionTitle')} <Text className="text-base font-normal text-theme-text-tertiary">{t('sober.descriptionOptional')}</Text>
+        </Text>
+        <View className="gap-3 px-2">
+          <FormTextInput
+            accessibilityLabel={t('sober.descriptionLabel')}
+            value={draft.description ?? ''}
+            onChangeText={(description) => setDraft({ ...draft, description })}
+            editable={!mutation.isPending}
+            maxLength={SOBER_DESCRIPTION_MAX_LENGTH}
+            multiline
+            scrollEnabled
+            textAlignVertical="top"
+            placeholder={t('sober.descriptionPlaceholder')}
+            placeholderTextColor={colors.textTertiary}
+            className={`h-28 ${FORM_TEXT_INPUT_CLASS_NAME}`}
+          />
+          <CharacterCount
+            length={draft.description?.length ?? 0}
+            maxLength={SOBER_DESCRIPTION_MAX_LENGTH}
+          />
+        </View>
+      </View>
+      <View className="flex-row items-center justify-between gap-3">
+        <Text className={SECTION_TITLE_CLASS_NAME}>{t('sober.important')}</Text>
+        <Switch
+          accessibilityLabel={t('sober.important')}
+          disabled={mutation.isPending}
+          value={draft.is_priority === 1}
+          onValueChange={(value) => setDraft({ ...draft, is_priority: value ? 1 : 0 })}
+          trackColor={{ false: colors.border, true: colors.accent }}
+          thumbColor={colors.surface}
+        />
       </View>
       <View className="gap-3">
         <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
@@ -273,30 +297,6 @@ export function SoberForm({ id }: { id?: number }) {
           onPress={() => setPicker('date')}
         />
         <InfoNotice>{t('habit.startedNotice')}</InfoNotice>
-      </View>
-      <View className="gap-3">
-        <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
-          {t('sober.pledgeOptional')}
-        </Text>
-        <View className="gap-3 px-2">
-          <FormTextInput
-            accessibilityLabel={t('sober.pledge')}
-            value={draft.description ?? ''}
-            onChangeText={(description) => setDraft({ ...draft, description })}
-            editable={!mutation.isPending}
-            maxLength={SOBER_DESCRIPTION_MAX_LENGTH}
-            multiline
-            scrollEnabled
-            textAlignVertical="top"
-            placeholder={t('sober.pledgePlaceholder')}
-            placeholderTextColor={colors.textTertiary}
-            className={`h-28 ${FORM_TEXT_INPUT_CLASS_NAME}`}
-          />
-          <CharacterCount
-            length={draft.description?.length ?? 0}
-            maxLength={SOBER_DESCRIPTION_MAX_LENGTH}
-          />
-        </View>
       </View>
     </RecordFormLayout>
   );

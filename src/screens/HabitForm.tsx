@@ -8,6 +8,7 @@ import { TextInput, View } from 'react-native';
 import { BottomSheetPage } from '../components/bottom-sheet/BottomSheetPage';
 import { CharacterCount } from '../components/CharacterCount';
 import { DateTimePicker } from '../components/DateTimePicker';
+import { FormTextInput } from '../components/FormTextInput';
 import { FormPickerRow } from '../components/FormPickerRow';
 import { HeaderAction } from '../components/HeaderAction';
 import { HabitIcon } from '../components/HabitIcon';
@@ -43,6 +44,7 @@ export function HabitForm({ id }: { id?: number }) {
   const db = useSQLiteContext();
   const query = useQuery({ ...habitQueries.byId(db, id ?? 0), enabled: id !== undefined });
   const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [priority, setPriority] = useState(1);
   const [icon, setIcon] = useState<HabitIconKey>('goal');
   const [iconColor, setIconColor] = useState<HabitIconColorKey>(DEFAULT_HABIT_ICON_COLOR);
@@ -57,6 +59,7 @@ export function HabitForm({ id }: { id?: number }) {
     if (query.data && !loaded.current) {
       loaded.current = true;
       setName(query.data.name);
+      setDescription(query.data.description ?? '');
       setPriority(query.data.priority);
       setIcon(query.data.icon_key);
       setIconColor(query.data.icon_color);
@@ -68,6 +71,7 @@ export function HabitForm({ id }: { id?: number }) {
       saveHabit(db, {
         id,
         name,
+        description,
         priority,
         icon_key: icon,
         icon_color: iconColor,
@@ -189,7 +193,7 @@ export function HabitForm({ id }: { id?: number }) {
     >
       <View className="gap-3">
         <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
-          {t('habit.name')}
+          {t('habit.nameTitle')}
         </Text>
         <View className="gap-3 px-1">
           <TextInput
@@ -204,6 +208,15 @@ export function HabitForm({ id }: { id?: number }) {
             className={`min-h-12 ${FORM_TEXT_INPUT_CLASS_NAME}`}
           />
           <CharacterCount length={name.length} maxLength={HABIT_NAME_MAX_LENGTH} />
+        </View>
+      </View>
+      <View className="gap-3">
+        <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
+          {t('habit.descriptionTitle')} <Text className="text-base font-normal text-theme-text-tertiary">{t('habit.descriptionOptional')}</Text>
+        </Text>
+        <View className="gap-3 px-2">
+          <FormTextInput accessibilityLabel={t('habit.descriptionLabel')} value={description} onChangeText={setDescription} editable={!mutation.isPending} maxLength={50} multiline scrollEnabled textAlignVertical="top" placeholder={t('habit.descriptionPlaceholder')} placeholderTextColor={colors.textTertiary} className={`h-28 ${FORM_TEXT_INPUT_CLASS_NAME}`} />
+          <CharacterCount length={description.length} maxLength={50} />
         </View>
       </View>
       <View className="gap-3">

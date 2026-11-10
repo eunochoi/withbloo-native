@@ -159,6 +159,7 @@ const records: SoberStreak[] = Array.from({ length: 25 }, (_, index) => ({
 const habit: Habit = {
   id: 1,
   name: '걷기',
+  description: null,
   priority: 2,
   icon_key: 'walking',
   icon_color: 'theme',

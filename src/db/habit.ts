@@ -6,6 +6,7 @@ import {
   DEFAULT_HABIT_ICON_COLOR,
   MAX_HABIT_COUNT,
 } from '../domain/constants';
+import { HABIT_DESCRIPTION_MAX_LENGTH } from '../domain/limits';
 import { assertDate, assertDateTime, canCheckHabit, localDate } from '../domain/date';
 import type { Settings } from '../settings/model';
 import { withRecordWriteLock } from './index';
@@ -45,6 +46,7 @@ export function sortHabits<T extends Habit>(
 interface HabitInput {
   id?: number;
   name: string;
+  description?: string | null;
   priority: number;
   icon_key: Habit['icon_key'];
   icon_color?: Habit['icon_color'];
@@ -53,6 +55,8 @@ interface HabitInput {
 export function validateHabit(input: HabitInput, now = Date.now()) {
   if (!input.name.trim() || input.name.trim().length > HABIT_NAME_MAX_LENGTH)
     throw new Error(`습관 이름은 1~${HABIT_NAME_MAX_LENGTH}자로 입력해주세요.`);
+  if (input.description != null && (typeof input.description !== 'string' || input.description.length > HABIT_DESCRIPTION_MAX_LENGTH))
+    throw new Error(`설명은 ${HABIT_DESCRIPTION_MAX_LENGTH}자까지 입력해주세요.`);
   if (
     !Number.isInteger(input.priority) ||
     input.priority < 0 ||
@@ -82,8 +86,9 @@ export function saveHabit(db: SQLiteDatabase, input: HabitInput, now = Date.now(
         )
           throw new Error('시작 일시는 저장 후 변경할 수 없어요.');
         const result = await tx.runAsync(
-          'UPDATE habits SET name = ?, priority = ?, icon_key = ?, icon_color = ?, updated_at = ? WHERE id = ?',
+          'UPDATE habits SET name = ?, description = ?, priority = ?, icon_key = ?, icon_color = ?, updated_at = ? WHERE id = ?',
           name,
+          input.description === undefined ? habit.description : input.description?.trim() || null,
           input.priority,
           input.icon_key,
           input.icon_color ?? DEFAULT_HABIT_ICON_COLOR,
@@ -99,8 +104,9 @@ export function saveHabit(db: SQLiteDatabase, input: HabitInput, now = Date.now(
           throw new Error(`습관은 최대 ${MAX_HABIT_COUNT}개까지 만들 수 있습니다.`);
         id = (
           await tx.runAsync(
-            'INSERT INTO habits (name, priority, icon_key, icon_color, initial_started_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO habits (name, description, priority, icon_key, icon_color, initial_started_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             name,
+            input.description?.trim() || null,
             input.priority,
             input.icon_key,
             input.icon_color ?? DEFAULT_HABIT_ICON_COLOR,

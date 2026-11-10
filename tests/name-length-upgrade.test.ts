@@ -22,7 +22,15 @@ test('v7 upgrade expands name limits without losing records, links, or sequences
         .join(';') + '; PRAGMA user_version = 7; PRAGMA foreign_keys = ON;',
     );
     await source.db.execAsync(`
-      INSERT INTO habits VALUES (2, 'old habit', 1, 'goal', 'theme', '2024-01-01T00:00:00.000Z', '2024-01-01T00:00:00.000Z', '2024-01-01T00:00:00.000Z');
+      DROP TABLE habit_record_images;
+      DROP TABLE sober_record_images;
+      DROP TABLE habit_records;
+      DROP INDEX IF EXISTS sober_record_restart_time;
+      ALTER TABLE sober_records DROP COLUMN is_restart;
+      ALTER TABLE sober_records RENAME COLUMN recorded_at TO restarted_at;
+      ALTER TABLE sober_records RENAME COLUMN text TO memo;
+      ALTER TABLE sober_records RENAME TO sober_restarts;
+      INSERT INTO habits (id, name, priority, icon_key, icon_color, initial_started_at, created_at, updated_at) VALUES (2, 'old habit', 1, 'goal', 'theme', '2024-01-01T00:00:00.000Z', '2024-01-01T00:00:00.000Z', '2024-01-01T00:00:00.000Z');
       INSERT INTO habit_completions VALUES (2, '2024-01-02', '2024-01-02T00:00:00.000Z');
       INSERT INTO sobers VALUES (3, 'old sober', NULL, 'favorite', 'theme', 0, '2024-01-01T00:00:00.000Z', 'AUTO', NULL, '2024-01-01T00:00:00.000Z', '2024-01-01T00:00:00.000Z');
       INSERT INTO sober_restarts VALUES (4, 3, '2024-01-02T00:00:00.000Z', NULL, '2024-01-02T00:00:00.000Z', '2024-01-02T00:00:00.000Z');
@@ -30,7 +38,7 @@ test('v7 upgrade expands name limits without losing records, links, or sequences
     `);
     const backup = await readBackupDatabase(source.db, {});
     await replaceRecords(restored.db, backup, new Map());
-    assert.equal(rows(restored.raw, 'SELECT count(*) FROM sober_restarts')[0][0], 1);
+    assert.equal(rows(restored.raw, 'SELECT count(*) FROM sober_records')[0][0], 1);
     // The backup reader intentionally makes its connection read-only.
     const upgraded = await database(source.raw.export());
     try {
@@ -38,14 +46,14 @@ test('v7 upgrade expands name limits without losing records, links, or sequences
       assert.equal(rows(upgraded.raw, 'PRAGMA user_version')[0][0], SCHEMA_VERSION);
       assert.deepEqual(rows(upgraded.raw, 'PRAGMA foreign_key_check'), []);
       assert.equal(rows(upgraded.raw, 'SELECT count(*) FROM habit_completions')[0][0], 1);
-      assert.equal(rows(upgraded.raw, 'SELECT count(*) FROM sober_restarts')[0][0], 1);
+      assert.equal(rows(upgraded.raw, 'SELECT count(*) FROM sober_records')[0][0], 1);
       const habitId = await saveHabit(upgraded.db, {
-        name: 'h'.repeat(30),
+        name: 'h'.repeat(20),
         priority: 1,
         icon_key: 'goal',
       });
       const soberId = await saveSober(upgraded.db, {
-        name: 's'.repeat(30),
+        name: 's'.repeat(20),
         description: null,
         icon_key: 'favorite',
         icon_color: 'theme',
@@ -57,11 +65,11 @@ test('v7 upgrade expands name limits without losing records, links, or sequences
       assert.equal(habitId, 21);
       assert.equal(soberId, 21);
       await assert.rejects(
-        saveHabit(upgraded.db, { name: 'h'.repeat(31), priority: 1, icon_key: 'goal' }),
+        saveHabit(upgraded.db, { name: 'h'.repeat(21), priority: 1, icon_key: 'goal' }),
       );
       await assert.rejects(
         saveSober(upgraded.db, {
-          name: 's'.repeat(31),
+          name: 's'.repeat(21),
           description: null,
           icon_key: 'favorite',
           icon_color: 'theme',

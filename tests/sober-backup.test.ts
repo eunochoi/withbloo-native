@@ -108,7 +108,7 @@ test('Sober and restart with memo survive ZIP backup and atomic record replaceme
     ),
     [['야식 절제', '수면을 위해', 'coral', 1, 'MANUAL', 14]],
   );
-  assert.deepEqual(rows(target.raw, 'SELECT restarted_at, memo FROM sober_restarts'), [
+  assert.deepEqual(rows(target.raw, 'SELECT recorded_at, text FROM sober_records'), [
     ['2024-01-10T22:35:00.000Z', '생각 기록'],
   ]);
   assert.equal(rows(target.raw, 'PRAGMA foreign_key_check').length, 0);
@@ -169,13 +169,13 @@ test('invalid FK and old DB schema are rejected before restore; failed inserts r
     name: '원래 기록',
   });
   target.raw.exec(
-    "CREATE TRIGGER fail_restart BEFORE INSERT ON sober_restarts BEGIN SELECT RAISE(ABORT, 'simulated'); END;",
+    "CREATE TRIGGER fail_restart BEFORE INSERT ON sober_records BEGIN SELECT RAISE(ABORT, 'simulated'); END;",
   );
   await assert.rejects(replaceRecords(target.db, records, new Map()));
   assert.equal(rows(target.raw, 'SELECT name FROM sobers')[0][0], '원래 기록');
   assert.equal(rows(target.raw, 'SELECT id FROM sobers')[0][0], targetId);
   const broken = await database(source.files['took.db']);
-  broken.raw.exec('PRAGMA foreign_keys = OFF; UPDATE sober_restarts SET sober_id = 999;');
+  broken.raw.exec('PRAGMA foreign_keys = OFF; UPDATE sober_records SET sober_id = 999;');
   await assert.rejects(readBackupDatabase(broken.db, source.files), /연결/);
   const old = await database(source.files['took.db']);
   old.raw.exec('PRAGMA user_version = 2;');

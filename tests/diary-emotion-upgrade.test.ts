@@ -26,6 +26,15 @@ async function legacyDatabase(version: 5 | 6) {
         .join(';') + `; PRAGMA user_version = ${version}; PRAGMA foreign_keys = ON;`,
     );
     await legacy.db.execAsync(`
+      DROP TABLE habit_record_images;
+      DROP TABLE sober_record_images;
+      DROP TABLE habit_records;
+      DROP INDEX IF EXISTS sober_record_restart_time;
+      ALTER TABLE sober_records DROP COLUMN is_restart;
+      ALTER TABLE sober_records RENAME COLUMN recorded_at TO restarted_at;
+      ALTER TABLE sober_records RENAME COLUMN text TO memo;
+      ALTER TABLE sober_records RENAME TO sober_restarts;
+      ALTER TABLE habits DROP COLUMN description;
       INSERT INTO diaries VALUES (3, '2024-01-01', 9, '예전 무심 기록', '2024-01-01T00:00:00.000Z', '2024-01-01T00:00:00.000Z');
       INSERT INTO diary_images VALUES (5, 3, 'kept.jpg', 0);
       INSERT INTO diaries VALUES (41, '2024-01-02', 0, '삭제한 일기', '2024-01-02T00:00:00.000Z', '2024-01-02T00:00:00.000Z');
@@ -49,10 +58,11 @@ for (const version of [5, 6] as const) {
         /CHECK/,
       );
       const tables = ['diaries', 'diary_images', 'habits', 'habit_completions', 'settings'];
-      const before = tables.map((table) => rows(raw, `SELECT * FROM ${table}`));
+      const readTable = (table: string) => rows(raw, `SELECT ${table === 'habits' ? 'id, name, priority, icon_key, icon_color, initial_started_at, created_at, updated_at' : '*'} FROM ${table}`);
+      const before = tables.map(readTable);
       await initializeDatabase(db);
       assert.deepEqual(
-        tables.map((table) => rows(raw, `SELECT * FROM ${table}`)),
+        tables.map(readTable),
         before,
       );
       assert.equal(rows(raw, 'PRAGMA user_version')[0][0], SCHEMA_VERSION);

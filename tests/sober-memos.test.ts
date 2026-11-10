@@ -67,7 +67,7 @@ test('memo cursor pages keep timestamp ties, include empty memos and isolate eac
     }
     const first = await getSoberMemoPage(db, id, 'DESC');
     // Removing an already loaded row must not shift the next page and skip a memo.
-    await db.runAsync('DELETE FROM sober_restarts WHERE id = ?', first.records[0].id);
+    await db.runAsync('DELETE FROM sober_records WHERE id = ?', first.records[0].id);
     const second = await getSoberMemoPage(db, id, 'DESC', first.nextCursor);
     assert.deepEqual(
       second.records.map((row) => row.id),
