@@ -124,7 +124,7 @@ export default function SoberMemos() {
                           {formatDisplayDate(item.date, formatLocale, 'long')}
                         </Text>
                       )}
-                      <SoberRestartCard record={item.record} pending={pending} onMenu={onMenu} emptyMemoLabel={t('sober.emptyRestartMemo')} />
+                      <SoberRestartCard record={item.record} pending={pending} onMenu={onMenu} />
                     </View>
                   );
                 },

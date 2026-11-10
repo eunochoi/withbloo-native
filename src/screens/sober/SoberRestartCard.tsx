@@ -10,12 +10,10 @@ export function SoberRestartCard({
   record,
   pending = false,
   onMenu,
-  emptyMemoLabel,
 }: {
   record: SoberRestart;
   pending?: boolean;
   onMenu?: (record: SoberRestart) => void;
-  emptyMemoLabel?: string;
 }) {
   const { t } = useI18n();
 
@@ -34,8 +32,8 @@ export function SoberRestartCard({
           />
         )}
       </View>
-      {(record.memo || emptyMemoLabel) && (
-        <Text className={MUTED_DESCRIPTION_CLASS_NAME}>{record.memo || emptyMemoLabel}</Text>
+      {!!record.memo && (
+        <Text className={MUTED_DESCRIPTION_CLASS_NAME}>{record.memo}</Text>
       )}
     </View>
   );

@@ -150,6 +150,14 @@ test('record cards place card-ratio photos before the memo', () => {
 });
 
 
+test('a restart without a memo shows its photo without a placeholder', () => {
+  const ui = scenario('sober', { mode: 'day', date: '2024-01-10' });
+  Object.assign(ui.records[1], { images: [{ id: 1, file_name: 'photo.jpg' }] });
+  const cards = nodes(ui.render()).filter((node) => node.type === 'View' && node.props.className?.includes('rounded-2xl border border-theme-border/50 p-4'));
+  const restart = nodes(cards[1]);
+  assert(restart.some((node) => node.type === 'DiaryGallery'));
+  assert(!restart.some((node) => node.type === 'Text' && node.props.className === 'text-sm leading-relaxed text-theme-text-secondary'));
+});
 function nodes(tree: any): any[] {
   if (!tree || typeof tree !== 'object') return [];
   if (Array.isArray(tree)) return tree.flatMap(nodes);

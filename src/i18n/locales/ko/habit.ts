@@ -173,7 +173,6 @@ export const habitKo = {
   latestFirst: '최신순',
   oldestFirst: '과거순',
   hasMemo: ', 기록 있음',
-  restartWithoutMemo: '내용 없이 다시 시작했어요.',
   recordActionHint: '기록을 선택한 방식으로 관리해요.',
   restartAddHint: '선택한 시각부터 거리두기를 다시 계산해요.',
   memoAddHint: '생각과 마음을 기록으로 남겨요.',

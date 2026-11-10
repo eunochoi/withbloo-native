@@ -176,7 +176,6 @@ export const habitEn = {
   latestFirst: 'Newest first',
   oldestFirst: 'Oldest first',
   hasMemo: ', has record',
-  restartWithoutMemo: 'Restarted without text.',
   recordActionHint: 'Manage your record.',
   restartAddHint: 'Recalculate Cut Back from the selected time.',
   memoAddHint: 'Record your thoughts and feelings.',

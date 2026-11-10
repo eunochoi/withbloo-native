@@ -86,7 +86,6 @@ export const soberEn = {
   daysTitle: 'Enter goal days',
   goalInput: 'Custom goal days',
   daysUnit: 'days',
-  emptyRestartMemo: 'Restarted without a note.',
   notesLoading: 'Loading records',
   notesFailed: 'Could not load records.',
   notesEmpty: 'No restart records yet.',

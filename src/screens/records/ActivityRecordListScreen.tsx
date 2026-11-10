@@ -186,7 +186,7 @@ export function ActivityRecordListScreen({ scope }: { scope: RecordScope }) {
                     />
                   </View>
                   {!!record.images?.length && <DiaryGallery images={record.images} detail cardAspect />}
-                  <Text className="text-sm leading-relaxed text-theme-text-secondary">{record.memo || t('habit.restartWithoutMemo')}</Text>
+                  {!!record.memo && <Text className="text-sm leading-relaxed text-theme-text-secondary">{record.memo}</Text>}
                 </View>
               </View>
             ))}

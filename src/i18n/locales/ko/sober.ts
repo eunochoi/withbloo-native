@@ -86,7 +86,6 @@ export const soberKo = {
   daysTitle: '목표 일수 입력',
   goalInput: '직접 목표 일수',
   daysUnit: '일',
-  emptyRestartMemo: '내용 없이 다시 시작했어요.',
   notesLoading: '다시 시작 기록 불러오는 중',
   notesFailed: '다시 시작 기록을 불러오지 못했어요.',
   notesEmpty: '아직 다시 시작한 기록이 없어요.',
