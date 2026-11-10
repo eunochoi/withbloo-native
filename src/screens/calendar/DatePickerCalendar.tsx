@@ -3,7 +3,8 @@ import { useMemo } from 'react';
 import { View } from 'react-native';
 import { AppIcon } from '../../components/AppIcon';
 import { SoberIcon } from '../../components/SoberIcon';
-import type { Sober } from '../../db/types';
+import { HabitIcon } from '../../components/HabitIcon';
+import type { Habit, Sober } from '../../db/types';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 import { calendarDays } from '../../domain/calendar';
 import { useMonthSwipe } from '../../hooks/useMonthSwipe';
@@ -20,6 +21,7 @@ export function DatePickerCalendar({
   compact = false,
   diaryDates,
   soberRecords,
+  habitRecords,
   onMonthChange,
   onSelect,
 }: {
@@ -29,6 +31,7 @@ export function DatePickerCalendar({
   minDate?: string;
   compact?: boolean;
   diaryDates?: readonly string[];
+  habitRecords?: { dates: readonly string[]; iconKey: Habit['icon_key']; iconColor: Habit['icon_color'] };
   soberRecords?: {
     dates: readonly string[];
     iconKey: Sober['icon_key'];
@@ -42,12 +45,13 @@ export function DatePickerCalendar({
   const { colors, iconSizes } = useAppTheme();
   const recorded = useMemo(() => new Set(diaryDates), [diaryDates]);
   const restarted = useMemo(() => new Set(soberRecords?.dates), [soberRecords?.dates]);
+  const completed = useMemo(() => new Set(habitRecords?.dates), [habitRecords?.dates]);
   const days = useMemo(() => calendarDays(month), [month]);
   const navigation = useCalendarNavigation(month, onMonthChange, minDate, today);
   const swipe = useMonthSwipe(navigation.changeMonth);
   return (
     <View className="gap-4">
-      <CalendarHeader month={month} today={today} navigation={navigation} centerTitle />
+      <CalendarHeader month={month} today={today} navigation={navigation} onTodayPress={() => { onMonthChange(today.slice(0, 7)); onSelect(today); }} />
       <CalendarGrid
         {...swipe.panHandlers}
         accessibilityLabel={t('calendar.datePickerLabel', { value: month })}
@@ -56,6 +60,7 @@ export function DatePickerCalendar({
           const unavailable = !navigation.isDateAvailable(date);
           const hasDiary = date.slice(0, 7) === month && !unavailable && recorded.has(date);
           const hasRestart = date.slice(0, 7) === month && !unavailable && restarted.has(date);
+          const hasHabit = date.slice(0, 7) === month && !unavailable && completed.has(date);
           const isSelected = date === selected && date.slice(0, 7) === month && !unavailable;
           return (
             <CalendarDay
@@ -78,9 +83,9 @@ export function DatePickerCalendar({
               onSelect={onSelect}
               className={compact ? 'aspect-auto h-10' : undefined}
               contentClassName={isSelected ? 'rounded-full bg-theme-accent' : undefined}
-              textClassName={isSelected ? 'text-theme-surface' : undefined}
+              textClassName={isSelected ? 'text-theme-text-on-accent' : undefined}
             >
-              {hasDiary || (hasRestart && soberRecords) ? (
+              {hasDiary || (hasRestart && soberRecords) || (hasHabit && habitRecords) ? (
                 <View
                   className={`w-3/5 aspect-square items-center justify-center ${isSelected ? 'rounded-full bg-theme-accent' : ''}`}
                 >
@@ -88,12 +93,15 @@ export function DatePickerCalendar({
                     <AppIcon
                       name="diary"
                       size={iconSizes.lg}
-                      color={isSelected ? colors.surface : colors.accent}
+                      color={isSelected ? colors.textOnAccent : colors.accent}
                     />
+                  ) : hasHabit && habitRecords ? (
+                    <HabitIcon name={habitRecords.iconKey} colorKey={habitRecords.iconColor} colorOverride={isSelected ? colors.textOnAccent : undefined} size={iconSizes.lg} />
                   ) : soberRecords ? (
                     <SoberIcon
                       name={soberRecords.iconKey}
                       colorKey={soberRecords.iconColor}
+                      colorOverride={isSelected ? colors.textOnAccent : undefined}
                       size={iconSizes.lg}
                     />
                   ) : null}

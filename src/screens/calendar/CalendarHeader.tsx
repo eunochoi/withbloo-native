@@ -11,14 +11,12 @@ export function CalendarHeader({
   today,
   navigation,
   onTodayPress,
-  centerTitle = false,
   detail = false,
 }: {
   month: string;
   today: string;
   navigation: ReturnType<typeof useCalendarNavigation>;
   onTodayPress?: () => void;
-  centerTitle?: boolean;
   detail?: boolean;
 }) {
   const { t, formatLocale } = useI18n();
@@ -46,13 +44,12 @@ export function CalendarHeader({
   });
   return (
     <View className="h-10 flex-row items-center justify-between">
-      {centerTitle && arrows[0]}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={t('calendar.monthToday', { value: month })}
         disabled={!todayAvailable}
         onPress={() => navigation.changeToMonth(today.slice(0, 7))}
-        className={`flex-1 justify-center ${centerTitle ? 'items-center' : 'items-start'}`}
+        className="flex-1 justify-center items-start"
       >
         <Text
           accessibilityRole="header"
@@ -61,29 +58,25 @@ export function CalendarHeader({
           {formatDisplayDate(`${month}-01`, formatLocale, 'month')}
         </Text>
       </Pressable>
-      {centerTitle ? (
-        arrows[1]
-      ) : (
-        <View className="flex-row items-center -mr-2">
-          {arrows[0]}
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('calendar.goToday')}
-            accessibilityHint={t('calendar.goTodayHint')}
-            accessibilityState={{ disabled: !todayAvailable }}
-            disabled={!todayAvailable}
-            onPress={() => {
-              if (!todayAvailable) return;
-              if (onTodayPress) onTodayPress();
-              else navigation.changeToMonth(today.slice(0, 7));
-            }}
-            className={`h-10 w-10 items-center justify-center ios:curve-continuous rounded-xl ${todayAvailable ? 'opacity-100' : 'opacity-30'}`}
-          >
-            <AppIcon name="today" size={appRem * 1.1} color={colors.tertiary} />
-          </Pressable>
-          {arrows[1]}
-        </View>
-      )}
+      <View className="flex-row items-center -mr-2">
+        {arrows[0]}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('calendar.goToday')}
+          accessibilityHint={t('calendar.goTodayHint')}
+          accessibilityState={{ disabled: !todayAvailable }}
+          disabled={!todayAvailable}
+          onPress={() => {
+            if (!todayAvailable) return;
+            if (onTodayPress) onTodayPress();
+            else navigation.changeToMonth(today.slice(0, 7));
+          }}
+          className={`h-10 w-10 items-center justify-center ios:curve-continuous rounded-xl ${todayAvailable ? 'opacity-100' : 'opacity-30'}`}
+        >
+          <AppIcon name="today" size={appRem * 1.1} color={colors.tertiary} />
+        </Pressable>
+        {arrows[1]}
+      </View>
     </View>
   );
 }

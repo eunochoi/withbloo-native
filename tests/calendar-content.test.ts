@@ -524,7 +524,7 @@ test('date picker owns its min/future range and highlights selection without sha
     onSelect: (date: string) => selected.push(date),
   });
   const header = nodes(tree).find((node) => node.type === 'CalendarHeader');
-  assert.equal(header.props.centerTitle, true);
+  assert.ok(header);
   for (const item of nodes(tree).filter((node) => node.type === 'CalendarDay')) {
     assert.equal(item.props.showTodayIndicator, false);
     assert.equal(item.props.showSelectedIndicator, false);
@@ -544,7 +544,7 @@ test('date picker owns its min/future range and highlights selection without sha
   );
   assert.equal(
     nodes(rendered).find((node) => node.type === 'Text').props.className,
-    'text-xs text-theme-surface',
+    'text-xs text-theme-text-on-accent',
   );
   assert(!nodes(rendered).some((node) => node.props.className?.includes('absolute -bottom-0.5')));
   const today = CalendarDay(cell(tree, day.today).props);
@@ -602,7 +602,7 @@ test('date picker highlights today and weekend selections in regular and compact
         const rendered = CalendarDay(highlighted[0].props);
         assert.equal(
           nodes(rendered).find((node) => node.type === 'Text').props.className,
-          'text-xs text-theme-surface',
+          'text-xs text-theme-text-on-accent',
         );
       }
     }
