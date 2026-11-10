@@ -1,39 +1,35 @@
-import type { itemAccentColors } from '../../theme/colors';
 import { useI18n } from '../../i18n/react';
 import { useMemo } from 'react';
 import { View } from 'react-native';
 import { Text } from '../../components/Text';
-import { InfoNotice } from '../../components/InfoNotice';
 import { HabitIcon } from '../../components/HabitIcon';
 import type { Habit } from '../../db/types';
 import { calendarDays } from '../../domain/calendar';
 import { localDate } from '../../domain/date';
-import type { getHabitMonthSummary } from '../../domain/habitStats';
 import { useCalendarNavigation } from '../../hooks/useCalendarNavigation';
 import { useMonthSwipe } from '../../hooks/useMonthSwipe';
 import { CalendarDay } from '../calendar/CalendarDay';
 import { CalendarGrid } from '../calendar/CalendarGrid';
 import { CalendarHeader } from '../calendar/CalendarHeader';
-import { HabitStatisticsSummary } from './HabitStatisticsSummary';
 
 export function HabitMonthStatistics({
   habit,
   dates,
+  memoDates = [],
+  onSelectDate,
   month,
   onMonthChange,
   today,
-  summary,
   unavailable,
-  accent,
 }: {
   habit: Habit;
   dates: string[];
+  memoDates?: string[];
+  onSelectDate?: (date: string) => void;
   month: string;
   onMonthChange: (month: string) => void;
   today: string;
-  summary: ReturnType<typeof getHabitMonthSummary>;
   unavailable: boolean;
-  accent?: ReturnType<typeof itemAccentColors>;
 }) {
   const { t } = useI18n();
 
@@ -54,60 +50,6 @@ export function HabitMonthStatistics({
       </View>
       <View className="px-1 gap-4">
         <CalendarHeader detail month={month} today={today} navigation={navigation} />
-        <HabitStatisticsSummary
-          accent={accent}
-          stats={
-            habit.priority === 0
-              ? [
-                  {
-                    label: t('habit.recordCount'),
-                    icon: 'check',
-                    value: summary.completed,
-                    unit: t('habit.timesUnit', { count: summary.completed }),
-                  },
-                  {
-                    label: t('habit.averageInterval'),
-                    icon: 'date',
-                    value:
-                      summary.averageInterval === null
-                        ? '—'
-                        : Number(summary.averageInterval.toFixed(1)),
-                    unit:
-                      unavailable || summary.averageInterval === null
-                        ? ''
-                        : t('habit.daysUnit', {
-                            count: Number(summary.averageInterval.toFixed(1)),
-                          }),
-                  },
-                ]
-              : [
-                  {
-                    label: t('habit.completionCount'),
-                    icon: 'check',
-                    value: summary.completed,
-                    unit: t('habit.timesUnit', { count: summary.completed }),
-                  },
-                  {
-                    label: t('habit.missedCount'),
-                    icon: 'close',
-                    value: summary.missed,
-                    unit: t('habit.timesUnit', { count: summary.missed }),
-                  },
-                  {
-                    label: t('habit.rate'),
-                    icon: 'habit-rate',
-                    value: summary.rate ?? '—',
-                    unit: '%',
-                  },
-                ]
-          }
-          unavailable={unavailable}
-        />
-        {habit.priority === 0 && (
-          <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
-            {t('habit.intervalNotice')}
-          </InfoNotice>
-        )}
         <View>
           <CalendarGrid
             {...swipe.panHandlers}
@@ -125,9 +67,11 @@ export function HabitMonthStatistics({
                   month={month}
                   today={today}
                   onMonthChange={navigation.changeToMonth}
-                  disabled={!outside || !available}
+                  disabled={unavailable || !available || (!outside && !onSelectDate)}
+                  hasMemo={!unavailable && available && memoDates.includes(date)}
+                  onSelect={onSelectDate}
                   dimmed={!available}
-                  label={`${date}${completed ? t('habit.hasRecord') : ''}${empty ? t('habit.noRecord') : ''}`}
+                  label={`${date}${completed ? t('habit.hasRecord') : ''}${empty ? t('habit.noRecord') : ''}${memoDates.includes(date) ? t('habit.hasMemo') : ''}`}
                   textClassName="font-medium"
                 >
                   {completed ? (

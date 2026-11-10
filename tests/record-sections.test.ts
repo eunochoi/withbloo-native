@@ -88,7 +88,7 @@ function section(path: string, name: string, initialProps: Record<string, unknow
         if (dependency.endsWith('/AnalysisSubtitle')) return { AnalysisSubtitle: 'AnalysisSubtitle' };
         if (dependency.endsWith('/ScrollableName')) return { ScrollableName: 'Text' };
         const habitPart = dependency.split('/').at(-1)!;
-        if (['HabitStatisticsSummary', 'HabitYearHeader', 'HabitYearChart'].includes(habitPart)) {
+        if (['HabitYearHeader', 'HabitYearChart'].includes(habitPart)) {
           const child = section(`src/screens/habit/${habitPart}.tsx`, habitPart, {});
           return {
             [habitPart]: (childProps: Record<string, unknown>) => {
@@ -98,8 +98,8 @@ function section(path: string, name: string, initialProps: Record<string, unknow
             },
           };
         }
-        if (dependency.endsWith('/HabitRecentRecord'))
-          return { HabitRecentRecord: 'HabitRecentRecord' };
+        if (dependency.endsWith('/SoberInfoCarousel'))
+          return { SoberInfoCarousel: 'SoberInfoCarousel' };
         if (dependency.endsWith('/HabitStars')) return { HabitStars: 'HabitStars' };
         if (dependency.endsWith('/HabitYearStatistics'))
           return { HabitYearStatistics: 'HabitYearStatistics' };
@@ -407,11 +407,11 @@ test('monthly and yearly statistics cache their calculations and navigate indepe
     yearlyProps,
   );
   yearUi.render();
-  assert.deepEqual(ui.calls, { month: 1, year: 0, calendar: 0 });
+  assert.deepEqual(ui.calls, { month: 0, year: 0, calendar: 0 });
   assert.deepEqual(yearUi.calls, { month: 0, year: 1, calendar: 0 });
   ui.render({ unavailable: true });
   yearUi.render({ unavailable: true });
-  assert.equal(ui.calls.month, 1);
+  assert.equal(ui.calls.month, 0);
   assert.equal(yearUi.calls.year, 1);
   yearUi
     .render()
@@ -419,11 +419,11 @@ test('monthly and yearly statistics cache their calculations and navigate indepe
     .props.onPress();
   yearUi.render();
   assert.equal(yearUi.calls.year, 2);
-  assert.equal(ui.calls.month, 1);
+  assert.equal(ui.calls.month, 0);
   const updated = ui.render().nodes;
   updated.find((node) => node.type === 'HabitMonthStatistics').props.onMonthChange('2024-02');
   ui.render();
-  assert.equal(ui.calls.month, 2);
+  assert.equal(ui.calls.month, 0);
   yearUi.render();
   assert.equal(yearUi.calls.year, 2);
 });
@@ -450,7 +450,7 @@ test('habit statistics refresh replacement records while every date remains read
     currentNodes.filter(
       (node) => node.props.className === 'w-full px-1 text-center text-theme-text-primary font-bold text-lg',
     ).length,
-    3,
+    0,
   );
   for (const date of ['2024-03-06', '2024-03-10', '2024-03-11']) {
     const cell = dayProps(currentNodes, date);
@@ -469,9 +469,9 @@ test('habit statistics refresh replacement records while every date remains read
   assert.equal(checked.contentClassName, undefined);
   assert.equal(checked.textClassName, 'font-medium');
   assert.equal(checked.label, '2024-03-10, 완료 기록 있음');
-  assert.deepEqual(ui.calls, { month: 2, year: 0, calendar: 0 });
+  assert.deepEqual(ui.calls, { month: 0, year: 0, calendar: 0 });
   ui.render({ today: '2024-03-11' });
-  assert.deepEqual(ui.calls, { month: 3, year: 0, calendar: 0 });
+  assert.deepEqual(ui.calls, { month: 0, year: 0, calendar: 0 });
 });
 
 test('yearly statistics refresh records, return to this year and preserve disabled year boundaries', () => {
@@ -484,10 +484,6 @@ test('yearly statistics refresh records, return to this year and preserve disabl
   ui.render();
   const updated = ui.render({ dates: ['2024-03-07', '2024-03-10'] }).nodes;
   assert.equal(ui.calls.year, 2);
-  const completed = updated.find(
-    (node) => node.props.className === 'w-full px-1 text-center text-theme-text-primary font-bold text-lg',
-  );
-  assert.equal(completed.props.children[0], 2);
   const bars = updated.filter(
     (node) => node.type === 'View' && typeof node.props.style?.height === 'number',
   );
@@ -585,50 +581,7 @@ test('year navigation includes start and current years and blocks requests outsi
   assert.deepEqual(changes, [2024, 2023, 2025]);
 });
 
-test('yearly habit summary uses monthly label order and refreshes missed counts when today changes', () => {
-  const ui = section('src/screens/habit/HabitYearStatistics.tsx', 'HabitYearStatistics', {
-    dates: ['2024-03-07', '2024-03-10'],
-    startedDate: '2023-03-01',
-    today: '2024-03-10',
-    unavailable: false,
-  });
-  const view = ui.render().nodes;
-  assert.deepEqual(
-    view
-      .filter((node) => node.props.className === 'w-full px-1 text-center text-theme-text-secondary text-sm')
-      .map((node) => node.props.children),
-    ['실천 횟수', '놓친 횟수', '실천율'],
-  );
-  const values = (nodes: any[]) =>
-    nodes
-      .filter(
-        (node) =>
-          node.props.className === 'w-full px-1 text-center text-theme-text-primary font-bold text-lg',
-      )
-      .map((node) => node.props.children[0]);
-  assert.deepEqual(values(view), [2, 68, '2.9']);
-  assert.deepEqual(values(ui.render({ today: '2024-03-12' }).nodes), [2, 70, '2.8']);
-  assert.equal(ui.calls.year, 2);
-  assert.deepEqual(values(ui.render({ unavailable: true }).nodes), ['—', '—', '—']);
-});
-
-test('yearly habit rate displays a dash when the habit has not started yet', () => {
-  const ui = section('src/screens/habit/HabitYearStatistics.tsx', 'HabitYearStatistics', {
-    dates: [],
-    startedDate: '2024-03-21',
-    today: '2024-03-20',
-    unavailable: false,
-  });
-  const values = ui
-    .render()
-    .nodes.filter(
-      (node) => node.props.className === 'w-full px-1 text-center text-theme-text-primary font-bold text-lg',
-    )
-    .map((node) => node.props.children[0]);
-  assert.deepEqual(values, [0, 0, '—']);
-});
-
-test('excluded habit detail retains the calendar and recent record but hides yearly statistics', () => {
+test('excluded habit detail retains the calendar but hides yearly statistics', () => {
   const ui = section('src/screens/habit/HabitStatistics.tsx', 'HabitStatistics', {
     habit: { ...habit, priority: 0 },
     dates: ['2024-03-09'],
@@ -636,22 +589,19 @@ test('excluded habit detail retains the calendar and recent record but hides yea
     unavailable: false,
   });
   const view = ui.render();
-  assert(view.nodes.some((node) => node.type === 'HabitRecentRecord'));
+  assert(view.nodes.some((node) => node.type === 'HabitMonthStatistics'));
+  assert(!view.nodes.some((node) => node.type === 'HabitRecentRecord'));
   assert(!view.nodes.some((node) => node.type === 'HabitYearStatistics'));
 });
 
-test('recent record uses the latest eligible date and distinguishes missing data from empty history', () => {
-  const ui = section('src/screens/habit/HabitRecentRecord.tsx', 'HabitRecentRecord', {
+test('habit carousel shows the latest eligible record and handles unavailable data', () => {
+  const ui = section('src/screens/habit/HabitInfoCarousel.tsx', 'HabitInfoCarousel', {
+    habit: { ...habit, priority: 0, initial_started_at: '2024-03-01T00:00:00.000Z' },
     dates: ['2024-03-08', '2024-03-09', '2024-03-11', '2024-02-29'],
-    startedDate: '2024-03-01',
-    today: '2024-03-10',
-    unavailable: false,
+    today: '2024-03-10', unavailable: false, color: '#123456',
   });
-  assert(ui.render().nodes.some((node) => node.props.children === '2024년 3월 9일 · 1일 전'));
+  assert(ui.render().nodes.some((node) => node.props.children === '24년 3월 9일'));
+  assert(ui.render().nodes.some((node) => node.props.children === '1일 전'));
   assert(ui.render({ unavailable: true }).nodes.some((node) => node.props.children === '—'));
-  assert(
-    ui
-      .render({ unavailable: false, dates: [] })
-      .nodes.some((node) => node.props.children === '아직 기록이 없어요.'),
-  );
+  assert(ui.render({ unavailable: false, dates: [] }).nodes.some((node) => node.props.children === '아직 기록이 없어요.'));
 });

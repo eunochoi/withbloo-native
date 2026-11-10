@@ -691,7 +691,8 @@ test('habit start and future boundaries block adjacent cells and share guarded m
   assert.equal(cell(current, '2026-10-05').props.contentClassName, undefined);
 });
 
-test('habit detail only queries completion records and exposes no write action to its statistics', () => {
+test('habit detail opens timed records without exposing completion mutations to its statistics', () => {
+  const opens: any[] = [];
   const habit = {
     id: 1,
     name: '독서',
@@ -701,6 +702,7 @@ test('habit detail only queries completion records and exposes no write action t
     initial_started_at: '2026-10-01T00:00:00.000Z',
   };
   const { default: HabitDetail } = load('app/habit/[id]/index.tsx', {
+    '../../../src/navigation/ModalNavigationProvider': { useModalNavigation: () => ({ openModal: (href: unknown) => opens.push(href) }) },
     'expo-router': {
       useLocalSearchParams: () => ({ id: '1' }),
       useRouter: () => ({ dismissTo() {} }),
@@ -722,11 +724,18 @@ test('habit detail only queries completion records and exposes no write action t
       }),
     },
   });
-  const stats = nodes(HabitDetail()).find((node) => node.type === 'HabitStatistics');
+  const detail = nodes(HabitDetail());
+  const progress = detail.find((node) => node.type === 'ProgressBar');
+  assert.equal(progress.props.value, 14.3);
+  const stats = detail.find((node) => node.type === 'HabitStatistics');
   assert.deepEqual(Array.from(stats.props.dates), ['2026-10-06']);
   assert.equal(stats.props.onToggle, undefined);
   assert.equal(stats.props.disabled, undefined);
   assert.equal(stats.props.unavailable, false);
+  stats.props.onSelectDate('2026-10-06');
+  assert.equal(opens[0].pathname, '/habit/[id]/records');
+  assert.equal(opens[0].params.date, '2026-10-06');
+  assert.equal(opens[0].params.mode, 'day');
 });
 
 test('calendar preserves date cell identity and decoration sizing across record changes', () => {
@@ -924,61 +933,23 @@ test('monthly toolbar shows zero for unavailable records', () => {
   );
 });
 
-test('irregular monthly summary shows record count and rounded interval without achievement stats', () => {
+test('monthly habit calendar does not render duplicate statistics', () => {
   const { HabitMonthStatistics } = load('src/screens/habit/HabitMonthStatistics.tsx');
-  const props = {
-    habit: {
-      priority: 0,
-      initial_started_at: '2026-09-01T00:00:00.000Z',
-      icon_key: 'goal',
-      icon_color: 'theme',
-    },
-    month: '2026-09',
-    today: '2026-10-07',
-    dates: [],
-    summary: { completed: 4, missed: 26, rate: '13.3', averageInterval: 10 / 3 },
-    unavailable: false,
-    onMonthChange: () => {},
-  };
-  const tree = HabitMonthStatistics(props);
-  const stats = nodes(tree).find((node) => node.type === 'HabitStatisticsSummary').props.stats;
-  assert.deepEqual(
-    Array.from(stats, (stat: any) => stat.label),
-    ['기록 횟수', '평균 기록 주기'],
-  );
-  assert.equal(stats[1].value, 3.3);
-  assert.equal(stats[1].unit, '일');
-  assert(
-    nodes(tree).some(
-      (node) =>
-        node.type === 'InfoNotice' &&
-        node.props.children === '습관 시작일을 반영한 월간 경과 일수 ÷ 기록 횟수예요.',
-    ),
-  );
-  for (const unavailable of [false, true]) {
-    const empty = HabitMonthStatistics({
-      ...props,
-      summary: { ...props.summary, completed: 0, averageInterval: null },
-      unavailable,
+  for (const priority of [0, 1]) {
+    const tree = HabitMonthStatistics({
+      habit: { priority, initial_started_at: '2026-09-01T00:00:00.000Z', icon_key: 'goal', icon_color: 'theme' },
+      month: '2026-09', today: '2026-10-07', dates: [], unavailable: false, onMonthChange() {},
     });
-    const interval = nodes(empty).find((node) => node.type === 'HabitStatisticsSummary').props
-      .stats[1];
-    assert.equal(interval.value, '—');
-    assert.equal(interval.unit, '');
+    assert(nodes(tree).some((node) => node.type === 'CalendarGrid'));
+    assert(!nodes(tree).some((node) => node.type === 'HabitStatisticsSummary'));
   }
-  const daily = HabitMonthStatistics({ ...props, habit: { ...props.habit, priority: 1 } });
-  assert.equal(
-    nodes(daily).find((node) => node.type === 'HabitStatisticsSummary').props.stats.length,
-    3,
-  );
-  assert(!nodes(daily).some((node) => node.type === 'InfoNotice'));
 });
 
 test('diary date picker replaces recorded date numbers with diary icons while preserving range and selection', () => {
   const { DatePickerCalendar } = load('src/screens/calendar/DatePickerCalendar.tsx', {
     '../../theme/AppThemeProvider': {
       useAppTheme: () => ({
-        colors: { accent: '#123456', surface: '#FFFFFF' },
+        colors: { accent: '#123456', surface: '#FFFFFF', textOnAccent: '#FFFFFF' },
         iconSizes: { lg: 24 },
       }),
     },
@@ -1059,4 +1030,23 @@ test('diary emotion tilt varies by date and survives restored timestamps, IDs an
     cell(first, '2026-09-30').props.children.props.children[0].props.style.transform[0].rotate,
     '0deg',
   );
+});
+
+
+test('habit date selection opens records while unavailable dates stay disabled and memos keep their own marker', () => {
+  const selected: string[] = [];
+  const { HabitMonthStatistics } = load('src/screens/habit/HabitMonthStatistics.tsx');
+  const tree = HabitMonthStatistics({ habit: { priority: 1, initial_started_at: '2026-10-03T00:00:00.000Z', icon_key: 'goal', icon_color: 'theme' }, month: '2026-10', today: '2026-10-07', dates: ['2026-10-05'], memoDates: ['2026-10-04', '2026-10-05'], summary: { completed: 1, missed: 4, rate: 20 }, unavailable: false, onMonthChange() {}, onSelectDate: (date: string) => selected.push(date) });
+  for (const date of ['2026-10-04', '2026-10-05']) {
+    const entry = cell(tree, date);
+    assert.equal(entry.props.hasMemo, true);
+    assert.equal(entry.props.disabled, false);
+    CalendarDay(entry.props).props.onPress();
+  }
+  for (const date of ['2026-10-02', '2026-10-08']) {
+    assert.equal(cell(tree, date).props.disabled, true);
+    CalendarDay(cell(tree, date).props).props.onPress();
+  }
+  assert.deepEqual(selected, ['2026-10-04', '2026-10-05']);
+  assert(!nodes(cell(tree, '2026-10-04')).some((node) => node.type === 'HabitIcon'));
 });
