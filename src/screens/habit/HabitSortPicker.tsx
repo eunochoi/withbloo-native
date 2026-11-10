@@ -1,3 +1,4 @@
+import { ContentBottomButton } from '../../components/ContentBottomButton';
 import { useI18n } from '../../i18n/react';
 import { useQuery } from '@tanstack/react-query';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -79,23 +80,6 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
           showNotice({ tone: 'info', title: t('habit.wait'), message: t('habit.savingHint') });
         return false;
       }}
-      headerLeft={
-        <HeaderAction
-          side="left"
-          label={t('ui.reset')}
-          accessibilityLabel={t('ui.resetSelection')}
-          disabled={saving || dragging || (sort === 'CUSTOM' && !order)}
-          onPress={() => {
-            if (sort === 'CUSTOM') {
-              setOrder(defaults);
-            } else {
-              setSort('DESC');
-              setStandardSort('DESC');
-              setPriority(false);
-            }
-          }}
-        />
-      }
       headerButton={
         <HeaderAction
           disabled={saving || dragging || (sort === 'CUSTOM' && (!order || !query.data))}
@@ -116,6 +100,7 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
         />
       }
     >
+
       <View accessibilityRole="radiogroup" accessibilityLabel={t('habit.sort')}>
         <View className="gap-5 pb-8">
           <Pressable accessibilityRole="radio" accessibilityState={{ checked: sort !== 'CUSTOM' }} onPress={() => setSort(standardSort)} className="flex-row items-center gap-2">
@@ -157,6 +142,20 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
             <InfoNotice>{t('ui.customDescription')}</InfoNotice>
           </View>
         </View>
+      <ContentBottomButton
+          label={t('ui.reset')}
+          accessibilityLabel={t('ui.resetSelection')}
+          disabled={saving || dragging || (sort === 'CUSTOM' && !order)}
+          onPress={() => {
+            if (sort === 'CUSTOM') {
+              setOrder(defaults);
+            } else {
+              setSort('DESC');
+              setStandardSort('DESC');
+              setPriority(false);
+            }
+          }}
+        />
       </View>
     </BottomSheetModal>
   );

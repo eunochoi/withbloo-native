@@ -4,6 +4,7 @@ import { View } from 'react-native';
 
 import { BottomSheetModal } from './bottom-sheet/BottomSheetModal';
 import { HeaderAction } from './HeaderAction';
+import { ContentBottomButton } from './ContentBottomButton';
 
 export function FilterSheet({
   title,
@@ -23,14 +24,6 @@ export function FilterSheet({
     <BottomSheetModal
       visible
       title={title}
-      headerLeft={
-        <HeaderAction
-          side="left"
-          label={t('ui.reset')}
-          accessibilityLabel={t('ui.resetSelection')}
-          onPress={onReset}
-        />
-      }
       headerButton={(close) => (
         <HeaderAction
           label={t('common.apply')}
@@ -44,7 +37,11 @@ export function FilterSheet({
       scrollFade
       onClose={onClose}
     >
-      <View className="gap-5">{children}</View>
+      <View className="gap-5">
+
+        {children}
+        <ContentBottomButton label={t('ui.reset')} accessibilityLabel={t('ui.resetSelection')} onPress={onReset} />
+      </View>
     </BottomSheetModal>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode, type ComponentProps } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { Keyboard, Modal, View, useWindowDimensions, type ScrollView } from 'react-native';
 import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import type { AnimatedRef } from 'react-native-reanimated';
@@ -17,8 +17,6 @@ export function BottomSheetModal({
   title,
   scrollableTitle,
   handleColor,
-  titleAction,
-  headerLeft,
   headerButton,
   contentHeader,
   onClose,
@@ -48,8 +46,6 @@ export function BottomSheetModal({
   title?: string;
   scrollableTitle?: boolean;
   handleColor?: string;
-  titleAction?: ComponentProps<typeof BottomSheetHeader>['titleAction'];
-  headerLeft?: ReactNode;
   headerButton?: ReactNode | ((closeSheet: CloseBottomSheet) => ReactNode);
   contentHeader?: ReactNode;
   onClose: () => void;
@@ -113,8 +109,6 @@ export function BottomSheetModal({
         handleColor={handleColor}
         title={title}
         scrollableTitle={scrollableTitle}
-        titleAction={titleAction}
-        headerLeft={headerLeft}
         headerButton={typeof headerButton === 'function' ? headerButton(closeSheet) : headerButton}
         menuAction={menuAction}
         onClose={dismissible || preserveHandle ? () => closeSheet() : undefined}

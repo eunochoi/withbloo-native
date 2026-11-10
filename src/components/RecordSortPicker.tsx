@@ -5,6 +5,7 @@ import { Switch, View } from 'react-native';
 import { useAppTheme } from '../theme/AppThemeProvider';
 import { BottomSheetModal } from './bottom-sheet/BottomSheetModal';
 import { HeaderAction } from './HeaderAction';
+import { ContentBottomButton } from './ContentBottomButton';
 import { PickerOption } from './PickerOption';
 import { Text } from './Text';
 
@@ -67,18 +68,6 @@ export function RecordSortPicker({
       visible
       title={title}
       onClose={onClose}
-      headerLeft={
-        <HeaderAction
-          side="left"
-          label={t('ui.reset')}
-          accessibilityLabel={t('ui.resetSelection')}
-          onPress={() => {
-            setSort('DESC');
-            setPriority(false);
-            setRecordSort(recordSort ? 'DESC' : undefined);
-          }}
-        />
-      }
       headerButton={(closePicker) => (
         <HeaderAction
           label={t('common.apply')}
@@ -92,6 +81,7 @@ export function RecordSortPicker({
       )}
     >
       <View className={showCriteriaSort ? 'gap-5' : 'gap-7'}>
+
         {prioritySection}
         {recordSort && (
           <View className="gap-3">
@@ -158,6 +148,15 @@ export function RecordSortPicker({
           </InfoNotice>
           {allowCustom && <InfoNotice>{t('ui.sortPriorityConflict')}</InfoNotice>}
         </View>
+        <ContentBottomButton
+          label={t('ui.reset')}
+          accessibilityLabel={t('ui.resetSelection')}
+          onPress={() => {
+            setSort('DESC');
+            setPriority(false);
+            setRecordSort(recordSort ? 'DESC' : undefined);
+          }}
+        />
       </View>
     </BottomSheetModal>
   );
