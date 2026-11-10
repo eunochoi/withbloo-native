@@ -10,6 +10,7 @@ type DiaryGalleryProps = {
   images: DiaryImage[];
   detail?: boolean;
   square?: boolean;
+  cardAspect?: boolean;
   onPress?: () => void;
 };
 
@@ -37,7 +38,7 @@ export function DiaryGallery(props: DiaryGalleryProps) {
   return <DiaryGalleryPages {...props} />;
 }
 
-function DiaryGalleryPages({ images, detail = false, square = false, onPress }: DiaryGalleryProps) {
+function DiaryGalleryPages({ images, detail = false, square = false, cardAspect = false, onPress }: DiaryGalleryProps) {
   const { t } = useI18n();
 
   const { rem: appRem } = useAppTheme();
@@ -47,7 +48,7 @@ function DiaryGalleryPages({ images, detail = false, square = false, onPress }: 
   const [fullView, setFullView] = useState<number | null>(null);
   const list = useRef<FlatList<DiaryImage>>(null);
   const gap = appRem * 0.5;
-  const height = detail ? Math.min(windowWidth * 0.9, 440) : square ? width : (width * 3) / 4;
+  const height = detail && !cardAspect ? Math.min(windowWidth * 0.9, 440) : square ? width : (width * 3) / 4;
   return (
     <View
       onLayout={(event) => {
@@ -100,11 +101,11 @@ function DiaryGalleryPages({ images, detail = false, square = false, onPress }: 
               onPress={detail ? () => setFullView(fullView === item.id ? null : item.id) : onPress}
               style={{ width, height }}
               className={
-                detail
+                detail && !cardAspect
                   ? 'ios:curve-continuous rounded-theme overflow-hidden bg-black/75 border border-theme-border-muted'
                   : square
                     ? 'ios:curve-continuous rounded-xl overflow-hidden border border-theme-border-muted'
-                    : 'ios:curve-continuous rounded-lg overflow-hidden'
+                    : 'ios:curve-continuous rounded-lg overflow-hidden bg-black/75'
               }
             >
               <Image
