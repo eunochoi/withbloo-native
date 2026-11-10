@@ -176,9 +176,7 @@ export function ActivityRecordListScreen({ scope }: { scope: RecordScope }) {
                     <Text className="text-base">
                       {dateTimeDraft(record.recorded_at).hour}:
                       {dateTimeDraft(record.recorded_at).minute}
-                      {scope === 'sober'
-                        ? ` · ${t(record.type === 'RESTART' ? 'sober.restartRecord' : 'habit.memo')}`
-                        : ''}
+                      {` · ${t(scope === 'sober' && record.type === 'RESTART' ? 'sober.restartRecord' : 'habit.record')}`}
                     </Text>
                     <RecordMenuButton
                       muted
