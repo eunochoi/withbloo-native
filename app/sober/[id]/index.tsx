@@ -186,7 +186,7 @@ export default function SoberDetail() {
               label={t('sober.restartButton')}
               onPress={() =>
                 openModal({
-                  pathname: '/sober/[id]/records',
+                  pathname: '/sober/[id]/record-form',
                   params: { id: String(soberId), mode: 'new', type: 'RESTART' },
                 })
               }

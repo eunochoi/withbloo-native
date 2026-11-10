@@ -1,5 +1,5 @@
-import { ActivityRecords } from '../../../../../src/screens/records/ActivityRecords';
+import { ActivityRecordFormScreen } from '../../../../../src/screens/records/ActivityRecordFormScreen';
 
 export default function SoberRestart() {
-  return <ActivityRecords scope="sober" legacy />;
+  return <ActivityRecordFormScreen scope="sober" legacy />;
 }

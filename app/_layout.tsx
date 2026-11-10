@@ -52,6 +52,8 @@ const sheetRoutes = [
   'sober/[id]/memos',
   'sober/[id]/records',
   'habit/[id]/records',
+  'habit/[id]/record-form',
+  'sober/[id]/record-form',
   'sober/[id]/day/[date]',
   'sober/[id]/restart/new',
   'sober/[id]/restart/[restartId]/edit',

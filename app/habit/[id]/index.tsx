@@ -92,7 +92,7 @@ export default function HabitDetail() {
                   </View>
                 )}
                 <View className="gap-3 px-1">
-                  <Button label={t('habit.recordAdd')} labelWeight="normal" style={{ backgroundColor: accent.color, borderColor: accent.color }} labelStyle={{ color: colors.surface }} onPress={() => openModal({ pathname: '/habit/[id]/records', params: { id, mode: 'new' } })} />
+                  <Button label={t('habit.recordAdd')} labelWeight="normal" style={{ backgroundColor: accent.color, borderColor: accent.color }} labelStyle={{ color: colors.surface }} onPress={() => openModal({ pathname: '/habit/[id]/record-form', params: { id, mode: 'new' } })} />
                   <Button label={t('habit.allRecords')} labelWeight="normal" subtle onPress={() => openModal({ pathname: '/habit/[id]/records', params: { id } })} />
                 </View>
               </View>

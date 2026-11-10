@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import test from 'node:test';
 import { runInNewContext } from 'node:vm';
-import { mockI18n, formatDisplayDate } from './helpers/i18n';
+import { formatDisplayDate, mockI18n } from './helpers/i18n';
 const require = createRequire(import.meta.url);
 const ts = require('typescript');
 
@@ -13,8 +13,9 @@ function scenario(scope: 'habit' | 'sober', params: Record<string, string> = {},
   let pending = false;
   let failWrite = false;
   let language: 'ko' | 'en' = 'ko';
-  let release: () => void = () => {};
+  let release: () => void = () => { };
   const writes: any[] = [];
+  const pushes: any[] = [];
   const records = [
     { id: 1, type: 'MEMO', recorded_at: '2024-01-10T10:00:00.000Z', memo: '마음 기록' },
     ...(scope === 'sober'
@@ -23,10 +24,10 @@ function scenario(scope: 'habit' | 'sober', params: Record<string, string> = {},
   ];
   const exports: any = {};
   const jsx = (type: unknown, props: any) => ({ type, props });
-  const query = { data: records, isPending: false, error: null, refetch() {} };
+  const query = { data: records, isPending: false, error: null, refetch() { } };
   runInNewContext(
     ts.transpileModule(
-      readFileSync(new URL('../src/screens/records/ActivityRecords.tsx', import.meta.url), 'utf8'),
+      readFileSync(new URL(`../src/screens/records/${legacy || params.mode === 'new' || params.mode === 'edit' ? 'ActivityRecordFormScreen' : 'ActivityRecordListScreen'}.tsx`, import.meta.url), 'utf8'),
       { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX } },
     ).outputText,
     {
@@ -60,14 +61,15 @@ function scenario(scope: 'habit' | 'sober', params: Record<string, string> = {},
         if (name === 'react-native')
           return { View: 'View', TextInput: 'TextInput', Pressable: 'Pressable', Switch: 'Switch' };
         if (name === 'expo-router') return { useLocalSearchParams: () => ({ id: '1', ...params }) };
-        if (name === 'expo-router/react-navigation') return { usePreventRemove() {} };
+        if (name === 'expo-router/react-navigation') return { usePreventRemove() { } };
         if (name === 'expo-sqlite') return { useSQLiteContext: () => ({}) };
-        if (name.endsWith('/NoticeProvider')) return { useNotice: () => ({ showNotice() {} }) };
+        if (name.endsWith('/NoticeProvider')) return { useNotice: () => ({ showNotice() { } }) };
+        if (name.endsWith('/ModalNavigationProvider')) return { useModalNavigation: () => ({ openModal: (href: unknown) => pushes.push(href) }) };
         if (name.endsWith('/i18n/react')) return mockI18n(() => language);
         if (name.endsWith('/i18n/format')) return { formatDisplayDate };
         if (name.endsWith('/i18n/errors'))
           return { translateErrorMessage: (value: string) => value };
-        if (name.endsWith('/media')) return { pickImages: async () => [{ file: 'photo.jpg', uri: 'cache://photo', temporary: true }], discardDraftImages() {}, mediaUri: (value: string) => value };
+        if (name.endsWith('/media')) return { pickImages: async () => [{ file: 'photo.jpg', uri: 'cache://photo', temporary: true }], discardDraftImages() { }, mediaUri: (value: string) => value };
         if (name.endsWith('/domain/limits')) return { DIARY_IMAGE_MAX_COUNT: 5 };
         if (name.endsWith('/domain/date')) return require('../src/domain/date');
         if (name.endsWith('/domain/sober')) return { getSoberAchievements: () => [] };
@@ -92,19 +94,19 @@ function scenario(scope: 'habit' | 'sober', params: Record<string, string> = {},
             useQuery: ({ queryKey }: any) =>
               queryKey[1] === 'id'
                 ? {
-                    ...query,
-                    data: {
-                      id: 1,
-                      name: '기록',
-                      initial_started_at: '2024-01-01T00:00:00.000Z',
-                      ...(scope === 'sober' ? { goal_mode: 'AUTO' } : {}),
-                    },
-                  }
+                  ...query,
+                  data: {
+                    id: 1,
+                    name: '기록',
+                    initial_started_at: '2024-01-01T00:00:00.000Z',
+                    ...(scope === 'sober' ? { goal_mode: 'AUTO' } : {}),
+                  },
+                }
                 : queryKey[1] === 'activity-record'
                   ? { ...query, data: records.find((record) => record.id === Number(queryKey[3])) ?? null }
-                : queryKey[1] === 'restarts'
-                  ? { ...query, data: [] }
-                  : query,
+                  : queryKey[1] === 'restarts'
+                    ? { ...query, data: [] }
+                    : query,
             useInfiniteQuery: () => ({
               ...query,
               data: { pages: [{ records }] },
@@ -121,12 +123,13 @@ function scenario(scope: 'habit' | 'sober', params: Record<string, string> = {},
   );
   return {
     writes,
+    pushes,
     records,
     release: (fail = false) => { failWrite = fail; release(); },
     setLanguage: (value: 'ko' | 'en') => { language = value; },
     render: () => {
       cursor = 0;
-      let tree = exports.ActivityRecords({ scope, legacy });
+      let tree = legacy || params.mode === 'new' || params.mode === 'edit' ? exports.ActivityRecordFormScreen({ scope, legacy }) : exports.ActivityRecordListScreen({ scope });
       if (typeof tree.type === 'function') tree = tree.type(tree.props);
       return tree;
     },
@@ -145,11 +148,15 @@ test('record cards place card-ratio photos before the memo', () => {
     assert.equal(items[galleryIndex].props.detail, true);
   }
 });
+
+
 function nodes(tree: any): any[] {
   if (!tree || typeof tree !== 'object') return [];
   if (Array.isArray(tree)) return tree.flatMap(nodes);
   return [tree, ...nodes(tree.props?.children)];
 }
+
+
 
 test('habit day shows timed memos, offers add at the top of the content, and cannot add on future dates', () => {
   const ui = scenario('habit', { mode: 'day', date: '2024-01-10' });
@@ -158,7 +165,7 @@ test('habit day shows timed memos, offers add at the top of the content, and can
   assert(add);
   assert(nodes(tree).some((node) => node.type === 'Text' && node.props.children === '마음 기록'));
   add.props.onPress();
-  const editor = ui.render();
+  const editor = scenario('habit', ui.pushes[0].params).render();
   assert.equal(editor.props.title, '기록 추가');
   assert.equal(nodes(editor).find((node) => node.type === 'TextInput').props.maxLength, 500);
   const future = scenario('habit', { mode: 'day', date: '2024-01-11' }).render();
@@ -173,15 +180,16 @@ test('sober day opens one editor with restart switch and allows a regular record
   const tree = ui.render();
   assert.equal(nodes(tree).filter((node) => node.type === 'RecordMenuButton').length, 2);
   nodes(tree).find((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가하기').props.onPress();
-  let editor = ui.render();
+  const form = scenario('sober', ui.pushes[0].params);
+  let editor = form.render();
   assert.equal(editor.props.title, '기록 추가');
   assert.equal(nodes(editor).find((node) => node.type === 'Switch').props.value, true);
   nodes(editor).find((node) => node.type === 'Switch').props.onValueChange(false);
-  editor = ui.render();
+  editor = form.render();
   nodes(editor).find((node) => node.type === 'TextInput').props.onChangeText('기록');
-  ui.render().props.headerButton.props.onPress();
-  assert.equal(ui.writes[0].input.type, 'MEMO');
-  ui.release();
+  form.render().props.headerButton.props.onPress();
+  assert.equal(form.writes[0].input.type, 'MEMO');
+  form.release();
   await new Promise((resolve) => setImmediate(resolve));
 });
 
@@ -192,6 +200,22 @@ test('legacy restart edit opens the common editor with the existing record', () 
   assert.equal(editor.props.title, '기록 수정');
   assert.equal(nodes(editor).find((node) => node.type === 'Switch').props.value, true);
   assert.equal(nodes(editor).find((node) => node.type === 'TextInput').props.value, '');
+});
+
+test('editing a listed record opens a separate form with the selected record', () => {
+  for (const scope of ['habit', 'sober'] as const) {
+    const ui = scenario(scope);
+    nodes(ui.render()).find((node) => node.type === 'RecordMenuButton').props.onPress();
+    const menu = nodes(ui.render()).find((node) => node.type === 'BottomSheetModal' && node.props.visible);
+    const actions = nodes(menu.props.children((afterClose: () => void) => afterClose()));
+    actions.find((node) => node.type === 'PickerAction' && node.props.icon === 'edit').props.onPress();
+    assert.equal(ui.pushes[0].params.recordId, '1');
+    assert.equal(ui.pushes[0].params.mode, 'edit');
+    assert(nodes(ui.render()).some((node) => node.type === 'RecordMenuButton'));
+    const editor = scenario(scope, ui.pushes[0].params).render();
+    assert.equal(editor.props.title, '기록 수정');
+    assert.equal(nodes(editor).find((node) => node.type === 'TextInput').props.value, '마음 기록');
+  }
 });
 
 test('legacy restart creation retains the selected day and defaults restart on', () => {
@@ -255,11 +279,13 @@ test('changing language preserves a draft in the common editor', () => {
   assert.equal(nodes(editor).find((node) => node.type === 'Switch').props.value, true);
 });
 
+
+
 test('closing a day record editor returns to the day list', () => {
   const ui = scenario('habit', { mode: 'day', date: '2024-01-10' });
   nodes(ui.render()).find((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가하기').props.onPress();
-  const editor = ui.render();
-  assert.equal(editor.props.onBeforeClose(), false);
+  const editor = scenario('habit', ui.pushes[0].params).render();
+  assert.equal(editor.props.onBeforeClose(), true);
   assert(nodes(ui.render()).some((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가하기'));
 });
 

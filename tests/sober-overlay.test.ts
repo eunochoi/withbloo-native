@@ -219,7 +219,7 @@ test('calendar and direct restart launch push routes while preserving detail sel
   ui.render()
     .find((node) => node.props.label === '다시 시작')
     .props.onPress();
-  assert.equal(ui.pushes[1].pathname, '/sober/[id]/records');
+  assert.equal(ui.pushes[1].pathname, '/sober/[id]/record-form');
   assert.equal(ui.pushes[1].params.type, 'RESTART');
   assert.equal(ui.pushes[1].params.date, undefined);
 });

@@ -1,4 +1,4 @@
-import { ActivityRecords } from '../../../src/screens/records/ActivityRecords';
+import { ActivityRecordListScreen } from '../../../src/screens/records/ActivityRecordListScreen';
 export default function HabitRecords() {
-  return <ActivityRecords scope="habit" />;
+  return <ActivityRecordListScreen scope="habit" />;
 }
