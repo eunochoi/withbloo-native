@@ -35,6 +35,7 @@ export const habitKo = {
   saving: '저장 중...',
   saveEdited: '수정한 습관 저장하기',
   save: '습관 저장하기',
+  descriptionOptional: '(선택)',
   whenStart: '언제부터 습관을 시작했나요?',
   name: '습관 이름',
   namePlaceholder: '매일 물 마시기',

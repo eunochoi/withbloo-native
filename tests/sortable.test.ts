@@ -105,7 +105,7 @@ function renderer(path: string, states: any[], saved: any[] = [], active = { val
 }
 
 test('photo grid keeps add tile outside draggable data and passes the drop order to the form', () => {
-  const render = renderer('src/screens/diary/DiaryFormImages.tsx', []);
+  const render = renderer('src/components/ImageAttachments.tsx', []);
   const moves: number[][] = [];
   const dragging: boolean[] = [];
   const props = {
@@ -117,13 +117,13 @@ test('photo grid keeps add tile outside draggable data and passes the drop order
     onReorder: (from: number, to: number) => moves.push([from, to]),
     onDragging: (value: boolean) => dragging.push(value),
   };
-  let tree = render('DiaryFormImages', props);
+  let tree = render('ImageAttachments', props);
   const grid = nodes(tree).find((node) => node.type === 'Grid');
   assert.equal(grid.props.data, props.images);
   assert.equal(grid.props.autoScrollDirection, 'horizontal');
   assert.equal(grid.props.overDrag, 'none');
   grid.props.onDragStart();
-  tree = render('DiaryFormImages', props);
+  tree = render('ImageAttachments', props);
   assert.equal(
     nodes(tree).find((node) => node.props.accessibilityLabel === '이미지 추가').props.disabled,
     true,
@@ -132,7 +132,7 @@ test('photo grid keeps add tile outside draggable data and passes the drop order
   assert.deepEqual(moves, [[0, 1]]);
   assert.deepEqual(dragging, [true, false]);
   assert.equal(
-    nodes(render('DiaryFormImages', { ...props, busy: true })).find((node) => node.type === 'Grid')
+    nodes(render('ImageAttachments', { ...props, busy: true })).find((node) => node.type === 'Grid')
       .props.sortEnabled,
     false,
   );

@@ -1,15 +1,15 @@
-import { useI18n } from '../../i18n/react';
+import { useI18n } from '../i18n/react';
 import type { ScrollView } from 'react-native';
 import { useState } from 'react';
 import { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortables';
-import { AnimatedScrollView } from '../../components/AnimatedScrollView';
-import { useAppTheme } from '../../theme/AppThemeProvider';
+import { AnimatedScrollView } from './AnimatedScrollView';
+import { useAppTheme } from '../theme/AppThemeProvider';
 import { ActivityIndicator, Image, Pressable, View } from 'react-native';
-import { AppIcon } from '../../components/AppIcon';
-import type { DraftImage } from '../../media';
-import { Text } from '../../components/Text';
-import { DIARY_IMAGE_MAX_COUNT } from '../../domain/constants';
+import { AppIcon } from './AppIcon';
+import type { DraftImage } from '../media';
+import { Text } from './Text';
+import { DIARY_IMAGE_MAX_COUNT } from '../domain/constants';
 
 function PhotoTile({
   image,
@@ -77,7 +77,7 @@ function PhotoTile({
   );
 }
 
-export function DiaryFormImages({
+export function ImageAttachments({
   images,
   busy,
   picking,

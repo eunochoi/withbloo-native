@@ -35,6 +35,7 @@ export const habitEn = {
   saving: 'Saving...',
   saveEdited: 'Save changes',
   save: 'Save habit',
+  descriptionOptional: '(optional)',
   whenStart: 'When did you start this habit?',
   name: 'Habit name',
   namePlaceholder: 'Drink water every day',

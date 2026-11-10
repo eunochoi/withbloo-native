@@ -29,7 +29,8 @@ import { useAppTheme } from '../theme/AppThemeProvider';
 import { FORM_TEXT_INPUT_CLASS_NAME, SECTION_TITLE_CLASS_NAME } from '../theme/classes';
 import { DiaryDatePicker } from './diary/DiaryDatePicker';
 import { DiaryEmotionPicker } from './diary/DiaryEmotionPicker';
-import { DiaryFormImages } from './diary/DiaryFormImages';
+import { ImageAttachments } from '../components/ImageAttachments';
+import { ImageAttachmentsHeader } from '../components/ImageAttachmentsHeader';
 
 export function DiaryForm({
   id,
@@ -269,15 +270,10 @@ export function DiaryForm({
         </View>
       </View>
       <View className="gap-3">
-        <View className="flex-row items-baseline gap-2">
-          <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>{t('diary.photoTitle')}</Text>
-          <Text className="text-sm text-theme-text-secondary">
-            {t('diary.photoLimit', { count: images.length, value: DIARY_IMAGE_MAX_COUNT })}
-          </Text>
-        </View>
+        <ImageAttachmentsHeader title={t('diary.photoTitle')} count={images.length} />
         <View className="gap-3 px-1">
           <Text className="text-base text-theme-text-secondary">{t('diary.photoHint')}</Text>
-          <DiaryFormImages
+          <ImageAttachments
             images={images}
             busy={busy}
             picking={picking}
@@ -294,7 +290,7 @@ export function DiaryForm({
                     discardDraftImages(added);
                     return;
                   }
-                  drafts.current.push(...added);
+                  drafts.current = [...drafts.current, ...added];
                   setImages((previous) => [...previous, ...added]);
                 })
                 .catch((error: Error) => {
