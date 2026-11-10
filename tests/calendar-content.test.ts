@@ -725,6 +725,9 @@ test('habit detail opens timed records without exposing completion mutations to 
     },
   });
   const detail = nodes(HabitDetail());
+  const header = detail.find((node) => node.type === 'View' && node.props.className === 'w-full min-w-0 items-center gap-3');
+  assert.deepEqual(Array.from(header.props.children, (child: any) => child.type), ['HabitIcon', 'HabitStars', 'View']);
+  assert.equal(header.props.children[2].props.children.type, 'ScrollableName');
   const progress = detail.find((node) => node.type === 'ProgressBar');
   assert.equal(progress.props.value, 14.3);
   const stats = detail.find((node) => node.type === 'HabitStatistics');

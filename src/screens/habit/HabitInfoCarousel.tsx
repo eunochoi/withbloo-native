@@ -43,10 +43,10 @@ export function HabitInfoCarousel({ habit, dates, today, unavailable, color }: {
         <Text className="text-center text-sm text-theme-text-secondary">{subtitle}</Text>
       </View>,
       <View key="summary" className="flex-row">
-        {details.map((item) => <View key={item.label} className="flex-1 min-w-0 items-center gap-2 px-2"><View className="items-center gap-1">
+        {details.map((item) => <View key={item.label} className="flex-1 min-w-0 items-center gap-1 px-2">
           <Text className="text-center text-base font-semibold text-theme-text-primary">{item.label}</Text>
           <Text className="text-center text-base tracking-tighter font-medium text-theme-text-primary">{item.value}</Text>
-        </View></View>)}
+        </View>)}
       </View>,
     ]} />
   );

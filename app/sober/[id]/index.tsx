@@ -144,15 +144,13 @@ export default function SoberDetail() {
                       ),
                     },
                   ].map((item) => (
-                    <View key={item.label} className="flex-1 min-w-0 items-center gap-2 px-2">
-                      <View className="items-center gap-1">
+                    <View key={item.label} className="flex-1 min-w-0 items-center gap-1 px-2">
                         <Text className="text-center text-base font-semibold text-theme-text-primary">
                           {item.label}
                         </Text>
                         <Text className="text-center text-base tracking-tighter font-medium text-theme-text-primary">
                           {item.value}
                         </Text>
-                      </View>
                     </View>
                   ))}
                 </View>,
@@ -166,7 +164,7 @@ export default function SoberDetail() {
                 <Text className="text-center text-sm text-theme-text-secondary">
                   {t('sober.goalLabel', { value: formatSoberGoal(summary.goalDays, language) })}
                 </Text>
-                <Text className="text-sm font-semibold" style={{ color: progressColor }}>
+                <Text className="text-sm font-semibold" style={{ color: accent.text }}>
                   {summary.progress.toFixed(0)}%
                 </Text>
               </View>

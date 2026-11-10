@@ -69,14 +69,9 @@ export default function HabitDetail() {
               <View className="gap-8">
                 <View className="w-full min-w-0 items-center gap-3">
                   <HabitIcon name={habit.icon_key} colorKey={habit.icon_color} size={appRem * 4} />
+                  <HabitStars color={accent.color} priority={habit.priority} size={appRem * 1.125} />
                   <View className="w-[90%] min-w-0">
                     <ScrollableName heading className="text-center text-xl font-semibold">{habit.name}</ScrollableName>
-                  </View>
-                  <View className="items-center gap-1">
-                    <HabitStars color={accent.color} priority={habit.priority} size={appRem * 1.25} />
-                    <Text className="text-sm text-theme-text-secondary">
-                      {habit.priority === 0 ? t('habit.free') : t('habit.daily')}
-                    </Text>
                   </View>
                 </View>
                 <HabitInfoCarousel habit={habit} dates={dates} today={today} unavailable={records.isPending || records.isError} color={accent.color} />
