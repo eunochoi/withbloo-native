@@ -36,7 +36,7 @@ export function HabitBox({
   const startedDate = localDate(habit.initial_started_at);
   const excluded = habit.priority === 0;
   return (
-    <View className="flex-1 gap-4 bg-theme-surface px-2 py-5">
+    <View className="flex-1 gap-6 bg-theme-surface px-2 py-5">
       <View className="relative">
         <Pressable
           accessibilityRole="button"
@@ -56,13 +56,7 @@ export function HabitBox({
             {habit.name}
           </ScrollableName>
           <View className="h-5 items-center justify-center">
-            {excluded ? (
-              <Text className="h-5 text-sm leading-5 text-center text-theme-text-secondary">
-                {t('habit.free')}
-              </Text>
-            ) : (
-              <HabitStars priority={habit.priority} color={habitColor} size={appRem} />
-            )}
+            <HabitStars priority={habit.priority} color={habitColor} size={appRem} />
           </View>
         </Pressable>
         <View className="absolute right-0 top-0">
