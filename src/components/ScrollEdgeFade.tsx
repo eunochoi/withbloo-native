@@ -11,18 +11,20 @@ export function ScrollEdgeFade({
   includeBottomInset = true,
   includeToolbar = true,
   outside = false,
+  heightRem = 2,
 }: {
   edge: 'top' | 'bottom';
   visible: boolean;
   includeBottomInset?: boolean;
   includeToolbar?: boolean;
   outside?: boolean;
+  heightRem?: number;
 }) {
   const { colors, rem, reducedMotion } = useAppTheme();
   const insets = useSafeAreaInsets();
 
   const isBottom = edge === 'bottom';
-  const fadeHeight = rem * 2;
+  const fadeHeight = rem * heightRem;
   const toolbarHeight = isBottom && includeToolbar ? 48 : 0;
   const bottomInset = isBottom && includeBottomInset ? insets.bottom : 0;
   const solidHeight = toolbarHeight + bottomInset;
