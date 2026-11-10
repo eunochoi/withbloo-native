@@ -6,9 +6,11 @@ import { useI18n } from '../../i18n/react';
 export function SoberInfoCarousel({
   pages,
   color,
+  labels,
 }: {
   pages: [ReactNode, ReactNode];
   color: string;
+  labels?: [string, string];
 }) {
   const { t } = useI18n();
   const carousel = useRef<ScrollView>(null);
@@ -63,7 +65,7 @@ export function SoberInfoCarousel({
         ))}
       </ScrollView>
       <View className="flex-row justify-center">
-        {[t('sober.currentDuration'), t('sober.recordSummary')].map((label, index) => (
+        {(labels ?? [t('sober.currentDuration'), t('sober.recordSummary')]).map((label, index) => (
           <Pressable
             key={label}
             accessibilityRole="button"
