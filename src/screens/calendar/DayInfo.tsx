@@ -37,6 +37,8 @@ export function DayInfo({ date, today }: { date: string; today: string }) {
     habitPriorityFirst: true,
     habitOrder: [],
   });
+  const counted = rows.filter((habit) => habit.priority > 0);
+  const done = counted.filter((habit) => habit.completed).length;
   return (
     <View className="gap-3">
       {error ? (
@@ -63,12 +65,11 @@ export function DayInfo({ date, today }: { date: string; today: string }) {
               <View className="h-16 w-full">
                 <EmotionImage emotion={diary.data.emotion} fill />
               </View>
-              <View className="px-2">
-                <CalendarHabitProgress
-                  done={rows.filter((habit) => habit.priority > 0 && habit.completed).length}
-                  total={rows.filter((habit) => habit.priority > 0).length}
-                />
-              </View>
+              {done > 0 && (
+                <View className="px-2">
+                  <CalendarHabitProgress done={done} total={counted.length} />
+                </View>
+              )}
             </View>
           )}
           <DayInfoDiarySection
