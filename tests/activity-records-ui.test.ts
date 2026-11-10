@@ -289,6 +289,15 @@ test('changing language preserves a draft in the common editor', () => {
 
 
 
+test('record placeholders include the item name for both record types and languages', () => {
+  for (const scope of ['habit', 'sober'] as const) {
+    const ui = scenario(scope, { mode: 'new' });
+    assert.equal(nodes(ui.render()).find((node) => node.type === 'TextInput').props.placeholder, "'기록' 항목과 관련된 내용을 입력하세요.");
+    ui.setLanguage('en');
+    assert.equal(nodes(ui.render()).find((node) => node.type === 'TextInput').props.placeholder, "Enter something related to '기록'.");
+  }
+});
+
 test('closing a day record editor returns to the day list', () => {
   const ui = scenario('habit', { mode: 'day', date: '2024-01-10' });
   nodes(ui.render()).find((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가하기').props.onPress();

@@ -21,6 +21,7 @@ import { useAppTheme } from '../../theme/AppThemeProvider';
 export function ActivityRecordForm({
   record,
   scope,
+  name,
   date,
   startedAt,
   habitRecords,
@@ -40,6 +41,7 @@ export function ActivityRecordForm({
   canClose: () => boolean;
   record: Partial<ActivityRecord>;
   scope: RecordScope;
+  name: string;
   date?: string;
   startedAt: string;
   habitRecords?: ComponentProps<typeof DateTimeFields>['habitRecords'];
@@ -143,7 +145,7 @@ export function ActivityRecordForm({
             scrollEnabled
             maxLength={500}
             textAlignVertical="top"
-            placeholder={t(isRestart ? 'habit.restartMemoPlaceholder' : 'habit.memoPlaceholder')}
+            placeholder={t('habit.memoPlaceholder', { value: name })}
             placeholderTextColor={colors.textTertiary}
             className="mx-1 h-[200px] bg-transparent p-0 text-base leading-6 text-theme-text-primary font-normal"
           />

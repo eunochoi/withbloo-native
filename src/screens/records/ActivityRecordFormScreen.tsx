@@ -119,6 +119,7 @@ export function ActivityRecordFormScreen({ scope, legacy }: { scope: RecordScope
         key={`${recordDraft.id ?? 'new'}:${recordDraft.type}`}
         record={recordDraft}
         scope={scope}
+        name={parent.data.name}
         date={date}
         startedAt={parent.data.initial_started_at}
         habitRecords={scope === 'habit' && !('goal_mode' in parent.data) ? { dates: (completions.data ?? []).map((item) => item.date), iconKey: parent.data.icon_key, iconColor: parent.data.icon_color } : undefined}
