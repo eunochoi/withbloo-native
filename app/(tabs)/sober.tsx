@@ -230,7 +230,7 @@ export default function SoberList() {
           </>
         }
       />
-      <ScrollEdgeFade edge="bottom" visible={fade.bottomVisible} />
+      <ScrollEdgeFade edge="bottom" visible={fade.bottomVisible} heightRem={4} includeToolbar={false} includeBottomInset={false} />
 
       {filterOpen && (
         <SoberFilterPicker

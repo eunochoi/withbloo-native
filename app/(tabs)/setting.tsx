@@ -283,7 +283,7 @@ export default function SettingsScreen() {
           />
         </View>
       </ScrollView>
-      <ScrollEdgeFade edge="bottom" visible={fade.bottomVisible} />
+      <ScrollEdgeFade edge="bottom" visible={fade.bottomVisible} heightRem={4} includeToolbar={false} includeBottomInset={false} />
 
       {onboardingOpen && <OnboardingSheet onClose={() => setOnboardingOpen(false)} />}
       {backupPicker && (

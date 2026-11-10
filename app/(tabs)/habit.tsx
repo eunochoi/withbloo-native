@@ -238,7 +238,7 @@ export default function HabitList() {
         </View>
         <TabBottomSpacer />
       </ScrollView>
-      <ScrollEdgeFade edge="bottom" visible={fade.bottomVisible} />
+      <ScrollEdgeFade edge="bottom" visible={fade.bottomVisible} heightRem={4} includeToolbar={false} includeBottomInset={false} />
 
       {filterOpen && (
         <HabitFilterPicker

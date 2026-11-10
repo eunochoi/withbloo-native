@@ -222,7 +222,7 @@ export default function DiaryList() {
         }}
         onEndReachedThreshold={0.4}
       />
-      <ScrollEdgeFade edge="bottom" visible={fade.bottomVisible} />
+      <ScrollEdgeFade edge="bottom" visible={fade.bottomVisible} heightRem={4} includeToolbar={false} includeBottomInset={false} />
 
       {picker === 'sort' && (
         <RecordSortPicker
