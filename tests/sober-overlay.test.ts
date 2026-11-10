@@ -190,9 +190,13 @@ test('memo launcher pushes a route above sober detail without closing its sheet'
     (node) => node.type === 'Button' && node.props.label === '기록 모아보기',
   );
   assert.equal(button.props.subtle, true);
+  const actions = nodes.filter((node) => node.type === 'Button');
+  assert.deepEqual(actions.map((node) => node.props.label), ['다시 시작', '기록 모아보기']);
+  assert.equal(actions[0].props.subtle, undefined);
+  assert.equal(actions[1].props.subtle, true);
   button.props.onPress();
   assert.equal(ui.pushes.length, 1);
-  assert.equal(ui.pushes[0].pathname, '/sober/[id]/memos');
+  assert.equal(ui.pushes[0].pathname, '/sober/[id]/records');
   assert.equal(ui.pushes[0].params.id, '1');
   assert.equal(
     ui.render().find((node) => node.type === 'BottomSheetPage').props.closeRequested,
@@ -205,16 +209,18 @@ test('calendar and direct restart launch push routes while preserving detail sel
   ui.render()
     .find((node) => node.type === 'SoberMonthCalendar')
     .props.onSelect('2026-10-04');
-  assert.equal(ui.pushes[0].pathname, '/sober/[id]/day/[date]');
+  assert.equal(ui.pushes[0].pathname, '/sober/[id]/records');
+  assert.equal(ui.pushes[0].params.mode, 'day');
   assert.equal(ui.pushes[0].params.date, '2026-10-04');
   const calendar = ui.render().find((node) => node.type === 'SoberMonthCalendar');
   assert.equal(calendar.props.selected, '2026-10-04');
   assert.equal(calendar.props.month, '2026-10');
   assert(!ui.render().some((node) => ['BottomSheetModal', 'DateTimePicker'].includes(node.type)));
   ui.render()
-    .find((node) => node.props.label === '다시 시작하기')
+    .find((node) => node.props.label === '다시 시작')
     .props.onPress();
-  assert.equal(ui.pushes[1].pathname, '/sober/[id]/restart/new');
+  assert.equal(ui.pushes[1].pathname, '/sober/[id]/records');
+  assert.equal(ui.pushes[1].params.type, 'RESTART');
   assert.equal(ui.pushes[1].params.date, undefined);
 });
 
@@ -278,8 +284,8 @@ test('restart deletion cancellation leaves the day route and its records intact'
 test('restart deletion blocks repeat requests and exits until completion, and failure keeps the day route', async () => {
   const ui = scenario('../app/sober/[id]/day/[date].tsx');
   const confirm = deleteConfirmation(ui);
-  confirm.props.onConfirm();
-  confirm.props.onConfirm();
+  const write = confirm.props.onConfirm();
+  await assert.rejects(confirm.props.onConfirm(), /Operation unavailable/);
   assert.deepEqual(ui.writes, [{ id: 2, owner: 1 }]);
   assert.equal(
     ui
@@ -290,6 +296,7 @@ test('restart deletion blocks repeat requests and exits until completion, and fa
   );
   await new Promise<void>((resolve) => setImmediate(resolve));
   ui.completeWrite(true);
+  await assert.rejects(write, /삭제 실패/);
   await new Promise<void>((resolve) => setImmediate(resolve));
   assert(ui.notices.some((notice) => notice.message === '삭제 실패'));
   assert.equal(
@@ -303,12 +310,8 @@ test('restart deletion blocks repeat requests and exits until completion, and fa
 });
 
 function memoCard(ui: ReturnType<typeof scenario>) {
-  const flat = ui
-    .render()
-    .find((node) => node.type === 'BottomSheetPage')
-    .props.renderScrollView({});
-  return ui
-    .nodes(flat.props.renderItem({ item: flat.props.data[0], index: 0 }))
+  const list = ui.render().find((node) => node.type === 'BottomSheetPage').props.list;
+  return ui.nodes(list.renderItem({ item: list.data[0], index: 0 }))
     .find((node) => node.type === 'SoberRestartCard');
 }
 
@@ -350,8 +353,8 @@ test('memo deletion explains recalculation, prevents repeats and unlocks after s
   const confirm = ui.render().find((node) => node.type === 'ConfirmModal');
   assert.equal(confirm.props.visible, true);
   assert.match(confirm.props.message, /경과 시간과 통계가 다시 계산/);
-  confirm.props.onConfirm();
-  confirm.props.onConfirm();
+  const write = confirm.props.onConfirm();
+  await assert.rejects(confirm.props.onConfirm(), /Operation unavailable/);
   assert.deepEqual(ui.writes, [{ id: 2, owner: 1 }]);
   assert.equal(memoCard(ui).props.pending, true);
   assert.equal(
@@ -363,6 +366,7 @@ test('memo deletion explains recalculation, prevents repeats and unlocks after s
   );
   await new Promise<void>((resolve) => setImmediate(resolve));
   ui.completeWrite();
+  await write;
   await new Promise<void>((resolve) => setImmediate(resolve));
   assert.equal(
     ui

@@ -1,8 +1,5 @@
-import { useLocalSearchParams } from 'expo-router';
-import { SoberRestartForm } from '../../../../src/screens/sober/SoberRestartForm';
+import { ActivityRecords } from '../../../../src/screens/records/ActivityRecords';
 
-export default function NewSoberRestart() {
-  const { id, date } = useLocalSearchParams<{ id: string; date?: string | string[] }>();
-  const soberId = typeof id === 'string' && /^\d+$/.test(id) ? Number(id) : NaN;
-  return <SoberRestartForm key={`${id}:${date ?? ''}`} soberId={soberId} initialDate={date} />;
+export default function SoberRestart() {
+  return <ActivityRecords scope="sober" legacy />;
 }

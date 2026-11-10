@@ -1,6 +1,7 @@
+import { ContentTopButton, ContentTopButtons } from '../../components/ContentTopButton';
 import { useI18n } from '../../i18n/react';
 import { format, parseISO } from 'date-fns';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { AppIcon } from '../../components/AppIcon';
 import { Text } from '../../components/Text';
 import type { SoberRestart } from '../../db/types';
@@ -30,16 +31,7 @@ export function SoberDayInfo({
   return (
     <View className="gap-3">
       {canAdd && (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('sober.restartAddDate')}
-          disabled={pending}
-          onPress={onAdd}
-          className={`min-h-11 self-end flex-row items-center gap-1 ${pending ? 'opacity-40' : 'opacity-100'}`}
-        >
-          <AppIcon name="add" size={iconSizes.sm} color={colors.accent} />
-          <Text className="text-sm text-theme-accent">{t('sober.recordAdd')}</Text>
-        </Pressable>
+        <ContentTopButtons><ContentTopButton label={t('sober.recordAdd')} accessibilityLabel={t('sober.restartAddDate')} disabled={pending} onPress={onAdd} icon={<AppIcon name="add" size={iconSizes.sm} color={colors.accent} />} /></ContentTopButtons>
       )}
       {achievements.map((item) => (
         <View

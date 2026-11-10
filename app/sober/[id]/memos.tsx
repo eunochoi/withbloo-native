@@ -1,10 +1,11 @@
+import { ContentTopButton, ContentTopButtons } from '../../../src/components/ContentTopButton';
 import { formatDisplayDate } from '../../../src/i18n/format';
 import { useI18n } from '../../../src/i18n/react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { AppIcon } from '../../../src/components/AppIcon';
 import { BottomSheetPage } from '../../../src/components/bottom-sheet/BottomSheetPage';
 import { QueryError } from '../../../src/components/QueryError';
@@ -108,19 +109,7 @@ export default function SoberMemos() {
                 windowSize: 5,
                 ListHeaderComponent: rows.length > 0 ? (
                   <View className="gap-3 pb-6">
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel={t('sober.notesSortLabel', {
-                        value: sort === 'DESC' ? t('ui.newest') : t('ui.oldest'),
-                      })}
-                      onPress={() => setSorting(true)}
-                      className="min-h-11 self-end flex-row items-center gap-1"
-                    >
-                      <AppIcon name="sort" size={iconSizes.sm} color={colors.accent} />
-                      <Text className="text-sm text-theme-accent">
-                        {sort === 'DESC' ? t('ui.newest') : t('ui.oldest')}
-                      </Text>
-                    </Pressable>
+                    <ContentTopButtons><ContentTopButton label={sort === 'DESC' ? t('ui.newest') : t('ui.oldest')} accessibilityLabel={t('sober.notesSortLabel', { value: sort === 'DESC' ? t('ui.newest') : t('ui.oldest') })} onPress={() => setSorting(true)} icon={<AppIcon name="sort" size={iconSizes.sm} color={colors.accent} />} /></ContentTopButtons>
                   </View>
                 ) : null,
                 renderItem: ({ item: row, index }) => {

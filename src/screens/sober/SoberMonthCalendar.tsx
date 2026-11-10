@@ -24,6 +24,7 @@ export function SoberMonthCalendar({
   iconKey,
   iconColor,
   recordsByDate,
+  memoDates = [],
   achievements = [],
   onMonthChange,
   onSelect,
@@ -34,6 +35,7 @@ export function SoberMonthCalendar({
   firstDate: string;
   iconKey: Sober['icon_key'];
   iconColor: Sober['icon_color'];
+  memoDates?: string[];
   recordsByDate: Map<string, SoberRestart[]>;
   achievements?: SoberAchievement[];
   onMonthChange: (month: string) => void;
@@ -84,12 +86,14 @@ export function SoberMonthCalendar({
                 today={today}
                 selected={selected}
                 showSelectedIndicator={false}
+                hasMemo={!unavailable && memoDates.includes(date)}
                 disabled={unavailable}
                 dimmed={unavailable}
                 onSelect={onSelect}
                 label={[
                   date,
                   ...goals.map((days) => t('sober.achievement', { count: days })),
+                  memoDates.includes(date) && !outside && !unavailable ? t('habit.hasMemo') : '',
                   hasRestart
                     ? t('sober.restartDay')
                     : !outside && !unavailable

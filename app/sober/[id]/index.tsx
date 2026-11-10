@@ -1,3 +1,5 @@
+import { getActivityDates } from '../../../src/db/records';
+import { withReadLock } from '../../../src/db';
 import { ScrollableName } from '../../../src/components/ScrollableName';
 import { itemAccentColors } from '../../../src/theme/colors';
 import { useQuery } from '@tanstack/react-query';
@@ -43,6 +45,7 @@ export default function SoberDetail() {
   const [hoursOnly, setHoursOnly] = useState(false);
   const [selected, setSelected] = useState(today);
   const [month, setMonth] = useState(today.slice(0, 7));
+  const memoDates = useQuery({ queryKey: ['sober', 'memo-dates', soberId], enabled: validId, queryFn: () => withReadLock(() => getActivityDates(db, 'sober', soberId)) });
   const query = useQuery({ ...soberQueries.byId(db, soberId), enabled: validId });
   const restarts = useQuery({
     ...soberQueries.restarts(db, soberId),
@@ -92,14 +95,15 @@ export default function SoberDetail() {
       menuAction={<SoberMenu sober={sober} onDeleted={() => router.dismissTo('/sober')} />}
     >
       <View className="gap-8">
-        <View className="gap-7">
+        <View className="gap-8">
           <View className="items-center gap-3">
             <SoberIcon name={sober.icon_key} colorKey={sober.icon_color} size={rem * 4} />
-            <ScrollableName heading className="text-center text-xl font-semibold">
-              {sober.name}
-            </ScrollableName>
+            <View className="w-[90%] min-w-0">
+              <ScrollableName heading className="text-center text-xl font-semibold">
+                {sober.name}
+              </ScrollableName>
+            </View>
           </View>
-          <View className="px-1 w-full gap-7">
             <SoberInfoCarousel
               color={progressColor}
               pages={[
@@ -155,13 +159,7 @@ export default function SoberDetail() {
               ]}
             />
             {!!sober.description?.trim() && (
-              <Text
-                textBreakStrategy="highQuality"
-                lineBreakStrategyIOS="standard"
-                className="w-[90%] self-center text-center text-base leading-relaxed text-theme-text-secondary"
-              >
-                {sober.description}
-              </Text>
+              <Text textBreakStrategy="highQuality" lineBreakStrategyIOS="standard" className="w-[90%] self-center text-center text-base leading-relaxed text-theme-text-secondary">{sober.description}</Text>
             )}
             <View className="w-[90%] self-center gap-3">
               <View className="flex-row flex-wrap justify-between gap-2">
@@ -173,7 +171,7 @@ export default function SoberDetail() {
                 </Text>
               </View>
               <ProgressBar
-                className="h-4"
+                className="h-5"
                 value={summary.progress}
                 color={progressColor}
                 accessibilityLabel={t('sober.goalLabel', {
@@ -181,18 +179,17 @@ export default function SoberDetail() {
                 })}
               />
             </View>
-          </View>
           <View className="w-full px-1 gap-3">
             <Button
               labelWeight="normal"
               className="w-full"
               style={{ backgroundColor: accent.color, borderColor: accent.color }}
               labelStyle={{ color: colors.surface }}
-              label={t('sober.restart')}
+              label={t('sober.restartButton')}
               onPress={() =>
                 openModal({
-                  pathname: '/sober/[id]/restart/new',
-                  params: { id: String(soberId) },
+                  pathname: '/sober/[id]/records',
+                  params: { id: String(soberId), mode: 'new', type: 'RESTART' },
                 })
               }
             />
@@ -202,7 +199,7 @@ export default function SoberDetail() {
               className="w-full"
               label={t('sober.viewNotes')}
               onPress={() =>
-                openModal({ pathname: '/sober/[id]/memos', params: { id: String(soberId) } })
+                openModal({ pathname: '/sober/[id]/records', params: { id: String(soberId) } })
               }
             />
           </View>
@@ -215,6 +212,7 @@ export default function SoberDetail() {
           iconKey={sober.icon_key}
           iconColor={sober.icon_color}
           recordsByDate={grouped}
+          memoDates={memoDates.data ?? []}
           achievements={getSoberAchievements(sober, restarts.data ?? [], now)}
           onMonthChange={setMonth}
           onSelect={(date) => {
@@ -222,8 +220,8 @@ export default function SoberDetail() {
             setSelected(date);
             setMonth(date.slice(0, 7));
             openModal({
-              pathname: '/sober/[id]/day/[date]',
-              params: { id: String(soberId), date },
+              pathname: '/sober/[id]/records',
+              params: { id: String(soberId), date, mode: 'day' },
             });
           }}
         />

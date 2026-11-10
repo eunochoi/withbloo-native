@@ -15,6 +15,7 @@ export function CalendarDay({
   onMonthChange,
   disabled = false,
   dimmed = false,
+  hasMemo = false,
   label,
   children,
   showTodayIndicator = false,
@@ -32,6 +33,7 @@ export function CalendarDay({
   onMonthChange?: (month: string) => void;
   disabled?: boolean;
   dimmed?: boolean;
+  hasMemo?: boolean;
   label?: string;
   children?: ReactNode;
   showTodayIndicator?: boolean;
@@ -83,6 +85,7 @@ export function CalendarDay({
           </Text>
         </View>
       )}
+      {!outside && hasMemo && <View className="absolute bottom-1 h-1 w-1 rounded-full bg-theme-text-secondary" />}
       {!outside && ((showTodayIndicator && isToday) || (showSelectedIndicator && isSelected)) && (
         <View className="absolute -bottom-0.5 h-1.5 w-1.5 ios:curve-continuous rounded-full bg-theme-accent/70" />
       )}
