@@ -55,6 +55,7 @@ function load(file: string) {
             useWindowDimensions: () => ({ width: 390 }),
           };
         if (name.endsWith('AppThemeProvider')) return { useAppTheme: () => ({ rem: 15 }) };
+        if (name.endsWith('/PageIndicator')) return { PageIndicator: 'PageIndicator' };
         if (name.endsWith('/media')) return { mediaUri: (file: string) => `file:///${file}` };
         if (name === './scrollFade') return require('../src/hooks/scrollFade');
         throw new Error(`Unexpected import: ${name}`);
@@ -141,6 +142,20 @@ test('a single detail photo retains crop and full-image toggling', () => {
   photo = list.props.renderItem({ item: images[0], index: 0 });
   assert.equal(photo.props.children.props.resizeMode, 'contain');
   assert.equal(photo.props.accessibilityState.selected, true);
+});
+
+test('record photos use the card ratio while retaining full-image toggling', () => {
+  const view = load('../src/screens/diary/DiaryGallery.tsx');
+  const props = { images: images.slice(0, 1), detail: true, cardAspect: true };
+  let tree = view.render('DiaryGallery', props);
+  tree.props.onLayout({ nativeEvent: { layout: { width: 300 } } });
+  tree = view.render('DiaryGallery', props);
+  let list = tree.props.children[0];
+  assert.equal(list.props.style.height, 225);
+  list.props.renderItem({ item: images[0], index: 0 }).props.onPress();
+  tree = view.render('DiaryGallery', props);
+  list = tree.props.children[0];
+  assert.equal(list.props.renderItem({ item: images[0], index: 0 }).props.children.props.resizeMode, 'contain');
 });
 
 test('fade event sequences handle initial size, scrolling, reset and content shrink without duplicate state changes', () => {
