@@ -136,7 +136,7 @@ export function DiaryForm({
     <RecordFormLayout
       backRoute="/diary"
       scrollEnabled={!dragging}
-      headerRight={
+      headerButton={
         <HeaderAction
           disabled={busy || dragging}
           onPress={() => {

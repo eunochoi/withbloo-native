@@ -117,7 +117,7 @@ export function IconPicker<Key extends string>({
         revealInitialSelection();
       }}
 
-      headerRight={(close) => (
+      headerButton={(close) => (
         <HeaderAction
           label={t('common.done')}
           onPress={() => {

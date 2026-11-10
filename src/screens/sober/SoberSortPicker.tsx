@@ -99,7 +99,7 @@ export function SoberSortPicker({ visible, onClose, onApplied }: { visible: bool
           }}
         />
       }
-      headerRight={
+      headerButton={
         <HeaderAction
           disabled={saving || dragging || (sort === 'CUSTOM' && (!order || !query.data))}
           label={t('common.apply')}

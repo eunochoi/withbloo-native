@@ -37,7 +37,7 @@ export function DateTimePicker({
       fixedHeight
       title={title}
       onClose={onClose}
-      headerRight={(close) => (
+      headerButton={(close) => (
         <HeaderAction
           label={confirmLabel ?? t('common.done')}
           onPress={() => {

@@ -89,14 +89,14 @@ test('time picker rejects invalid input, stays open on failure and closes after 
           modal.props.children(() => {
             closes++;
           }),
-          modal.props.headerRight(() => {
+          modal.props.headerButton(() => {
             closes++;
           }),
         ],
       }),
     };
   }
-  assert.equal(render().modal.props.headerRight(() => {}).type, 'HeaderAction');
+  assert.equal(render().modal.props.headerButton(() => {}).type, 'HeaderAction');
   assert.equal(nodes(render().body, 'Button')[0].props.label, '알림 해제');
   nodes(render().tree, 'TextInput')[0].props.onChangeText('24');
   nodes(render().tree, 'HeaderAction')[0]

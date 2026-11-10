@@ -127,7 +127,7 @@ export function DiaryEmotionPicker({
         opened.current = true;
         revealInitialSelection();
       }}
-      headerRight={(closePicker) => (
+      headerButton={(closePicker) => (
         <HeaderAction
           label={allowDeselect ? t('common.apply') : t('common.done')}
           disabled={!allowDeselect && draft === null}

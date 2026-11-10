@@ -149,7 +149,7 @@ function picker(kind: 'habit' | 'sober', value: string, colorKey = 'pink') {
           shell.props.onContentSizeChange(width, height);
         },
       } };
-      footer = shell.props.headerRight((action?: () => void) => {
+      footer = shell.props.headerButton((action?: () => void) => {
         closed++;
         deferred = action;
       });

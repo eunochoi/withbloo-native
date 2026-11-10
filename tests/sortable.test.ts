@@ -167,7 +167,7 @@ test('habit grid uses modal scrolling and saves the returned order', async () =>
   grid.props.onDragStart();
   assert.equal(nodes(picker('HabitSortPicker', props)).find((node) => node.type === 'BottomSheetModal').props.scrollEnabled, false);
   grid.props.onDragEnd({ data: [{ id: 3 }, { id: 2 }, { id: 1 }] });
-  const button = nodes(picker('HabitSortPicker', props)).find((node) => node.type === 'BottomSheetModal').props.headerRight;
+  const button = nodes(picker('HabitSortPicker', props)).find((node) => node.type === 'BottomSheetModal').props.headerButton;
   assert.equal(button.props.disabled, false);
   button.props.onPress();
   await Promise.resolve();
@@ -187,15 +187,15 @@ test('automatic habit sorting remains usable while manual order is loading or ha
     assert.equal(nodes(tree).some((node) => node.type === 'QueryState'), false);
     const sheet = nodes(tree).find((node) => node.type === 'BottomSheetModal');
     assert.equal(sheet.props.scrollFade, true);
-    assert.equal(sheet.props.headerRight.props.disabled, false);
-    sheet.props.headerRight.props.onPress();
+    assert.equal(sheet.props.headerButton.props.disabled, false);
+    sheet.props.headerButton.props.onPress();
     await Promise.resolve();
     assert.deepEqual(JSON.parse(JSON.stringify(saved)), [{ habitSort: 'DESC', habitPriorityFirst: false }]);
     states[1] = 'CUSTOM';
     states[4] = false;
     tree = render('HabitSortPicker', props);
     assert.equal(nodes(tree).some((node) => node.type === 'QueryState'), true);
-    assert.equal(nodes(tree).find((node) => node.type === 'BottomSheetModal').props.headerRight.props.disabled, true);
+    assert.equal(nodes(tree).find((node) => node.type === 'BottomSheetModal').props.headerButton.props.disabled, true);
   }
 });
 
@@ -224,10 +224,10 @@ test('custom order can be applied without changes', () => {
   const render = renderer('src/screens/habit/HabitSortPicker.tsx', states);
   const props = { visible: true, onClose: () => {} };
   let tree = render('HabitSortPicker', props);
-  assert.equal(nodes(tree).find((node) => node.type === 'BottomSheetModal').props.headerRight.props.disabled, false);
+  assert.equal(nodes(tree).find((node) => node.type === 'BottomSheetModal').props.headerButton.props.disabled, false);
   nodes(tree).filter((node) => node.props.accessibilityRole === 'radio')[1].props.onPress();
   tree = render('HabitSortPicker', props);
-  assert.equal(nodes(tree).find((node) => node.type === 'BottomSheetModal').props.headerRight.props.disabled, false);
+  assert.equal(nodes(tree).find((node) => node.type === 'BottomSheetModal').props.headerButton.props.disabled, false);
 });
 
 
@@ -239,10 +239,10 @@ test('sober custom order saves dragged IDs and blocks apply during drag', async 
   const tree = render('SoberSortPicker', props);
   const list = nodes(tree).find((node) => node.type === 'SoberManualSortList');
   list.props.onDraggingChange(true);
-  assert.equal(nodes(render('SoberSortPicker', props)).find((node) => node.type === 'BottomSheetModal').props.headerRight.props.disabled, true);
+  assert.equal(nodes(render('SoberSortPicker', props)).find((node) => node.type === 'BottomSheetModal').props.headerButton.props.disabled, true);
   list.props.onOrderChange([3, 2, 1]);
   list.props.onDraggingChange(false);
-  const button = nodes(render('SoberSortPicker', props)).find((node) => node.type === 'BottomSheetModal').props.headerRight;
+  const button = nodes(render('SoberSortPicker', props)).find((node) => node.type === 'BottomSheetModal').props.headerButton;
   assert.equal(button.props.disabled, false);
   button.props.onPress();
   await Promise.resolve();

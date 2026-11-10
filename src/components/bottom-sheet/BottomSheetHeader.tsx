@@ -12,7 +12,7 @@ export function BottomSheetHeader({
   handleColor,
   titleAction,
   headerLeft,
-  headerRight,
+  headerButton,
   menuAction,
   onClose,
   handleDisabled = false,
@@ -27,7 +27,7 @@ export function BottomSheetHeader({
     showChevron?: boolean;
   };
   headerLeft?: ReactNode;
-  headerRight?: ReactNode;
+  headerButton?: ReactNode;
   menuAction?: ReactNode;
   onClose?: () => void;
   handleDisabled?: boolean;
@@ -52,9 +52,9 @@ export function BottomSheetHeader({
           />
         </Pressable>
       )}
-      {(title || menuAction || headerLeft || headerRight) && (
+      {(title || menuAction || headerLeft || headerButton) && (
         <View
-          className={`relative self-stretch flex-row items-center gap-2 py-1 ${headerLeft || headerRight ? 'px-20' : ''}`}
+          className={`relative self-stretch flex-row items-center gap-2 py-1 ${headerLeft || headerButton ? 'px-20' : ''}`}
         >
           {menuAction && <View className="w-11 shrink-0" />}
           <View className="flex-1 min-w-0 flex-row items-center justify-center gap-2">
@@ -112,7 +112,7 @@ export function BottomSheetHeader({
           </View>
           {menuAction && <View className="w-11 shrink-0 items-end">{menuAction}</View>}
           {headerLeft && <View className="absolute left-0 items-center">{headerLeft}</View>}
-          {headerRight && <View className="absolute right-0 items-center">{headerRight}</View>}
+          {headerButton && <View className="absolute right-0 items-center">{headerButton}</View>}
         </View>
       )}
     </View>

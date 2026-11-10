@@ -31,7 +31,7 @@ export function FilterSheet({
           onPress={onReset}
         />
       }
-      headerRight={(close) => (
+      headerButton={(close) => (
         <HeaderAction
           label={t('common.apply')}
           accessibilityLabel={t('ui.applyTitle', { title })}

@@ -6,7 +6,7 @@ import { BottomSheetPage } from './bottom-sheet/BottomSheetPage';
 export function RecordFormLayout({
   title,
   titleAction,
-  headerRight,
+  headerButton,
   backRoute,
   onBeforeClose,
   closeRequested = false,
@@ -17,7 +17,7 @@ export function RecordFormLayout({
 }: {
   title: string;
   titleAction?: ComponentProps<typeof BottomSheetPage>['titleAction'];
-  headerRight?: ReactNode;
+  headerButton?: ReactNode;
   backRoute: Href;
   onBeforeClose?: () => boolean;
   closeRequested?: boolean;
@@ -31,7 +31,7 @@ export function RecordFormLayout({
       <BottomSheetPage
         title={title}
         titleAction={titleAction}
-        headerRight={headerRight}
+        headerButton={headerButton}
         backRoute={backRoute}
         onBeforeClose={onBeforeClose}
         closeRequested={closeRequested}

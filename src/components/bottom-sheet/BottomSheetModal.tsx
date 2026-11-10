@@ -19,7 +19,7 @@ export function BottomSheetModal({
   handleColor,
   titleAction,
   headerLeft,
-  headerRight,
+  headerButton,
   contentHeader,
   onClose,
   children,
@@ -50,7 +50,7 @@ export function BottomSheetModal({
   handleColor?: string;
   titleAction?: ComponentProps<typeof BottomSheetHeader>['titleAction'];
   headerLeft?: ReactNode;
-  headerRight?: ReactNode | ((closeSheet: CloseBottomSheet) => ReactNode);
+  headerButton?: ReactNode | ((closeSheet: CloseBottomSheet) => ReactNode);
   contentHeader?: ReactNode;
   onClose: () => void;
   children?: ReactNode | ((closeSheet: CloseBottomSheet) => ReactNode);
@@ -115,7 +115,7 @@ export function BottomSheetModal({
         scrollableTitle={scrollableTitle}
         titleAction={titleAction}
         headerLeft={headerLeft}
-        headerRight={typeof headerRight === 'function' ? headerRight(closeSheet) : headerRight}
+        headerButton={typeof headerButton === 'function' ? headerButton(closeSheet) : headerButton}
         menuAction={menuAction}
         onClose={dismissible || preserveHandle ? () => closeSheet() : undefined}
         handleDisabled={!dismissible}

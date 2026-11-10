@@ -101,7 +101,7 @@ function picker(value: number | null, allowDeselect = false) {
         shell.props.onContentSizeChange(width, height);
       },
     } };
-    const footer = shell.props.headerRight((after?: () => void) => {
+    const footer = shell.props.headerButton((after?: () => void) => {
       closed++;
       deferred = after;
     });

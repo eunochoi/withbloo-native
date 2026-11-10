@@ -110,7 +110,7 @@ export function SoberForm({ id }: { id?: number }) {
         });
         return false;
       }}
-      headerRight={
+      headerButton={
         <HeaderAction
           label={mutation.isPending ? t('common.saving') : t('common.save')}
           disabled={mutation.isPending}

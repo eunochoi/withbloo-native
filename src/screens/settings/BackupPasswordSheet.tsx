@@ -56,7 +56,7 @@ export function BackupPasswordSheet({
       dismissible={!busy}
       preserveHandle
       dismissOnBack={!busy}
-      headerRight={(close) => (
+      headerButton={(close) => (
         <HeaderAction
           disabled={busy || !password}
           label={t('common.confirm')}

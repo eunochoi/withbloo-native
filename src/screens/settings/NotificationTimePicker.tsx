@@ -53,7 +53,7 @@ export function NotificationTimePicker({
       title={title}
       onClose={onClose}
       onBeforeClose={() => !saving.current}
-      headerRight={(close) => (
+      headerButton={(close) => (
         <HeaderAction
           label={busy ? t('common.saving') : t('common.save')}
           disabled={busy}

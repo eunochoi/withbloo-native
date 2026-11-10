@@ -89,7 +89,7 @@ test('color picker combines theme and fourteen colors in equal-height three-colu
   const soberPreview = nodes(render('sober').props.contentHeader).filter((node) => node.type === 'SoberIcon');
   assert.deepEqual(soberPreview.map((node) => node.props.name), ['phone', 'coffee', 'shopping']);
   assert(soberPreview.every((node) => node.props.colorKey === 'mocha'));
-  tree.props.headerRight(() => {}).props.onPress();
+  tree.props.headerButton(() => {}).props.onPress();
   assert.deepEqual(applied, ['mocha']);
   assert(isHabitIconColor('mocha'));
   assert.equal(resolveIconColor('mocha', theme.colors.accent), '#B99E8C');

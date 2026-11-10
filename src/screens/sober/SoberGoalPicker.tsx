@@ -40,7 +40,7 @@ export function SoberGoalPicker({
       onClose={onClose}
       dismissOnBack={editor === null}
       onBeforeClose={() => editor === null}
-      headerRight={(close) => (
+      headerButton={(close) => (
         <HeaderAction
           label={t('common.apply')}
           disabled={editor !== null}
@@ -99,7 +99,7 @@ export function SoberGoalPicker({
             visible
             title={editor.kind === 'PERIOD' ? t('sober.periodTitle') : t('sober.daysTitle')}
             onClose={() => setEditor(null)}
-            headerRight={(close) => (
+            headerButton={(close) => (
               <HeaderAction
                 label={t('common.done')}
                 disabled={!valid}

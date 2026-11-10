@@ -125,7 +125,7 @@ export function HabitForm({ id }: { id?: number }) {
         });
         return false;
       }}
-      headerRight={
+      headerButton={
         <HeaderAction
           disabled={mutation.isPending}
           onPress={() => {

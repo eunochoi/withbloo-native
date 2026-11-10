@@ -69,7 +69,7 @@ export function IconColorPicker({
           </PickerInfoCard>
         </View>
       }
-      headerRight={(close) => (
+      headerButton={(close) => (
         <HeaderAction
           label={t('common.done')}
           onPress={() => {

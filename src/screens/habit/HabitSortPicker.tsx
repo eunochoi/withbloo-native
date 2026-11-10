@@ -96,7 +96,7 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
           }}
         />
       }
-      headerRight={
+      headerButton={
         <HeaderAction
           disabled={saving || dragging || (sort === 'CUSTOM' && (!order || !query.data))}
           label={t('common.apply')}

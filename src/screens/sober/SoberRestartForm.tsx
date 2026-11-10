@@ -142,7 +142,7 @@ export function SoberRestartForm({
       closeRequested={saved && !mutation.isPending}
       onClosed={onClosed}
       onBeforeClose={onBeforeClose}
-      headerRight={
+      headerButton={
         <HeaderAction
           label={editing ? t('common.save') : t('habit.record')}
           disabled={busy}

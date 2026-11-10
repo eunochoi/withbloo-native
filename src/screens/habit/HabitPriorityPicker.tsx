@@ -26,7 +26,7 @@ export function HabitPriorityPicker({
       visible
       title={t('habit.priority')}
       onClose={onClose}
-      headerRight={(close) => (
+      headerButton={(close) => (
         <HeaderAction
           label={t('common.done')}
           onPress={() => {

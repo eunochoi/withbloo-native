@@ -79,7 +79,7 @@ export function RecordSortPicker({
           }}
         />
       }
-      headerRight={(closePicker) => (
+      headerButton={(closePicker) => (
         <HeaderAction
           label={t('common.apply')}
           onPress={() => {

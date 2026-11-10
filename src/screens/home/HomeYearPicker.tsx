@@ -29,7 +29,7 @@ export function HomeYearPicker({
       visible
       title={t('home.yearTitle')}
       onClose={onClose}
-      headerRight={
+      headerButton={
         !query.isError && !query.isPending
           ? (closePicker) => (
               <HeaderAction

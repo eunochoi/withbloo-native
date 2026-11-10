@@ -59,7 +59,7 @@ export function DiaryDatePicker({
           }}
         />
       }
-      headerRight={(close) => (
+      headerButton={(close) => (
         <HeaderAction
           label={t('common.done')}
           disabled={disabled}
