@@ -133,9 +133,14 @@ export function ActivityRecordListScreen({ scope }: { scope: RecordScope }) {
                 icon={<AppIcon name="add" size={iconSizes.sm} color={colors.accent} />}
                 onPress={() => openModal({ pathname: scope === 'habit' ? '/habit/[id]/record-form' : '/sober/[id]/record-form', params: { id, mode: 'new', date, type: scope === 'sober' ? 'RESTART' : 'MEMO' } })} /></ContentTopButtons>
             )}
-            {mode === 'list' && rows.length > 0 && (
-              <ContentTopButtons><ContentTopButton label={t(sort === 'DESC' ? 'habit.latestFirst' : 'habit.oldestFirst')}
-                icon={<AppIcon name="sort" size={iconSizes.sm} color={colors.accent} />} onPress={() => setSorting(true)} /></ContentTopButtons>
+            {mode === 'list' && (
+              <ContentTopButtons>
+                {rows.length > 0 && <ContentTopButton label={t(sort === 'DESC' ? 'habit.latestFirst' : 'habit.oldestFirst')}
+                  icon={<AppIcon name="sort" size={iconSizes.sm} color={colors.accent} />} onPress={() => setSorting(true)} />}
+                <ContentTopButton label={t('habit.recordAdd')} disabled={busy}
+                  icon={<AppIcon name="add" size={iconSizes.sm} color={colors.accent} />}
+                  onPress={() => openModal({ pathname: scope === 'habit' ? '/habit/[id]/record-form' : '/sober/[id]/record-form', params: { id, mode: 'new', type: 'MEMO' } })} />
+              </ContentTopButtons>
             )}
             <QueryState query={listQuery} />
             {scope === 'sober' &&

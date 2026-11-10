@@ -149,7 +149,6 @@ test('record cards place card-ratio photos before the memo', () => {
   }
 });
 
-
 test('a restart without a memo shows its photo without a placeholder', () => {
   const ui = scenario('sober', { mode: 'day', date: '2024-01-10' });
   Object.assign(ui.records[1], { images: [{ id: 1, file_name: 'photo.jpg' }] });
@@ -164,12 +163,29 @@ function nodes(tree: any): any[] {
   return [tree, ...nodes(tree.props?.children)];
 }
 
-
+test('record lists offer a regular record even when empty', () => {
+  for (const scope of ['habit', 'sober'] as const) {
+    for (const empty of [false, true]) {
+      const ui = scenario(scope);
+      if (empty) ui.records.splice(0);
+      const buttons = nodes(ui.render()).filter((node) => node.type === 'ContentTopButton');
+      assert.equal(buttons.length, empty ? 1 : 2);
+      const add = buttons.find((node) => node.props.label === '기록 추가');
+      assert(add);
+      add.props.onPress();
+      assert.equal(ui.pushes[0].params.type, 'MEMO');
+      assert(nodes(ui.render()).some((node) => node.type === 'ContentTopButton'));
+      const editor = scenario(scope, ui.pushes[0].params).render();
+      assert.equal(editor.props.title, '기록 추가');
+      if (scope === 'sober') assert.equal(nodes(editor).find((node) => node.type === 'Switch').props.value, false);
+    }
+  }
+});
 
 test('habit day shows timed memos, offers add at the top of the content, and cannot add on future dates', () => {
   const ui = scenario('habit', { mode: 'day', date: '2024-01-10' });
   const tree = ui.render();
-  const add = nodes(tree).find((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가하기');
+  const add = nodes(tree).find((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가');
   assert(add);
   assert(nodes(tree).some((node) => node.type === 'Text' && node.props.children === '마음 기록'));
   add.props.onPress();
@@ -178,7 +194,7 @@ test('habit day shows timed memos, offers add at the top of the content, and can
   assert.equal(nodes(editor).find((node) => node.type === 'TextInput').props.maxLength, 500);
   const future = scenario('habit', { mode: 'day', date: '2024-01-11' }).render();
   assert.equal(
-    nodes(future).find((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가하기'),
+    nodes(future).find((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가'),
     undefined,
   );
 });
@@ -187,7 +203,7 @@ test('sober day opens one editor with restart switch and allows a regular record
   const ui = scenario('sober', { mode: 'day', date: '2024-01-10' });
   const tree = ui.render();
   assert.equal(nodes(tree).filter((node) => node.type === 'RecordMenuButton').length, 2);
-  nodes(tree).find((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가하기').props.onPress();
+  nodes(tree).find((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가').props.onPress();
   const form = scenario('sober', ui.pushes[0].params);
   let editor = form.render();
   assert.equal(editor.props.title, '기록 추가');
@@ -287,8 +303,6 @@ test('changing language preserves a draft in the common editor', () => {
   assert.equal(nodes(editor).find((node) => node.type === 'Switch').props.value, true);
 });
 
-
-
 test('record placeholders include the item name for both record types and languages', () => {
   for (const scope of ['habit', 'sober'] as const) {
     const ui = scenario(scope, { mode: 'new' });
@@ -300,10 +314,10 @@ test('record placeholders include the item name for both record types and langua
 
 test('closing a day record editor returns to the day list', () => {
   const ui = scenario('habit', { mode: 'day', date: '2024-01-10' });
-  nodes(ui.render()).find((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가하기').props.onPress();
+  nodes(ui.render()).find((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가').props.onPress();
   const editor = scenario('habit', ui.pushes[0].params).render();
   assert.equal(editor.props.onBeforeClose(), true);
-  assert(nodes(ui.render()).some((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가하기'));
+  assert(nodes(ui.render()).some((node) => node.type === 'ContentTopButton' && node.props.label === '기록 추가'));
 });
 
 test('rapid save taps dispatch one write and prevent dismissal until saving finishes', async () => {
