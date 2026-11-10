@@ -179,7 +179,6 @@ export function HabitForm({ id }: { id?: number }) {
           {picker === 'date' && id === undefined && (
             <DateTimePicker
               mode="start"
-              title={t('habit.whenStart')}
               value={initialStartedAt}
               onClose={() => setPicker(null)}
               onApply={setInitialStartedAt}

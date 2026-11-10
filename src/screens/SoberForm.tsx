@@ -155,7 +155,6 @@ export function SoberForm({ id }: { id?: number }) {
           {picker === 'date' && id === undefined && (
             <DateTimePicker
               mode="start"
-              title={t('sober.whenStart')}
               value={draft.initial_started_at}
               onClose={() => setPicker(null)}
               onApply={(initial_started_at) => setDraft({ ...draft, initial_started_at })}

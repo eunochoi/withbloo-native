@@ -1,22 +1,16 @@
-import { FormTextInput } from './FormTextInput';
 import { formatDisplayDate } from '../i18n/format';
 import { useI18n } from '../i18n/react';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { View } from 'react-native';
 import type { dateTimeDraft } from '../domain/date';
-import type { Sober } from '../db/types';
+import type { Habit, Sober } from '../db/types';
 import { useCurrentMinute } from '../hooks/useCurrentMinute';
-import { DatePickerCalendar } from '../screens/calendar/DatePickerCalendar';
+import { DateSelectionForm } from './DateSelectionForm';
 import { useAppTheme } from '../theme/AppThemeProvider';
 import { AppIcon } from './AppIcon';
 import { FormPickerRow } from './FormPickerRow';
 import { Text } from './Text';
-
-const TIME_INPUT_CONTAINER_CLASS_NAME =
-  'h-12 w-16 justify-center ios:curve-continuous rounded-2xl border border-theme-border';
-const TIME_INPUT_CLASS_NAME =
-  'w-full py-0 bg-transparent text-center text-lg leading-tight text-theme-text-primary font-normal';
 
 export function DateTimeFields({
   draft,
@@ -25,6 +19,7 @@ export function DateTimeFields({
   compactCalendar = false,
   disabled = false,
   soberRecords,
+  habitRecords,
   onChange,
 }: {
   draft: ReturnType<typeof dateTimeDraft>;
@@ -32,6 +27,7 @@ export function DateTimeFields({
   collapsible?: boolean;
   compactCalendar?: boolean;
   disabled?: boolean;
+  habitRecords?: { dates: readonly string[]; iconKey: Habit['icon_key']; iconColor: Habit['icon_color'] };
   soberRecords?: {
     dates: readonly string[];
     iconKey: Sober['icon_key'];
@@ -62,9 +58,11 @@ export function DateTimeFields({
       )}
       {expanded && (
         <View className="gap-5" pointerEvents={disabled ? 'none' : 'auto'}>
-          <DatePickerCalendar
+          <DateSelectionForm
+            time={{ hour: draft.hour, minute: draft.minute, disabled, onChange: (value) => onChange({ ...draft, ...value }) }}
             compact={compactCalendar}
             soberRecords={soberRecords}
+            habitRecords={habitRecords}
             month={month}
             selected={draft.date}
             today={today}
@@ -78,37 +76,6 @@ export function DateTimeFields({
               setMonth(date.slice(0, 7));
             }}
           />
-          <View className="flex-row items-center justify-center gap-3">
-            <View className={TIME_INPUT_CONTAINER_CLASS_NAME}>
-              <FormTextInput
-                accessibilityLabel={t('habit.hourInput')}
-                keyboardType="number-pad"
-                maxLength={2}
-                editable={!disabled}
-                value={draft.hour}
-                onChangeText={(hour) => {
-                  if (!disabled) onChange({ ...draft, hour });
-                }}
-                className={TIME_INPUT_CLASS_NAME}
-                style={{ includeFontPadding: false, textAlignVertical: 'center' }}
-              />
-            </View>
-            <Text>:</Text>
-            <View className={TIME_INPUT_CONTAINER_CLASS_NAME}>
-              <FormTextInput
-                accessibilityLabel={t('habit.minuteInput')}
-                keyboardType="number-pad"
-                maxLength={2}
-                editable={!disabled}
-                value={draft.minute}
-                onChangeText={(minute) => {
-                  if (!disabled) onChange({ ...draft, minute });
-                }}
-                className={TIME_INPUT_CLASS_NAME}
-                style={{ includeFontPadding: false, textAlignVertical: 'center' }}
-              />
-            </View>
-          </View>
         </View>
       )}
     </View>

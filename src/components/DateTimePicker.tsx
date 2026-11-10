@@ -10,7 +10,6 @@ import { InfoNotice } from './InfoNotice';
 import { Text } from './Text';
 
 export function DateTimePicker({
-  title,
   value,
   minTime,
   description,
@@ -19,7 +18,6 @@ export function DateTimePicker({
   onApply,
 }: {
   mode: 'start';
-  title: string;
   value: string;
   minTime?: string;
   description?: string;
@@ -35,7 +33,7 @@ export function DateTimePicker({
     <BottomSheetModal
       visible
       fixedHeight
-      title={title}
+      title={language.startsWith('ko') ? '시간 선택' : 'Select time'}
       onClose={onClose}
       headerButton={(close) => (
         <HeaderAction
