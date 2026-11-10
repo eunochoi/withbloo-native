@@ -12,15 +12,17 @@ import { useAppTheme } from '../theme/AppThemeProvider';
 export function SoberIcon({
   name,
   colorKey = DEFAULT_HABIT_ICON_COLOR,
+  colorOverride,
   size,
 }: {
   name: SoberIconKey;
   colorKey?: HabitIconColorKey;
+  colorOverride?: string;
   size?: number;
 }) {
   const { colors, rem: appRem } = useAppTheme();
   const maskId = useId();
-  const color = resolveIconColor(colorKey, colors.accent);
+  const color = colorOverride ?? resolveIconColor(colorKey, colors.accent);
   const iconSize = size ?? appRem * 1.75;
   if (name === 'age19')
     return (

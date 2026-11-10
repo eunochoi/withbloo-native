@@ -11,14 +11,16 @@ import {
 export function HabitIcon({
   name,
   colorKey = DEFAULT_HABIT_ICON_COLOR,
+  colorOverride,
   size,
 }: {
   name: HabitIconKey;
   colorKey?: HabitIconColorKey;
+  colorOverride?: string;
   size?: number;
 }) {
   const { colors, rem: appRem } = useAppTheme();
-  const color = resolveIconColor(colorKey, colors.accent);
+  const color = colorOverride ?? resolveIconColor(colorKey, colors.accent);
   const resolvedSize = size ?? appRem * 1.75;
   if (name === 'meditation')
     return <MaterialCommunityIcons name="meditation" color={color} size={resolvedSize} />;
