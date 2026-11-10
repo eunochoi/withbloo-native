@@ -167,7 +167,7 @@ export function AppearanceSettingsSection({
           </View>
           <View className="flex-row gap-2">
             {(['tmoney', 'suit', 'maruburi'] as const).map((fontFamily) => (
-              <PickerOption key={fontFamily} accessibilityLabel={fontLabels[fontFamily]} selected={(settings.fontFamily ?? 'tmoney') === fontFamily} disabled={disabled} onPress={() => onChange({ fontFamily })} className={`flex-1 min-w-0 gap-2 px-2 py-4 ${dimmed ? 'opacity-40' : 'opacity-100'}`}>
+              <PickerOption key={fontFamily} accessibilityLabel={fontLabels[fontFamily]} selected={(settings.fontFamily ?? 'tmoney') === fontFamily} disabled={disabled} onPress={() => onChange({ fontFamily })} className={`h-[5.666667rem] flex-1 min-w-0 gap-2 px-2 py-2 ${dimmed ? 'opacity-40' : 'opacity-100'}`}>
                 <Text style={{ fontFamily: fontFamily === 'suit' ? 'SUITRegular' : fontFamily === 'maruburi' ? 'MaruBuriRegular' : 'Tmoney' }} className="text-center text-lg">{t('settings.fontPreview')}</Text>
                 <Text className="text-center text-sm">{fontLabels[fontFamily]}</Text>
               </PickerOption>

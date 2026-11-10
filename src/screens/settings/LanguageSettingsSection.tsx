@@ -32,7 +32,7 @@ export function LanguageSettingsSection({
             disabled={disabled}
             accessibilityLabel={choice.label}
             onPress={() => onChange(choice.value)}
-            className="flex-1 min-w-0 items-center justify-center px-2 py-3"
+            className="h-[5.666667rem] flex-1 min-w-0 items-center justify-center px-2 py-2"
           >
             <Text
               className={`text-center text-sm leading-5 font-medium ${value === choice.value ? 'text-theme-accent' : 'text-theme-text-primary'}`}
