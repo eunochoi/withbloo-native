@@ -51,7 +51,7 @@ export function EmotionIconStyleSelector({
           onPress={() => onChange(style)}
           className={twMerge(
             SELECTION_BOX_CLASS_NAME,
-            value === style ? CHECKED_BOX_CLASS_NAME : UNCHECKED_BOX_CLASS_NAME,
+            value === style ? CHECKED_BOX_CLASS_NAME : compact ? 'border border-transparent bg-transparent' : UNCHECKED_BOX_CLASS_NAME,
             'flex-1 px-2',
             compact ? 'gap-1 py-2' : 'h-[5.666667rem] min-w-0 gap-1 py-2',
             choiceClassName,
@@ -64,6 +64,7 @@ export function EmotionIconStyleSelector({
           </View>
           <Text
             autoLineHeight={autoLineHeight}
+            style={compact ? { includeFontPadding: false } : undefined}
             className={twMerge(
               `text-center ${labelSize === 'base' ? 'text-base' : 'text-sm'} font-medium ${compact ? '' : labelSize === 'base' ? 'leading-6' : 'leading-5'} ${value === style ? 'text-theme-accent-deep' : 'text-theme-text-primary'}`,
               labelClassName,

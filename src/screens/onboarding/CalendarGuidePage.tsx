@@ -66,7 +66,7 @@ export function CalendarGuidePage() {
           <View className={`${exampleClassName} justify-evenly`}>
             <View className="flex-row items-center gap-1.5">
               <AppIcon name="diary" size={rem * 1.25} className="text-theme-accent" />
-              <Text autoLineHeight className="text-[13px]">{t('calendar.entryNumber', { count: 12 })}</Text>
+              <Text autoLineHeight style={{ includeFontPadding: false }} className="text-[13px]">{t('calendar.entryNumber', { count: 12 })}</Text>
             </View>
             {[
               { count: 8, color: '#7BBDAD' },
@@ -75,7 +75,7 @@ export function CalendarGuidePage() {
             ].map((item) => (
               <View key={item.color} className="flex-row items-center gap-1.5">
                 <AppIcon name="habit" size={rem * 1.25} color={item.color} />
-                <Text autoLineHeight className="text-[13px]">
+                <Text autoLineHeight style={{ includeFontPadding: false }} className="text-[13px]">
                   {t('calendar.compactDayCount', { count: item.count })}
                 </Text>
               </View>

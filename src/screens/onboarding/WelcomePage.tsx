@@ -29,24 +29,21 @@ export function WelcomePage() {
         </Text>
       </View>
       <View className="gap-4">
-        <View className="relative h-20 w-full max-w-[21rem] self-center items-center justify-center px-6 pb-4">
-          <Svg
-            width="100%"
-            height="100%"
-            viewBox="0 0 320 88"
-            preserveAspectRatio="none"
-            accessible={false}
-            style={{ position: 'absolute' }}
-          >
-            <Path
-              d="M42 4 C21 3 7 14 7 35 C6 56 20 69 43 70 C77 72 67 71 98 71 C102 78 111 83 124 82 C116 77 113 73 114 71 C157 73 242 72 277 69 C301 67 315 55 314 35 C314 14 299 5 276 4 C203 1 115 2 42 4 Z"
-              fill={moods[mood].color}
-              fillOpacity={0.2}
-            />
-          </Svg>
-          <Text autoLineHeight accessibilityLiveRegion="polite" className="text-center text-[13px]">
-            {t(`onboarding.${moods[mood].key}Story`)}
-          </Text>
+        <View className="relative min-h-24 w-full max-w-[21rem] self-center pb-4">
+          <View pointerEvents="none" className="absolute inset-0">
+            <Svg width="100%" height="100%" viewBox="0 0 320 88" preserveAspectRatio="none" accessible={false}>
+              <Path
+                d="M42 4 C21 3 7 14 7 35 C6 56 20 69 43 70 C77 72 67 71 98 71 C102 78 111 83 124 82 C116 77 113 73 114 71 C157 73 242 72 277 69 C301 67 315 55 314 35 C314 14 299 5 276 4 C203 1 115 2 42 4 Z"
+                fill={moods[mood].color}
+                fillOpacity={0.2}
+              />
+            </Svg>
+          </View>
+          <View className="min-h-20 justify-center px-10 py-4">
+            <Text autoLineHeight accessibilityLiveRegion="polite" style={{ includeFontPadding: false }} className="text-center text-[13px]">
+              {t(`onboarding.${moods[mood].key}Story`)}
+            </Text>
+          </View>
         </View>
         <Image
           key={mood}
@@ -68,14 +65,15 @@ export function WelcomePage() {
               })}
               accessibilityState={{ selected: mood === index }}
               onPress={() => setMood(index)}
-              className={`min-h-11 min-w-0 flex-1 flex-row flex-wrap items-center justify-center gap-2 rounded-xl border px-2 py-2 ${mood === index ? 'border-theme-accent bg-theme-accent-light/50' : 'border-transparent'}`}
+              className={`min-h-11 min-w-0 flex-1 flex-row items-center justify-center gap-2 rounded-xl border px-2 py-2 ${mood === index ? 'border-theme-accent bg-theme-accent-light/50' : 'border-transparent'}`}
             >
               <View
                 className="h-3 w-3 shrink-0 rounded-full"
                 style={{ backgroundColor: item.color }}
               />
               <Text autoLineHeight
-                className={`text-[13px] ${mood === index ? 'font-semibold text-theme-accent-text' : 'text-theme-text-primary'}`}
+                style={{ includeFontPadding: false }}
+                className={`shrink text-center text-[13px] ${mood === index ? 'text-theme-accent-text' : 'text-theme-text-primary'}`}
               >
                 {t(`onboarding.${item.key}`)}
               </Text>

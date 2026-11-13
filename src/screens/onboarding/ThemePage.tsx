@@ -61,7 +61,7 @@ export function ThemePage({
         <EmotionIconStyleSelector
           compact
           autoLineHeight
-          choiceClassName="h-24"
+          choiceClassName="h-24 border"
           labelSize="base"
           labelClassName="text-[13px] text-theme-text-primary"
           value={settings.emotionStyle}
@@ -84,7 +84,7 @@ export function ThemePage({
               onPress={() => void onChange({ themeMode: mode })}
               className={`${choiceClassName} flex-1 ${settings.themeMode === mode ? 'border-theme-accent bg-theme-accent-light/50' : 'border-transparent'}`}
             >
-              <Text autoLineHeight
+              <Text autoLineHeight style={{ includeFontPadding: false }}
                 className="text-[13px] text-theme-text-primary"
               >
                 {t(mode === 'light' ? 'settings.themeLight' : mode === 'dark' ? 'settings.themeDark' : 'settings.themeSystem')}
@@ -106,8 +106,8 @@ export function ThemePage({
               onPress={() => void onChange({ fontFamily })}
               className={`${choiceClassName} flex-1 gap-2 ${(settings.fontFamily ?? 'tmoney') === fontFamily ? 'border-theme-accent bg-theme-accent-light/50' : 'border-transparent'}`}
             >
-              <Text autoLineHeight style={{ fontFamily: fontFamily === 'suit' ? 'SUITRegular' : fontFamily === 'maruburi' ? 'MaruBuriRegular' : 'Tmoney' }} className="text-center text-[15px]">{t('settings.fontPreview')}</Text>
-              <Text autoLineHeight className="text-center text-[11px]">{t(index === 0 ? 'settings.fontType1' : index === 1 ? 'settings.fontType2' : 'settings.fontType3')}</Text>
+              <Text autoLineHeight style={{ includeFontPadding: false, fontFamily: fontFamily === 'suit' ? 'SUITRegular' : fontFamily === 'maruburi' ? 'MaruBuriRegular' : 'Tmoney' }} className="text-center text-[15px]">{t('settings.fontPreview')}</Text>
+              <Text autoLineHeight style={{ includeFontPadding: false }} className="text-center text-[11px]">{t(index === 0 ? 'settings.fontType1' : index === 1 ? 'settings.fontType2' : 'settings.fontType3')}</Text>
             </Pressable>
           ))}
         </View>
@@ -125,7 +125,7 @@ export function ThemePage({
               onPress={() => void onChange({ fontSize: size })}
               className={`${choiceClassName} flex-1 ${settings.fontSize === size ? 'border-theme-accent bg-theme-accent-light/50' : 'border-transparent'}`}
             >
-              <Text autoLineHeight
+              <Text autoLineHeight style={{ includeFontPadding: false }}
                 className="text-[13px] text-theme-text-primary"
               >
                 {t(`settings.${size}`)}
