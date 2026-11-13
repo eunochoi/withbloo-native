@@ -61,7 +61,7 @@ export const diaryEn = {
   moveForward: 'Move earlier',
   moveBackward: 'Move later',
   chooseEmotionFilter: 'Which feelings would you like to see?',
-  chooseEmotion: 'How are you feeling today?',
+  chooseEmotion: 'Emotion Selection',
   dateRequired: 'Please choose a diary date.',
   emotionRequired: "Please choose today's emotion.",
   wait: 'Please wait',

@@ -1,11 +1,11 @@
-import { mockI18n, formatDisplayDate } from './helpers/i18n';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { runInNewContext } from 'node:vm';
 import test from 'node:test';
+import { runInNewContext } from 'node:vm';
 import { EMOTIONS } from '../src/domain/constants';
 import { DIARY_EMOTION_GROUPS } from '../src/domain/diaryFilters';
+import { formatDisplayDate, mockI18n } from './helpers/i18n';
 
 const require = createRequire(import.meta.url);
 const ts = require('typescript');
@@ -94,13 +94,15 @@ function picker(value: number | null, allowDeselect = false) {
       },
       onApply: (next: number | null) => applied.push(next),
     });
-    const scroll = { type: 'ScrollView', key: shell.props.contentKey, props: {
-      children: [null, shell.props.children],
-      onContentSizeChange: (width: number, height: number) => {
-        sizes.push([width, height]);
-        shell.props.onContentSizeChange(width, height);
-      },
-    } };
+    const scroll = {
+      type: 'ScrollView', key: shell.props.contentKey, props: {
+        children: [null, shell.props.children],
+        onContentSizeChange: (width: number, height: number) => {
+          sizes.push([width, height]);
+          shell.props.onContentSizeChange(width, height);
+        },
+      }
+    };
     const footer = shell.props.headerButton((after?: () => void) => {
       closed++;
       deferred = after;
@@ -288,7 +290,7 @@ test('editing reveals the initial row after opening and category changes reset t
 test('emotion picker translates names and descriptions while preserving selection and stored emotion IDs', () => {
   const ui = picker(10);
   ui.setLanguage('en');
-  assert.equal(ui.render().shell.props.title, 'How are you feeling today?');
+  assert.equal(ui.render().shell.props.title, 'Emotion Selection');
   assert.equal(ui.option('Neutral category').props.selected, true);
   assert.equal(ui.option('Drowsy, Feeling relaxed and a little low on energy').props.selected, true);
   ui.option('Mixed, A subtle mix of good and difficult feelings').props.onPress();

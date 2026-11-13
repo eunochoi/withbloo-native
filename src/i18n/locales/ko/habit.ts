@@ -153,7 +153,7 @@ export const habitKo = {
   recordFormAdd: '기록 추가',
   recordFormEdit: '기록 수정',
   recordPhotoHint: '이 기록과 함께 남기고 싶은 사진을 추가해보세요.',
-  restartSwitchHint: '다시 시작하기를 끄면 일반 기록으로 저장돼요.',
+  restartSwitchHint: '다시 시작하기 스위치를 변경하면 일반 기록으로 저장돼요.',
   recordAdd: '기록 추가',
   allRecords: '기록 모아보기',
   recordEdit: '기록 수정하기',

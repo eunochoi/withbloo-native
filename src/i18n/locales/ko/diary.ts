@@ -61,7 +61,7 @@ export const diaryKo = {
   moveForward: '앞으로 이동',
   moveBackward: '뒤로 이동',
   chooseEmotionFilter: '어떤 감정의 기록을 볼까요?',
-  chooseEmotion: '오늘의 감정을 골라주세요',
+  chooseEmotion: '감정 선택',
   dateRequired: '일기 날짜를 선택해주세요.',
   emotionRequired: '오늘의 감정을 선택해주세요.',
   wait: '잠시만 기다려주세요',
