@@ -1,6 +1,5 @@
 import { type ReactNode } from 'react';
 import { Keyboard, View } from 'react-native';
-import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import type { useBottomSheetMotion } from './useBottomSheetMotion';
 import type { useScrollFade } from '../../hooks/useScrollFade';
@@ -67,13 +66,7 @@ export function BottomSheetContent({
           height: fixedHeight ? sheetHeight : undefined,
         }}
       >
-        {!list ? (
-          <GestureDetector gesture={motion.panGesture}>
-            <View collapsable={false}>{header}</View>
-          </GestureDetector>
-        ) : (
-          header
-        )}
+        {header}
         {contentHeader && (
           <View className={contentFullBleed ? 'px-[5%]' : 'mx-1'}>
             {contentHeader}

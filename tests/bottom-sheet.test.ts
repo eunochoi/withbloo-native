@@ -32,6 +32,8 @@ function harness(
     contentFullBleed?: boolean;
     list?: any;
     renderBody?: (close: any, scroll: any) => unknown;
+    windowHeight?: number;
+    topInset?: number;
   } = {},
 ) {
   const slots: any[] = [];
@@ -196,7 +198,7 @@ function harness(
           useAppTheme: () => ({ colors: {}, rem: 15, reducedMotion, iconSizes: { md: 20 } }),
         };
       if (name === 'react-native-safe-area-context')
-        return { useSafeAreaInsets: () => ({ top: 24, bottom: 30, left: 0, right: 0 }) };
+        return { useSafeAreaInsets: () => ({ top: options.topInset ?? 24, bottom: 30, left: 0, right: 0 }) };
       if (name === 'react-native')
         return {
           Modal: 'Modal',
@@ -204,7 +206,7 @@ function harness(
           View: 'View',
           ScrollView: 'ScrollView',
           Pressable: 'Pressable',
-          useWindowDimensions: () => ({ height: 800 }),
+          useWindowDimensions: () => ({ height: options.windowHeight ?? 800 }),
           Keyboard: { isVisible: () => false, dismiss: () => {}, addListener: () => ({ remove: () => {} }) },
           AccessibilityInfo: { announceForAccessibility: () => {} },
           BackHandler: {
@@ -409,6 +411,11 @@ function harness(
     get native() {
       return find(tree, (node) => node.props?.gesture?.kind === 'native').props.gesture;
     },
+    get gestureWrapsSheetAndScroll() {
+      const panNode = find(tree, (node) => node.props?.gesture?.kind === 'pan');
+      const nativeNode = find(panNode, (node) => node.props?.gesture?.kind === 'native');
+      return Boolean(find(nativeNode, (node) => node === this.scroll()));
+    },
     get y() {
       return this.sheet().props.style.current().transform[0].translateY;
     },
@@ -586,16 +593,24 @@ test('route sheet keeps its header outside its keyboard-aware scroll area', () =
   assert.ok(h.sheet());
 });
 
-test('explicit fixed-height sheets share the 95-percent maximum in either presentation', () => {
+test('fixed-height sheets use screen height minus 40 in either presentation', () => {
   for (const presentation of ['screen', 'modal'] as const) {
-    const h = harness(true, false, undefined, { fixedHeight: true, presentation });
+    const h = harness(true, false, undefined, { fixedHeight: true, presentation, windowHeight: 1000 });
     if (presentation === 'modal') h.show();
     const surface = h.sheet().props.children;
-    const expectedHeight = 800 * 0.95;
+    const expectedHeight = 960;
     assert.equal(surface.props.style.height, expectedHeight);
     assert.equal(surface.props.style.maxHeight, expectedHeight);
     assert(surface.props.children[2].props.className.includes('flex-1'));
     assert(h.scroll().props.className.includes('flex-1'));
+  }
+});
+
+test('sheet height respects a larger top safe area and never becomes negative', () => {
+  for (const [windowHeight, topInset, expected] of [[800, 60, 740], [30, 0, 0]]) {
+    const h = harness(true, false, undefined, { windowHeight, topInset });
+    h.show();
+    assert.equal(h.sheet().props.children.props.style.maxHeight, expected);
   }
 });
 
@@ -609,18 +624,27 @@ test('automatic sheets retain a bounded viewport and scroll fades', () => {
   assert(h.scroll().props.className.includes('shrink'));
 });
 
-test('ordinary sheets keep scroll gestures separate from header dismissal', () => {
-  const h = harness();
-  h.show();
-  h.completeOpen();
-  assert.equal(h.scroll().type, 'KeyboardAwareScrollView');
-  assert.equal(h.scroll().props.bounces, false);
-  h.begin();
-  h.move(0, 60);
-  assert.equal(h.gestureState, 'active');
-  h.end(false);
-  h.completeAnimation();
-  assert.equal(h.closes, 0);
+test('ordinary and list content coordinate scrolling with sheet dismissal', () => {
+  for (const list of [undefined, { data: [], renderItem: () => null }]) {
+    const h = harness(true, false, undefined, { list });
+    h.show();
+    h.completeOpen();
+    assert.equal(h.gestureWrapsSheetAndScroll, true);
+    assert.equal(h.native.config.requireExternalGestureToFail, h.pan);
+    assert.equal(h.scroll().props.bounces, false);
+    h.offset(50);
+    h.begin();
+    assert.equal(h.gestureState, 'failed');
+    h.offset(0);
+    h.move(0, 120);
+    assert.equal(h.closes, 0);
+    h.begin();
+    h.move(0, 120);
+    assert.equal(h.gestureState, 'active');
+    h.end();
+    h.completeAnimation();
+    assert.equal(h.closes, 1);
+  }
 });
 
 test('list sheets create the shared virtualized list and forward data and loading callbacks', () => {

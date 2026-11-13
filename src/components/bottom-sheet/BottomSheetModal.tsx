@@ -78,7 +78,7 @@ export function BottomSheetModal({
   const fade = useScrollFade();
   const { onScrollOffset } = fade;
   useEffect(() => onScrollOffset(0), [contentKey, onScrollOffset]);
-  const sheetHeight = Math.max(0, Math.min(height * 0.95, height - insets.top));
+  const sheetHeight = Math.max(0, height - Math.max(40, insets.top));
   const { present, bodyVisible, closingBody, session, motion, closeSheet, onShow } =
     useBottomSheetLifecycle({
       visible,
@@ -97,7 +97,6 @@ export function BottomSheetModal({
       contentKey,
       onScrollOffset,
       scrollEnabled,
-      headerOnlyDrag: !list,
       scrollRef,
     });
   const headerContent = (
@@ -164,8 +163,7 @@ export function BottomSheetModal({
             onClose={closeSheet}
           />
         )}
-        {bodyVisible &&
-          (!list ? sheet : <GestureDetector gesture={motion.panGesture}>{sheet}</GestureDetector>)}
+        {bodyVisible && <GestureDetector gesture={motion.panGesture}>{sheet}</GestureDetector>}
         <NoticeHost modal active={present && (presentation === 'modal' || noticeHostActive)} />
       </View>
     </GestureHandlerRootView>

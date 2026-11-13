@@ -74,18 +74,20 @@ export function BottomSheetScrollViewport({
           <BottomSheetList {...scrollProps} list={list} contentKey={contentKey} />
         </GestureDetector>
       ) : (
-        <BottomSheetScroll
-          motion={motion}
-          fade={fade}
-          fixedHeight={fixedHeight}
-          scrollEnabled={scrollEnabled}
-          contentKey={contentKey}
-          bottomPadding={bottomPadding}
-          contentContainerClassName={contentContainerClassName}
-          onContentSizeChange={onContentSizeChange}
-        >
-          {children}
-        </BottomSheetScroll>
+        <GestureDetector gesture={motion.scrollGesture}>
+          <BottomSheetScroll
+            motion={motion}
+            fade={fade}
+            fixedHeight={fixedHeight}
+            scrollEnabled={scrollEnabled}
+            contentKey={contentKey}
+            bottomPadding={bottomPadding}
+            contentContainerClassName={contentContainerClassName}
+            onContentSizeChange={onContentSizeChange}
+          >
+            {children}
+          </BottomSheetScroll>
+        </GestureDetector>
       )}
       {scrollFade && (
         <>

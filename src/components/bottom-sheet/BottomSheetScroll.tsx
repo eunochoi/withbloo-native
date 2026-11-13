@@ -41,7 +41,7 @@ export function BottomSheetScroll({
         fade.onContentSizeChange(width, height);
         onContentSizeChange?.(width, height);
       }}
-      onScroll={fade.onScroll}
+      onScroll={motion.onScroll}
       scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}
       nestedScrollEnabled

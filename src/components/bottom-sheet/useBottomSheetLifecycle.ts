@@ -23,7 +23,6 @@ type Options = {
   contentKey?: string | number;
   onScrollOffset: (offset: number) => void;
   scrollEnabled: boolean;
-  headerOnlyDrag?: boolean;
   scrollRef?: AnimatedRef<ScrollView>;
 };
 
@@ -45,7 +44,6 @@ export function useBottomSheetLifecycle({
   contentKey,
   onScrollOffset,
   scrollEnabled,
-  headerOnlyDrag,
   scrollRef,
 }: Options) {
   const [present, setPresent] = useState(visible);
@@ -111,7 +109,6 @@ export function useBottomSheetLifecycle({
     onClosed: finishClose,
     onOpened: finishOpen,
     scrollEnabled,
-    headerOnlyDrag,
     dismissible,
     externalScrollRef: scrollRef,
   });
