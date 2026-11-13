@@ -102,14 +102,14 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
     >
 
       <View accessibilityRole="radiogroup" accessibilityLabel={t('habit.sort')}>
-        <View className="gap-5 pb-8">
+        <View className="gap-8 pb-8">
           <Pressable accessibilityRole="radio" accessibilityState={{ checked: sort !== 'CUSTOM' }} onPress={() => setSort(standardSort)} className="flex-row items-center gap-2">
             <View className="h-5 w-5 items-center justify-center rounded-full border border-theme-accent">
               {sort !== 'CUSTOM' && <View className="h-3 w-3 rounded-full bg-theme-accent" />}
             </View>
             <Text className="text-lg font-semibold">{t('habit.criteriaSort')}</Text>
           </Pressable>
-          <View className="gap-5" style={{ opacity: sort === 'CUSTOM' ? 0.4 : 1 }} pointerEvents={sort === 'CUSTOM' ? 'none' : 'auto'} accessibilityElementsHidden={sort === 'CUSTOM'} importantForAccessibility={sort === 'CUSTOM' ? 'no-hide-descendants' : 'auto'}>
+          <View className="gap-8" style={{ opacity: sort === 'CUSTOM' ? 0.4 : 1 }} pointerEvents={sort === 'CUSTOM' ? 'none' : 'auto'} accessibilityElementsHidden={sort === 'CUSTOM'} importantForAccessibility={sort === 'CUSTOM' ? 'no-hide-descendants' : 'auto'}>
             <View className="flex-row items-center justify-between gap-3">
               <Text className="text-base font-semibold">{t('ui.priorityFirst')}</Text>
               <Switch accessibilityLabel={t('ui.priorityFirst')} value={priority} onValueChange={setPriority} ios_backgroundColor={colors.switchTrack} trackColor={{ false: colors.switchTrack, true: colors.accent }} thumbColor={colors.switchThumb} />
@@ -129,14 +129,14 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
             <InfoNotice>{t('ui.sortDescription', { value: `${priority ? t('ui.importantPrefix') : ''}${t('ui.createdDate')}` })}</InfoNotice>
           </View>
         </View>
-        <View className="gap-5 border-t border-theme-border/30 pt-8">
+        <View className="gap-8 border-t border-theme-border/30 pt-8">
           <Pressable accessibilityRole="radio" accessibilityState={{ checked: sort === 'CUSTOM' }} onPress={() => { setSort('CUSTOM'); }} className="flex-row items-center gap-2">
             <View className="h-5 w-5 items-center justify-center rounded-full border border-theme-accent">
               {sort === 'CUSTOM' && <View className="h-3 w-3 rounded-full bg-theme-accent" />}
             </View>
             <Text className="text-lg font-semibold">{t('habit.customSort')}</Text>
           </Pressable>
-          <View className="gap-5" style={{ opacity: sort !== 'CUSTOM' ? 0.4 : 1 }} pointerEvents={sort !== 'CUSTOM' ? 'none' : 'auto'} accessibilityElementsHidden={sort !== 'CUSTOM'} importantForAccessibility={sort !== 'CUSTOM' ? 'no-hide-descendants' : 'auto'}>
+          <View className="gap-8" style={{ opacity: sort !== 'CUSTOM' ? 0.4 : 1 }} pointerEvents={sort !== 'CUSTOM' ? 'none' : 'auto'} accessibilityElementsHidden={sort !== 'CUSTOM'} importantForAccessibility={sort !== 'CUSTOM' ? 'no-hide-descendants' : 'auto'}>
             {sort === 'CUSTOM' && !query.data && <QueryState query={query} />}
             {order && <HabitManualSortList items={items} scrollRef={scrollRef} disabled={sort !== 'CUSTOM'} saving={saving} dragging={dragging} onDraggingChange={setDragging} onOrderChange={setOrder} onMove={move} />}
             <InfoNotice>{t('ui.customDescription')}</InfoNotice>

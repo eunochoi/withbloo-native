@@ -37,7 +37,7 @@ export function FilterSheet({
       scrollFade
       onClose={onClose}
     >
-      <View className="gap-5">
+      <View className="gap-8">
 
         {children}
         <ContentBottomButton label={t('ui.reset')} accessibilityLabel={t('ui.resetSelection')} onPress={onReset} />

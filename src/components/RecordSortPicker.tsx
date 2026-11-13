@@ -80,7 +80,7 @@ export function RecordSortPicker({
         />
       )}
     >
-      <View className={showCriteriaSort ? 'gap-5' : 'gap-7'}>
+      <View className={showCriteriaSort ? 'gap-8' : 'gap-7'}>
 
         {prioritySection}
         {recordSort && (
