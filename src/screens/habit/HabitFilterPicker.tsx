@@ -42,8 +42,8 @@ export function HabitFilterPicker({
           accessibilityLabel={t('habit.completedOnly')}
           value={draft.completedOnly}
           onValueChange={(completedOnly) => setDraft({ ...draft, completedOnly })}
-          trackColor={{ false: colors.border, true: colors.accent }}
-          thumbColor={colors.surface}
+          ios_backgroundColor={colors.switchTrack} trackColor={{ false: colors.switchTrack, true: colors.accent }}
+          thumbColor={colors.switchThumb}
         />
       </View>
       <View className="gap-3">

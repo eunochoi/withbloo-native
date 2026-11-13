@@ -52,8 +52,8 @@ export function AutomaticBackupSection({ disabled }: { disabled: boolean }) {
           accessibilityLabel={t('settings.autoBackup')}
           disabled={disabled || busy}
           value={status.enabled && !status.paused}
-          trackColor={{ false: colors.border, true: colors.accent }}
-          thumbColor={colors.surface}
+          ios_backgroundColor={colors.switchTrack} trackColor={{ false: colors.switchTrack, true: colors.accent }}
+          thumbColor={colors.switchThumb}
           onValueChange={(enabled) =>
             enabled
               ? status.configured

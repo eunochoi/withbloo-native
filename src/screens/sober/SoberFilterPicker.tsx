@@ -55,8 +55,8 @@ export function SoberFilterPicker({
             accessibilityLabel={t('sober.onlyImportant')}
             value={draft.priorityOnly}
             onValueChange={(priorityOnly) => setDraft({ ...draft, priorityOnly })}
-            trackColor={{ false: colors.border, true: colors.accent }}
-            thumbColor={colors.surface}
+            ios_backgroundColor={colors.switchTrack} trackColor={{ false: colors.switchTrack, true: colors.accent }}
+            thumbColor={colors.switchThumb}
           />
         </View>
         <View className="gap-3">

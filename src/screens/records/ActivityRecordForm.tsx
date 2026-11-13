@@ -122,7 +122,7 @@ export function ActivityRecordForm({
         {scope === 'sober' && (
           <View className="min-h-12 flex-row items-center justify-between gap-3">
             <Text accessibilityRole="header" className="text-lg font-semibold">{t('sober.restart')}</Text>
-            <Switch accessibilityLabel={t('sober.restart')} value={isRestart} disabled={busy} onValueChange={(value) => { setIsRestart(value); setValidation(''); }} trackColor={{ false: colors.border, true: colors.accent }} thumbColor={colors.surface} />
+            <Switch accessibilityLabel={t('sober.restart')} value={isRestart} disabled={busy} onValueChange={(value) => { setIsRestart(value); setValidation(''); }} ios_backgroundColor={colors.switchTrack} trackColor={{ false: colors.switchTrack, true: colors.accent }} thumbColor={colors.switchThumb} />
           </View>
         )}
         <RecordDateTimeField

@@ -112,7 +112,7 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
           <View className="gap-5" style={{ opacity: sort === 'CUSTOM' ? 0.4 : 1 }} pointerEvents={sort === 'CUSTOM' ? 'none' : 'auto'} accessibilityElementsHidden={sort === 'CUSTOM'} importantForAccessibility={sort === 'CUSTOM' ? 'no-hide-descendants' : 'auto'}>
             <View className="flex-row items-center justify-between gap-3">
               <Text className="text-base font-semibold">{t('ui.priorityFirst')}</Text>
-              <Switch accessibilityLabel={t('ui.priorityFirst')} value={priority} onValueChange={setPriority} trackColor={{ false: colors.border, true: colors.accent }} thumbColor={colors.surface} />
+              <Switch accessibilityLabel={t('ui.priorityFirst')} value={priority} onValueChange={setPriority} ios_backgroundColor={colors.switchTrack} trackColor={{ false: colors.switchTrack, true: colors.accent }} thumbColor={colors.switchThumb} />
             </View>
             <View className="gap-3">
               <Text className="text-base font-semibold">{t('ui.createdDateSort')}</Text>

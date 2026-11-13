@@ -58,8 +58,8 @@ export function RecordSortPicker({
           if (value && draftSort === 'CUSTOM') setSort('DESC');
           setPriority(value);
         }}
-        trackColor={{ false: colors.border, true: colors.accent }}
-        thumbColor={colors.surface}
+        ios_backgroundColor={colors.switchTrack} trackColor={{ false: colors.switchTrack, true: colors.accent }}
+        thumbColor={colors.switchThumb}
       />
     </View>
   );

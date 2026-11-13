@@ -229,8 +229,8 @@ export function SoberForm({ id }: { id?: number }) {
           disabled={mutation.isPending}
           value={draft.is_priority === 1}
           onValueChange={(value) => setDraft({ ...draft, is_priority: value ? 1 : 0 })}
-          trackColor={{ false: colors.border, true: colors.accent }}
-          thumbColor={colors.surface}
+          ios_backgroundColor={colors.switchTrack} trackColor={{ false: colors.switchTrack, true: colors.accent }}
+          thumbColor={colors.switchThumb}
         />
       </View>
       <View className="gap-3">
