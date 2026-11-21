@@ -144,4 +144,4 @@ Whenever I ask you to commit changes, you must always adhere to the following ru
 - 설명이 있는 메뉴 항목은 `PickerAction`, 연도·월·감정 같은 선택 항목은 `PickerOption`을 사용한다. surface 배경, `rounded-2xl`, 눌림·비활성 상태를 공통 컴포넌트에서 관리한다.
 - 선택 상태는 accent 테두리와 강조 텍스트로 표시한다. 선택 텍스트에는 `text-theme-accent`를 적용한다. 다중 열 그리드는 `compact` 옵션으로 패딩을 줄인다.
 - 메뉴 카드 사이 간격은 `gap-3`을 기본으로 한다. 월·감정처럼 열이 많은 그리드는 `gap-1.5`를 사용한다. 적용/완료 버튼은 공통 `Button`을 사용한다.
-- safe area, 하단 패딩, 등장/닫힘 애니메이션은 `BottomSheetModal`에서 관리하며 새 피커에 개별 구현하지 않는다.
+- 피커의 표시와 닫힘은 Expo UI의 `BottomSheetModal`을 사용한다. 경로가 있는 패널은 Expo Router의 `formSheet`를 사용한다.
