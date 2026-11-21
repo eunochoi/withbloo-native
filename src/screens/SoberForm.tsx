@@ -11,9 +11,10 @@ import { useQuery } from '@tanstack/react-query';
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
-import { ScrollView, Switch, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, TextInput, View } from 'react-native';
 import { SheetHeader } from '../components/SheetHeader';
 import { HeaderAction } from '../components/HeaderAction';
+import { AppIcon } from '../components/AppIcon';
 import { CharacterCount } from '../components/CharacterCount';
 import { DateTimePicker } from '../components/DateTimePicker';
 import { FormPickerRow } from '../components/FormPickerRow';
@@ -27,7 +28,7 @@ import { Text } from '../components/Text';
 import { saveSober } from '../db/sober';
 import { DEFAULT_HABIT_ICON_COLOR, HABIT_ICON_COLORS } from '../domain/constants';
 import { SOBER_DESCRIPTION_MAX_LENGTH, SOBER_NAME_MAX_LENGTH } from '../domain/limits';
-import type { SoberInput } from '../domain/sober';
+import { SOBER_GOALS, type SoberInput } from '../domain/sober';
 import { assertDateTime } from '../domain/date';
 import { soberQueries, useRecordMutation } from '../queries';
 import { useAppTheme } from '../theme/AppThemeProvider';
@@ -43,7 +44,7 @@ export function SoberForm({ id }: { id?: number }) {
   const { t, language, formatLocale } = useI18n();
 
   const db = useSQLiteContext();
-  const { colors, rem: appRem } = useAppTheme();
+  const { colors, iconSizes, rem: appRem } = useAppTheme();
   const query = useQuery({ ...soberQueries.byId(db, id ?? 0), enabled: id !== undefined });
   const [draft, setDraft] = useState<SoberInput>(() => ({
     id,
@@ -83,6 +84,7 @@ export function SoberForm({ id }: { id?: number }) {
   );
   const iconBackgroundColor =
     draft.icon_color === 'theme' ? colors.accent : HABIT_ICON_COLORS[draft.icon_color].value;
+  const manualGoalIcon = SOBER_GOALS.some((days) => days === draft.goal_days) ? 'flag' : 'edit';
   const title = id ? t('sober.edit') : t('sober.add');
   const didClose = useRef(false);
   useEffect(() => {
@@ -264,70 +266,86 @@ export function SoberForm({ id }: { id?: number }) {
           />
         </View>
       </View>
-      <View className="flex-row items-center justify-between gap-3">
+      <Pressable
+        accessibilityRole="checkbox"
+        accessibilityLabel={t('sober.important')}
+        accessibilityState={{ checked: draft.is_priority === 1, disabled: mutation.isPending }}
+        disabled={mutation.isPending}
+        onPress={() =>
+          setDraft((current) => ({ ...current, is_priority: current.is_priority === 1 ? 0 : 1 }))
+        }
+        className="min-h-12 flex-row items-center justify-between gap-3 disabled:opacity-40"
+      >
         <Text className={SECTION_TITLE_CLASS_NAME}>{t('sober.important')}</Text>
-        <Switch
-          accessibilityLabel={t('sober.important')}
-          disabled={mutation.isPending}
-          value={draft.is_priority === 1}
-          onValueChange={(value) => setDraft({ ...draft, is_priority: value ? 1 : 0 })}
-          ios_backgroundColor={colors.switchTrack} trackColor={{ false: colors.switchTrack, true: colors.accent }}
-          thumbColor={colors.switchThumb}
-        />
-      </View>
-      <View className="gap-3">
-        <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
-          {t('habit.icon')}
-        </Text>
-        <FormPickerRow
-          label={t(`soberIcons.${draft.icon_key}`)}
-          accessibilityLabel={t('habit.chooseIcon')}
-          disabled={mutation.isPending}
-          onPress={() => setPicker('icon')}
-          leading={
-            <SoberIcon name={draft.icon_key} colorKey={draft.icon_color} size={appRem * 1.75} />
-          }
-        />
-      </View>
-      <View className="gap-3">
-        <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
-          {t('habit.iconColor')}
-        </Text>
-        <FormPickerRow
-          label={
-            draft.icon_color === 'theme'
-              ? t('habit.defaultThemeColor')
-              : t(`iconColors.${draft.icon_color}`)
-          }
-          accessibilityLabel={t('habit.chooseIconColor')}
-          disabled={mutation.isPending}
-          onPress={() => setPicker('color')}
-          leading={
+        <View
+          className="mr-2 h-5 w-5 shrink-0 items-center justify-center ios:curve-continuous rounded-md border-[1px] bg-theme-surface"
+          style={{
+            borderColor: `${colors.accent}${draft.is_priority === 1 ? 'BF' : '99'}`,
+            backgroundColor: draft.is_priority === 1 ? `${colors.accent}BF` : undefined,
+          }}
+        >
+          {draft.is_priority === 1 && (
+            <AppIcon name="check" size={iconSizes.sm} color="white" accessible={false} />
+          )}
+        </View>
+      </Pressable>
+      {([
+        {
+          key: 'icon',
+          title: t('habit.icon'),
+          label: t(`soberIcons.${draft.icon_key}`),
+          accessibilityLabel: t('habit.chooseIcon'),
+          preview: (
+            <SoberIcon name={draft.icon_key} colorKey={draft.icon_color} size={appRem * 1.5} />
+          ),
+        },
+        {
+          key: 'color',
+          title: t('habit.iconColor'),
+          label: draft.icon_color === 'theme'
+            ? t('habit.defaultThemeColor')
+            : t(`iconColors.${draft.icon_color}`),
+          accessibilityLabel: t('habit.chooseIconColor'),
+          preview: (
             <View
-              className="h-6 w-6 ios:curve-continuous rounded-full border"
+              className="h-6 w-6 rounded-full border"
               style={{
                 backgroundColor: iconBackgroundColor,
                 borderColor: adjustColorBrightness(iconBackgroundColor, -0.1),
               }}
             />
-          }
-        />
-      </View>
-      <View className="gap-3">
-        <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
-          {t('sober.goal')}
-        </Text>
-        <FormPickerRow
-          label={
-            draft.goal_mode === 'AUTO'
-              ? t('sober.autoGoal')
-              : formatSoberGoal(draft.goal_days!, language)
-          }
-          accessibilityLabel={t('sober.chooseGoal')}
-          disabled={mutation.isPending}
-          onPress={() => setPicker('goal')}
-        />
-      </View>
+          ),
+        },
+        {
+          key: 'goal',
+          title: t('sober.goal'),
+          label: draft.goal_mode === 'AUTO'
+            ? t('sober.autoGoal')
+            : formatSoberGoal(draft.goal_days!, language),
+          accessibilityLabel: t('sober.chooseGoal'),
+          preview: (
+            <AppIcon
+              name={draft.goal_mode === 'AUTO' ? 'auto-awesome' : manualGoalIcon}
+              size={appRem * 1.5}
+              color={colors.accent}
+              accessible={false}
+            />
+          ),
+        },
+      ] as const).map(({ key, title, label, accessibilityLabel, preview }) => (
+        <View key={key} className="gap-3">
+          <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
+            {title}
+          </Text>
+          <FormPickerRow
+            label={label}
+            accessibilityLabel={accessibilityLabel}
+            disabled={mutation.isPending}
+            onPress={() => setPicker(key)}
+            leading={<View className="h-7 w-7 shrink-0 items-center justify-center">{preview}</View>}
+          />
+        </View>
+      ))}
       <View className="gap-3">
         <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
           {t('habit.startedAt')}

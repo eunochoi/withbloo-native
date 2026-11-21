@@ -1090,7 +1090,7 @@ test('a removed diary year becomes all years on the next filter application with
   assert.deepEqual(ui.applied, [[null, ['summer'], ['neutral']]]);
 });
 
-test('habit priority picker has four choices in two rows and explains exclusion', () => {
+test('habit priority picker fills the sheet and switches between free and daily entries', () => {
   const ui = picker('src/screens/habit/HabitPriorityPicker.tsx', 'HabitPriorityPicker', {
     value: 1,
   });
@@ -1100,12 +1100,22 @@ test('habit priority picker has four choices in two rows and explains exclusion'
     options.map((node) => node.props.accessibilityLabel),
     ['없음 · 자유 기록', '낮음 · 매일 기록', '보통 · 매일 기록', '높음 · 매일 기록'],
   );
-  const gridRows = view.content.filter(
-    (node) => node.type === 'View' && node.props.className === 'flex-row gap-3',
+  assert.equal(view.shell.props.children.props.style.height, 900 - 40 - 24);
+  const lists = view.content.filter(
+    (node) => node.type === 'View' && node.props.className === 'gap-3 pl-7',
   );
-  assert.equal(gridRows.length, 2);
-  assert(gridRows.every((row) => row.props.children.length === 2));
-  ui.press('없음 · 자유 기록');
+  assert.deepEqual(lists.map((node) => nodes(node).filter((child) => child.type === 'PickerOption').length), [1, 3]);
+  assert(nodes(lists[0]).some((node) => node.type === 'InfoNotice'));
+  assert.deepEqual(view.content.filter((node) => node.type === 'Switch').map((node) => node.props.value), [false, true]);
+  ui.press('높음 · 매일 기록');
+  ui.press('자유 기록');
+  ui.press('매일 기록');
+  assert.equal(
+    ui.render().content.find((node) => node.type === 'PickerOption' && node.props.selected)
+      ?.props.accessibilityLabel,
+    '높음 · 매일 기록',
+  );
+  ui.press('자유 기록');
   assert(
     ui
       .render()
