@@ -1,8 +1,11 @@
+import { NoticeHost } from '../../components/NoticeProvider';
+import { SheetHeader } from '../../components/SheetHeader';
 import { useI18n } from '../../i18n/react';
 import { InfoNotice } from '../../components/InfoNotice';
-import { useState } from 'react';
-import { Switch, View } from 'react-native';
-import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
+import { useEffect, useRef, useState } from 'react';
+import { ScrollView, Switch, View } from 'react-native';
+import { SheetModal } from '../../components/SheetModal';
+import type { BottomSheetModal } from '@expo/ui/community/bottom-sheet';
 import { FormPickerRow } from '../../components/FormPickerRow';
 import { FilterSheet } from '../../components/FilterSheet';
 import { PickerOption } from '../../components/PickerOption';
@@ -41,6 +44,17 @@ export function SoberFilterPicker({
   const { colors } = useAppTheme();
   const [draft, setDraft] = useState(filter);
   const [periodOpen, setPeriodOpen] = useState(false);
+  const sheet = useRef<BottomSheetModal>(null);
+  const afterDismiss = useRef<(() => void) | undefined>(undefined);
+  useEffect(() => {
+    if (periodOpen) sheet.current?.present();
+  }, [periodOpen]);
+  const closeSheet = (action?: () => void) => {
+    if (afterDismiss.current) return false;
+    afterDismiss.current = action;
+    sheet.current?.dismiss();
+    return true;
+  };
   return (
     <FilterSheet
       title={t('sober.filterTitle')}
@@ -55,7 +69,8 @@ export function SoberFilterPicker({
             accessibilityLabel={t('sober.onlyImportant')}
             value={draft.priorityOnly}
             onValueChange={(priorityOnly) => setDraft({ ...draft, priorityOnly })}
-            ios_backgroundColor={colors.switchTrack} trackColor={{ false: colors.switchTrack, true: colors.accent }}
+            ios_backgroundColor={colors.switchTrack}
+            trackColor={{ false: colors.switchTrack, true: colors.accent }}
             thumbColor={colors.switchThumb}
           />
         </View>
@@ -67,15 +82,29 @@ export function SoberFilterPicker({
             disabled={false}
             onPress={() => setPeriodOpen(true)}
           />
+          <InfoNotice>
+            {t('sober.minimumPeriodHint')}
+          </InfoNotice>
         </View>
-        <InfoNotice>{t('sober.minimumPeriodHint')}</InfoNotice>
         {periodOpen && (
-          <BottomSheetModal
-            visible
-            title={t('sober.minimumPeriod')}
-            onClose={() => setPeriodOpen(false)}
+          <SheetModal
+            ref={sheet}
+            onDismiss={() => {
+              const action = afterDismiss.current;
+              afterDismiss.current = undefined;
+              (() => setPeriodOpen(false))();
+              action?.();
+            }}
+
           >
-            {(close) => (
+            <SheetHeader title={t('sober.minimumPeriod')} onClose={closeSheet} />
+
+            <ScrollView
+              className="mx-1 shrink grow-0"
+              contentContainerClassName="gap-7 py-8"
+              nestedScrollEnabled
+              showsVerticalScrollIndicator={false}
+            >
               <View className="gap-3">
                 {recordFilters.map((option) => (
                   <PickerOption
@@ -85,7 +114,9 @@ export function SoberFilterPicker({
                     compact
                     selected={draft.minimumDays === option.days}
                     accessibilityLabel={t('sober.currentRecord', { value: option.label })}
-                    onPress={() => close(() => setDraft({ ...draft, minimumDays: option.days }))}
+                    onPress={() =>
+                      closeSheet(() => setDraft({ ...draft, minimumDays: option.days }))
+                    }
                   >
                     <Text
                       className={`text-base ${draft.minimumDays === option.days ? 'text-theme-accent-deep' : ''}`}
@@ -95,8 +126,10 @@ export function SoberFilterPicker({
                   </PickerOption>
                 ))}
               </View>
-            )}
-          </BottomSheetModal>
+            </ScrollView>
+
+            <NoticeHost modal />
+          </SheetModal>
         )}
       </>
     </FilterSheet>

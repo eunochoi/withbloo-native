@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { File } from 'expo-file-system';
 import {
   backupBusy,
@@ -29,7 +30,6 @@ import { Text } from '../../src/components/Text';
 import { Toolbar } from '../../src/components/Toolbar';
 import { useScrollFade } from '../../src/hooks/useScrollFade';
 import { useI18n } from '../../src/i18n/react';
-import { useModalNavigation } from '../../src/navigation/ModalNavigationProvider';
 import { OnboardingSheet } from '../../src/screens/onboarding/OnboardingSheet';
 import { AppearanceSettingsSection } from '../../src/screens/settings/AppearanceSettingsSection';
 import { BackupDestinationPicker } from '../../src/screens/settings/BackupDestinationPicker';
@@ -50,7 +50,7 @@ export default function SettingsScreen() {
   const scroll = useRef<ScrollView>(null);
   useScrollToTop(scroll);
   const db = useSQLiteContext();
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const client = useQueryClient();
   const { settings, updateSettings, reloadSettings } = useSettings();
   const [activity, setActivity] = useState<'export' | 'restore' | 'settings' | null>(null);
@@ -234,7 +234,7 @@ export default function SettingsScreen() {
             accessibilityState={{ disabled }}
             disabled={disabled}
             accessibilityLabel={t('settings.privacy')}
-            onPress={() => openModal('/privacy')}
+            onPress={() => router.navigate('/privacy')}
             className={`shrink-0 flex-row items-center justify-center gap-1.5 active:opacity-65 ${disabled ? 'opacity-40' : 'opacity-100'}`}
           >
             <AppIcon name="privacy-tip" size={appRem * 1.2} className="text-theme-accent" />

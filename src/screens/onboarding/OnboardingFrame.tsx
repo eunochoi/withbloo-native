@@ -15,7 +15,7 @@ export function OnboardingFrame({
   children: ReactNode;
 }) {
   return (
-    <View className="w-full max-w-lg grow self-center gap-12 px-6 py-6">
+    <View className="w-full max-w-lg grow self-center gap-12 py-6">
       <View className="shrink-0 gap-2">
         <Text autoLineHeight
           accessibilityRole="header"

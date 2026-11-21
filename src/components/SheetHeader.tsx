@@ -1,10 +1,10 @@
-import { useI18n } from '../../i18n/react';
+import { useI18n } from '../i18n/react';
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
-import { Text } from '../Text';
-import { ScrollableName } from '../ScrollableName';
+import { Text } from './Text';
+import { ScrollableName } from './ScrollableName';
 
-export function BottomSheetHeader({
+export function SheetHeader({
   title,
   scrollableTitle = false,
   handleColor,

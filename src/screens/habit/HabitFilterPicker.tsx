@@ -99,8 +99,10 @@ export function HabitFilterPicker({
             </View>
           ))}
         </View>
+        <InfoNotice>
+          {t('habit.priorityHint')}
+        </InfoNotice>
       </View>
-      <InfoNotice>{t('habit.priorityHint')}</InfoNotice>
     </FilterSheet>
   );
 }

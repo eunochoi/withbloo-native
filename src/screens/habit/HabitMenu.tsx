@@ -1,15 +1,17 @@
+import { SheetHeader } from '../../components/SheetHeader';
+import { useRouter } from 'expo-router';
 import { useI18n } from '../../i18n/react';
-import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { RecordMenuButton } from '../../components/RecordMenuButton';
-import { useNotice } from '../../components/NoticeProvider';
-import { useState } from 'react';
-import { View } from 'react-native';
+import { NoticeHost, useNotice } from '../../components/NoticeProvider';
+import { useEffect, useRef, useState } from 'react';
+import { ScrollView, View } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import { deleteHabit } from '../../db/habit';
 import type { Habit } from '../../db/types';
 import { useRecordMutation } from '../../queries';
 import { ConfirmModal } from '../../components/ConfirmModal';
-import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
+import { SheetModal } from '../../components/SheetModal';
+import type { BottomSheetModal } from '@expo/ui/community/bottom-sheet';
 import { PickerAction } from '../../components/PickerAction';
 
 export function HabitMenu({
@@ -25,7 +27,7 @@ export function HabitMenu({
 
   const { showNotice } = useNotice();
   const db = useSQLiteContext();
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const mutation = useRecordMutation(
@@ -35,6 +37,18 @@ export function HabitMenu({
     (error) =>
       showNotice({ tone: 'error', title: t('habit.processFailed'), message: error.message }),
   );
+  const sheet = useRef<BottomSheetModal>(null);
+  const afterDismiss = useRef<(() => void) | undefined>(undefined);
+  useEffect(() => {
+    if (open) sheet.current?.present();
+    else sheet.current?.dismiss();
+  }, [open]);
+  const closeSheet = (action?: () => void) => {
+    if (afterDismiss.current) return false;
+    afterDismiss.current = action;
+    sheet.current?.dismiss();
+    return true;
+  };
   return (
     <>
       <RecordMenuButton
@@ -44,8 +58,24 @@ export function HabitMenu({
         onPress={() => setOpen(true)}
         className="-mr-3.5 h-9 w-8 items-center justify-center"
       />
-      <BottomSheetModal visible={open} title={habit.name} scrollableTitle onClose={() => setOpen(false)}>
-        {(closePicker) => (
+      <SheetModal
+        ref={sheet}
+        onDismiss={() => {
+          const action = afterDismiss.current;
+          afterDismiss.current = undefined;
+          (() => setOpen(false))();
+          action?.();
+        }}
+
+      >
+        <SheetHeader title={habit.name} scrollableTitle onClose={closeSheet} />
+
+        <ScrollView
+          className="mx-1 shrink grow-0"
+          contentContainerClassName="gap-7 py-8"
+          nestedScrollEnabled
+          showsVerticalScrollIndicator={false}
+        >
           <View className="gap-3">
             {showDetail && (
               <PickerAction
@@ -53,7 +83,7 @@ export function HabitMenu({
                 title={t('habit.menuDetail')}
                 description={t('habit.menuDetailHint')}
                 singleLineDescription
-                onPress={() => closePicker(() => openModal(`/habit/${habit.id}`))}
+                onPress={() => closeSheet(() => router.navigate(`/habit/${habit.id}`))}
               />
             )}
             <PickerAction
@@ -61,7 +91,7 @@ export function HabitMenu({
               title={t('habit.edit')}
               description={t('habit.editHint')}
               singleLineDescription
-              onPress={() => closePicker(() => openModal(`/habit/${habit.id}/edit`))}
+              onPress={() => closeSheet(() => router.navigate(`/habit/${habit.id}/edit`))}
             />
             <PickerAction
               icon="delete-outline"
@@ -69,11 +99,13 @@ export function HabitMenu({
               description={t('habit.deleteHint')}
               singleLineDescription
               danger
-              onPress={() => closePicker(() => setConfirmOpen(true))}
+              onPress={() => closeSheet(() => setConfirmOpen(true))}
             />
           </View>
-        )}
-      </BottomSheetModal>
+        </ScrollView>
+
+        <NoticeHost modal />
+      </SheetModal>
       <ConfirmModal
         danger
         visible={confirmOpen}

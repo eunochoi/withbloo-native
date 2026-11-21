@@ -54,7 +54,7 @@ function widgetFlow(active = true) {
   const changes = new Set<() => void>();
   const pushes: any[] = [];
   const resets: any[] = [];
-  let transitionResets = 0;
+
   const handled = { current: null };
   const appState = {
     currentState: active ? 'active' : 'background',
@@ -97,22 +97,13 @@ function widgetFlow(active = true) {
             return {
               useLocalSearchParams: () => params,
               useNavigation: () => navigation,
+              useRouter: () => ({ navigate: (href: unknown) => pushes.push(href) }),
               useFocusEffect: (fn: any) => {
                 focusEffect = fn;
               },
             };
           if (name === 'expo-router/react-navigation')
             return { useRoute: () => ({ key: 'widget-request' }) };
-          if (name.endsWith('/ModalNavigationProvider'))
-            return {
-              useModalTransition: () => ({
-                resetTransitions: () => transitionResets++,
-                openModal: (href: any) => {
-                  pushes.push(href);
-                  return true;
-                },
-              }),
-            };
           if (name.endsWith('/AppThemeProvider'))
             return { useAppTheme: () => ({ colors: { accent: 'blue' } }) };
           throw Error(`Unexpected dependency: ${name}`);
@@ -146,7 +137,7 @@ function widgetFlow(active = true) {
     },
     pushes,
     resets,
-    transitionResets: () => transitionResets,
+
   };
 }
 
@@ -158,7 +149,7 @@ test('widget first restores only the sober tab, then its focused screen opens on
   assert.equal(h.resets.length, 0, 'do not reset during initial layout');
   h.flush();
   assert.equal(h.resets.length, 1);
-  assert.equal(h.transitionResets(), 1);
+
   const payload = h.resets[0];
   assert.equal(payload.routes.length, 1, 'never create tabs and transparent modal together');
   const tab = TabRouter({ initialRouteName: 'index' }).getRehydratedState(payload.routes[0].state, {

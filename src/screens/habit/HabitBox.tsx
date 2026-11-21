@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { ScrollableName } from '../../components/ScrollableName';
 import { formatDisplayDate } from '../../i18n/format';
 import { useI18n } from '../../i18n/react';
@@ -8,7 +9,6 @@ import { Text } from '../../components/Text';
 import type { Completion, Habit } from '../../db/types';
 import { resolveIconColor } from '../../domain/constants';
 import { canCheckHabit, localDate, shiftDate } from '../../domain/date';
-import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 import { HabitMenu } from './HabitMenu';
 import { HabitStars } from './HabitStars';
@@ -29,7 +29,7 @@ export function HabitBox({
   const { t, formatLocale } = useI18n();
 
   const { colors, rem: appRem, iconSizes } = useAppTheme();
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const habitColor = resolveIconColor(habit.icon_color, colors.accent);
   const checked = (date: string) =>
     records.some((record) => record.habit_id === habit.id && record.date === date);
@@ -43,7 +43,7 @@ export function HabitBox({
           accessibilityLabel={t('habit.habitInfo', {
             value: `${habit.name}${excluded ? `, ${t('habit.free')}` : ''}`,
           })}
-          onPress={() => openModal(`/habit/${habit.id}`)}
+          onPress={() => router.navigate(`/habit/${habit.id}`)}
           className="items-center gap-2"
         >
           <View

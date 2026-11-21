@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { ScrollableName } from '../../components/ScrollableName';
 import { formatSoberDuration, formatSoberGoal } from '../../i18n/sober';
 import { useI18n } from '../../i18n/react';
@@ -9,7 +10,6 @@ import { Text } from '../../components/Text';
 import type { Sober, SoberRestart } from '../../db/types';
 import { resolveIconColor } from '../../domain/constants';
 import { getAutoSoberGoal, getCurrentSoberStart, getSoberProgress } from '../../domain/sober';
-import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 import { adjustColorBrightness } from '../../theme/colors';
 import { SoberMenu } from './SoberMenu';
@@ -29,7 +29,7 @@ export function SoberBox({
 }) {
   const { t, language } = useI18n();
 
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const { colors, rem: appRem } = useAppTheme();
   const start = getCurrentSoberStart(sober, restarts);
   const duration = Math.max(0, now - Date.parse(start));
@@ -43,7 +43,7 @@ export function SoberBox({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('sober.itemInfo', { value: sober.name })}
-          onPress={() => openModal(`/sober/${sober.id}`)}
+          onPress={() => router.navigate(`/sober/${sober.id}`)}
           className="min-h-11 min-w-0 flex-1 flex-row items-center gap-2"
         >
           <View className="min-w-0 flex-1">
@@ -64,7 +64,7 @@ export function SoberBox({
           value: formatSoberDuration(duration, language),
           setting: formatSoberGoal(goalDays, language),
         })}
-        onPress={() => openModal(`/sober/${sober.id}`)}
+        onPress={() => router.navigate(`/sober/${sober.id}`)}
         className="flex-row items-end gap-4"
       >
         <View className="flex-1 min-w-0 gap-3">

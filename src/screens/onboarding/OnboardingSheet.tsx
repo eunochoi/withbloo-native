@@ -1,12 +1,16 @@
+import { ScrollEdgeFade } from '../../components/ScrollEdgeFade';
+import { useScrollFade } from '../../hooks/useScrollFade';
+import { NoticeHost } from '../../components/NoticeProvider';
+import { SheetHeader } from '../../components/SheetHeader';
 import { useI18n } from '../../i18n/react';
 import { useEffect, useRef, useState } from 'react';
-import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
+import { SheetModal } from '../../components/SheetModal';
+import type { BottomSheetModal } from '@expo/ui/community/bottom-sheet';
 import { Button } from '../../components/Button';
 import { Text } from '../../components/Text';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useAppTheme } from '../../theme/AppThemeProvider';
-import type { CloseBottomSheet } from '../../components/bottom-sheet/useBottomSheetLifecycle';
 import { completeOnboarding, hasCompletedOnboarding } from '../../onboarding/storage';
 import type { Settings } from '../../settings/model';
 import { useSettings } from '../../settings/SettingsProvider';
@@ -44,6 +48,7 @@ export function OnboardingSheet({
   firstRun?: boolean;
   onClose: () => void;
 }) {
+  const sheetFade = useScrollFade();
   const { t } = useI18n();
   const { settings, updateSettings } = useSettings();
   const { reducedMotion } = useAppTheme();
@@ -74,7 +79,7 @@ export function OnboardingSheet({
       setBusy(false);
     }
   };
-  const confirm = async (close: CloseBottomSheet) => {
+  const confirm = async (close: () => void) => {
     if (saving.current || !isLast || (firstRun && allowClose.current)) return;
     setError('');
     if (!firstRun) {
@@ -95,20 +100,63 @@ export function OnboardingSheet({
       setBusy(false);
     }
   };
+  const sheet = useRef<BottomSheetModal>(null);
+  useEffect(() => {
+    sheet.current?.present();
+  }, []);
+  const closeSheet = () => {
+    if (!(() => allowClose.current && !saving.current)()) return false;
+    sheet.current?.dismiss();
+    return true;
+  };
   return (
-    <BottomSheetModal
-      visible
-      fixedHeight
-      contentFullBleed
-      scrollFade
-      contentKey={page}
-      scrollEnabled={!busy}
-      dismissible={!firstRun}
-      onClose={onClose}
-      onBeforeClose={() => allowClose.current && !saving.current}
-      contentContainerClassName="grow"
-      footer={(close) => (
-        <View className="w-full max-w-lg self-center gap-2 px-1 pt-4">
+    <SheetModal
+      ref={sheet}
+      onDismiss={onClose}
+      enablePanDownToClose={!firstRun && !busy}
+      fillHeight
+    >
+      <SheetHeader
+        onClose={
+          !firstRun && !busy
+            ? () => {
+                if (!firstRun && !busy) closeSheet();
+              }
+            : undefined
+        }
+      />
+
+      <View className="min-h-0 flex-1 overflow-hidden">
+        <ScrollView
+          onScroll={sheetFade.onScroll}
+          scrollEventThrottle={16}
+          onLayout={sheetFade.onLayout}
+          onContentSizeChange={sheetFade.onContentSizeChange}
+          key={page}
+          className="min-h-0 flex-1"
+          contentContainerClassName={'grow'}
+          nestedScrollEnabled
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={!busy}
+        >
+          <Animated.View
+            className="grow"
+            entering={reducedMotion ? undefined : FadeIn.duration(200)}
+            exiting={reducedMotion ? undefined : FadeOut.duration(200)}
+          >
+            <Page settings={settings} busy={busy} onChange={change} />
+          </Animated.View>
+        </ScrollView>
+        <ScrollEdgeFade edge="top" visible={sheetFade.topVisible} />
+        <ScrollEdgeFade
+          edge="bottom"
+          visible={sheetFade.bottomVisible}
+          includeBottomInset={false}
+          includeToolbar={false}
+        />
+      </View>
+      <View className="pb-4">
+        <View className="w-full max-w-lg self-center gap-2 pt-4">
           {!!error && (
             <Text accessibilityRole="alert" className="text-[14px] text-theme-danger">
               {error}
@@ -145,21 +193,14 @@ export function OnboardingSheet({
                       : t('common.next')
                 }
                 disabled={busy}
-                onPress={() => (isLast ? confirm(close) : changePage(page + 1))}
+                onPress={() => (isLast ? confirm(closeSheet) : changePage(page + 1))}
                 className="w-full grow"
               />
             </View>
           </View>
         </View>
-      )}
-    >
-      <Animated.View
-        className="grow"
-        entering={reducedMotion ? undefined : FadeIn.duration(200)}
-        exiting={reducedMotion ? undefined : FadeOut.duration(200)}
-      >
-        <Page settings={settings} busy={busy} onChange={change} />
-      </Animated.View>
-    </BottomSheetModal>
+      </View>
+      <NoticeHost modal />
+    </SheetModal>
   );
 }

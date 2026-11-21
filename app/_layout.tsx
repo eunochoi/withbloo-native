@@ -5,6 +5,7 @@ import { useI18n } from '../src/i18n/react';
 import { translateErrorMessage } from '../src/i18n/errors';
 import { themeColors } from '../src/theme/colors';
 import { AppThemeProvider, useAppTheme } from '../src/theme/AppThemeProvider';
+import { metrics } from '../src/theme/tokens.json';
 import '../global.css';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { AppState, Platform, Pressable, Text as NativeText, View } from 'react-native';
@@ -24,7 +25,6 @@ import { initializeMedia } from '../src/media';
 import { AppLoadingScreen } from '../src/components/AppLoadingScreen';
 import { refreshSoberWidgets } from '../src/widgets/sober';
 import { NotificationController } from '../src/notifications/NotificationController';
-import { ModalNavigationProvider } from '../src/navigation/ModalNavigationProvider';
 import { NoticeProvider } from '../src/components/NoticeProvider';
 import { FirstRunOnboarding } from '../src/screens/onboarding/OnboardingSheet';
 
@@ -99,36 +99,35 @@ function Navigation({ onReady }: { onReady: () => void }) {
         },
       }}
     >
-      <ModalNavigationProvider>
-        <ColorView background="surface" className="flex-1 bg-theme-surface" onLayout={onReady}>
-          <NotificationController />
-          <AutoBackupController />
-          <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              animation: reducedMotion ? 'none' : 'slide_from_right',
-              contentStyle: { backgroundColor: colors.surface },
-            }}
-          >
-            <Stack.Screen name="(tabs)" options={{ animation: 'none' }} />
-            <Stack.Screen name="widget" options={{ animation: 'none' }} />
-            {sheetRoutes.map((name) => (
-              <Stack.Screen
-                key={name}
-                name={name}
-                options={{
-                  presentation: 'transparentModal',
-                  animation: 'none',
-                  gestureEnabled: false,
-                  contentStyle: { backgroundColor: 'transparent' },
-                }}
-              />
-            ))}
-          </Stack>
-          <FirstRunOnboarding ready={ready} />
-        </ColorView>
-      </ModalNavigationProvider>
+      <ColorView background="surface" className="flex-1 bg-theme-surface" onLayout={onReady}>
+        <NotificationController />
+        <AutoBackupController />
+        <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: reducedMotion ? 'none' : 'slide_from_right',
+            contentStyle: { backgroundColor: colors.surface },
+          }}
+        >
+          <Stack.Screen name="(tabs)" options={{ animation: 'none' }} />
+          <Stack.Screen name="widget" options={{ animation: 'none' }} />
+          {sheetRoutes.map((name) => (
+            <Stack.Screen
+              key={name}
+              name={name}
+              options={{
+                presentation: 'formSheet',
+                animation: reducedMotion ? 'none' : 'default',
+                sheetAllowedDetents: Platform.OS === 'ios' ? [1] : [0.94],
+                sheetCornerRadius:
+                  Platform.OS === 'android' ? metrics.androidSheetCornerRadius : undefined,
+              }}
+            />
+          ))}
+        </Stack>
+        <FirstRunOnboarding ready={ready} />
+      </ColorView>
     </ThemeProvider>
   );
 }

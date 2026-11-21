@@ -1,15 +1,17 @@
+import { SheetHeader } from '../../components/SheetHeader';
+import { useRouter } from 'expo-router';
 import { useI18n } from '../../i18n/react';
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useSQLiteContext } from 'expo-sqlite';
-import { useRef, useState, type ReactNode } from 'react';
-import { View } from 'react-native';
-import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { ScrollView, View } from 'react-native';
+import { SheetModal } from '../../components/SheetModal';
+import type { BottomSheetModal } from '@expo/ui/community/bottom-sheet';
 import { ConfirmModal } from '../../components/ConfirmModal';
-import { useNotice } from '../../components/NoticeProvider';
+import { NoticeHost, useNotice } from '../../components/NoticeProvider';
 import { PickerAction } from '../../components/PickerAction';
 import { deleteSoberRestart } from '../../db/sober';
 import type { SoberRestart } from '../../db/types';
-import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { useRecordMutation } from '../../queries';
 
 type Overlay = { kind: 'menu' | 'delete'; record: SoberRestart } | null;
@@ -28,7 +30,7 @@ export function SoberRestartActions({
   const { t } = useI18n();
 
   const db = useSQLiteContext();
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const { showNotice } = useNotice();
   const [overlay, setOverlay] = useState<Overlay>(null);
   const menu = overlay?.kind === 'menu' ? overlay.record : null;
@@ -56,15 +58,39 @@ export function SoberRestartActions({
     notifyDeleting();
     return false;
   };
+  const sheet = useRef<BottomSheetModal>(null);
+  const afterDismiss = useRef<(() => void) | undefined>(undefined);
+  useEffect(() => {
+    if (menu !== null) sheet.current?.present();
+    else sheet.current?.dismiss();
+  }, [menu !== null]);
+  const closeSheet = (action?: () => void) => {
+    if (afterDismiss.current) return false;
+    afterDismiss.current = action;
+    sheet.current?.dismiss();
+    return true;
+  };
   return (
     <>
       {children({ pending: mutation.isPending, onMenu, onBeforeClose })}
-      <BottomSheetModal
-        visible={menu !== null}
-        title={t('sober.restartRecord')}
-        onClose={() => setOverlay(null)}
+      <SheetModal
+        ref={sheet}
+        onDismiss={() => {
+          const action = afterDismiss.current;
+          afterDismiss.current = undefined;
+          (() => setOverlay(null))();
+          action?.();
+        }}
+
       >
-        {(close) => (
+        <SheetHeader title={t('sober.restartRecord')} onClose={closeSheet} />
+
+        <ScrollView
+          className="mx-1 shrink grow-0"
+          contentContainerClassName="gap-7 py-8"
+          nestedScrollEnabled
+          showsVerticalScrollIndicator={false}
+        >
           <View className="gap-3">
             <PickerAction
               icon="edit"
@@ -73,9 +99,9 @@ export function SoberRestartActions({
               singleLineDescription
               onPress={() => {
                 const record = menu;
-                close(() => {
+                closeSheet(() => {
                   if (record)
-                    openModal({
+                    router.navigate({
                       pathname: '/sober/[id]/restart/[restartId]/edit',
                       params: { id: String(soberId), restartId: String(record.id) },
                     });
@@ -90,14 +116,16 @@ export function SoberRestartActions({
               danger
               onPress={() => {
                 const record = menu;
-                close(() => {
+                closeSheet(() => {
                   if (record) setOverlay({ kind: 'delete', record });
                 });
               }}
             />
           </View>
-        )}
-      </BottomSheetModal>
+        </ScrollView>
+
+        <NoticeHost modal />
+      </SheetModal>
       <ConfirmModal
         visible={confirm !== null}
         title={t('sober.deleteRecordTitle')}

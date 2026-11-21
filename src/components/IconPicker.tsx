@@ -1,9 +1,15 @@
+import { ScrollEdgeFade } from './ScrollEdgeFade';
+import { useScrollFade } from '../hooks/useScrollFade';
+import { AnimatedScrollView } from './AnimatedScrollView';
+import { NoticeHost } from './NoticeProvider';
+import { SheetHeader } from './SheetHeader';
+import { SheetModal } from './SheetModal';
 import { useI18n } from '../i18n/react';
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useAnimatedRef } from 'react-native-reanimated';
 import { useAppTheme } from '../theme/AppThemeProvider';
-import { BottomSheetModal } from './bottom-sheet/BottomSheetModal';
+import type { BottomSheetModal } from '@expo/ui/community/bottom-sheet';
 import { HeaderAction } from './HeaderAction';
 import { PickerInfoCard } from './PickerInfoCard';
 import { PickerGridItem } from './PickerGridItem';
@@ -34,6 +40,7 @@ export function IconPicker<Key extends string>({
   onApply: (value: Key) => void;
   onClose: () => void;
 }) {
+  const sheetFade = useScrollFade();
   const { t } = useI18n();
 
   const { rem: appRem } = useAppTheme();
@@ -99,70 +106,100 @@ export function IconPicker<Key extends string>({
     </View>
   );
 
+  const sheet = useRef<BottomSheetModal>(null);
+  useEffect(() => {
+    sheet.current?.present();
+  }, []);
+  const closeSheet = () => sheet.current?.dismiss();
   return (
-    <BottomSheetModal
-      visible
-      fixedHeight
-      contentFullBleed
-      scrollFade
-      title={title}
-      onClose={onClose}
-      scrollRef={scrollRef}
-      contentKey={contentKey}
-      contentHeader={topContent}
-      contentContainerClassName="gap-3 pb-8"
-      onContentSizeChange={revealInitialSelection}
-      onOpened={() => {
-        opened.current = true;
-        revealInitialSelection();
-      }}
-
-      headerButton={(close) => (
-        <HeaderAction
-          label={t('common.done')}
-          onPress={() => {
-            onApply(draft);
-            close();
-          }}
-        />
-      )}
+    <SheetModal
+      ref={sheet}
+      onDismiss={onClose}
+      fillHeight
     >
-      <View className="mx-[5%] px-1">
-        <View
-          className="-mx-1.5 flex-row flex-wrap"
-          onLayout={(event) => {
-            gridY.current = event.nativeEvent.layout.y;
+      <SheetHeader
+        title={title}
+        headerButton={
+          <HeaderAction
+            label={t('common.done')}
+            onPress={() => {
+              onApply(draft);
+              closeSheet();
+            }}
+          />
+        }
+        onClose={closeSheet}
+      />
+      {topContent}
+      <View className="min-h-0 flex-1 overflow-hidden">
+        <AnimatedScrollView
+          onScroll={sheetFade.onScroll}
+          scrollEventThrottle={16}
+          key={contentKey}
+          className="min-h-0 flex-1"
+          contentContainerClassName={'gap-3 pb-8'}
+          nestedScrollEnabled
+          showsVerticalScrollIndicator={false}
+          ref={scrollRef}
+          onContentSizeChange={(width, height) => {
+            sheetFade.onContentSizeChange(width, height);
             revealInitialSelection();
           }}
+          onLayout={(event) => {
+            sheetFade.onLayout(event);
+            (() => {
+              opened.current = true;
+              revealInitialSelection();
+            })();
+          }}
         >
-          {category.keys.map((key) => {
-            const label = options.find((option) => option.key === key)!.label;
-            return (
-              <View
-                key={key}
-                className="aspect-square w-1/3 p-1.5"
-                onLayout={(event) => {
-                  if (key === value && initialScrollPending.current) {
-                    initialRowY.current = event.nativeEvent.layout.y;
-                    revealInitialSelection();
-                  }
-                }}
-              >
-                <PickerGridItem
-                  selected={draft === key}
-                  label={label}
-                  onPress={() => {
-                    initialScrollPending.current = false;
-                    setDraft(key);
-                  }}
-                >
-                  {renderIcon(key)}
-                </PickerGridItem>
-              </View>
-            );
-          })}
-        </View>
+          <View className="px-1">
+            <View
+              className="-mx-1.5 flex-row flex-wrap"
+              onLayout={(event) => {
+                gridY.current = event.nativeEvent.layout.y;
+                revealInitialSelection();
+              }}
+            >
+              {category.keys.map((key) => {
+                const label = options.find((option) => option.key === key)!.label;
+                return (
+                  <View
+                    key={key}
+                    className="aspect-square w-1/3 p-1.5"
+                    onLayout={(event) => {
+                      if (key === value && initialScrollPending.current) {
+                        initialRowY.current = event.nativeEvent.layout.y;
+                        revealInitialSelection();
+                      }
+                    }}
+                  >
+                    <PickerGridItem
+                      selected={draft === key}
+                      label={label}
+                      onPress={() => {
+                        initialScrollPending.current = false;
+                        setDraft(key);
+                      }}
+                    >
+                      {renderIcon(key)}
+                    </PickerGridItem>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        </AnimatedScrollView>
+        <ScrollEdgeFade edge="top" visible={sheetFade.topVisible} />
+        <ScrollEdgeFade
+          edge="bottom"
+          visible={sheetFade.bottomVisible}
+          includeBottomInset={false}
+          includeToolbar={false}
+        />
       </View>
-    </BottomSheetModal>
+
+      <NoticeHost modal />
+    </SheetModal>
   );
 }

@@ -1,10 +1,15 @@
+import { ScrollEdgeFade } from '../../components/ScrollEdgeFade';
+import { useScrollFade } from '../../hooks/useScrollFade';
+import { useIsFocused } from 'expo-router/react-navigation';
+import { useRouter } from 'expo-router';
+import { NoticeHost } from '../../components/NoticeProvider';
 import { useI18n } from '../../i18n/react';
 import { useQuery } from '@tanstack/react-query';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { ScrollView, Pressable, View } from 'react-native';
 import { AppIcon } from '../../components/AppIcon';
-import { BottomSheetPage } from '../../components/bottom-sheet/BottomSheetPage';
+import { SheetHeader } from '../../components/SheetHeader';
 import { QueryError } from '../../components/QueryError';
 import { Text } from '../../components/Text';
 import { soberQueries, statsQueries } from '../../queries';
@@ -25,6 +30,9 @@ export function HomeStatsScreen({
   currentYear: number;
   onYearChange: (year: number) => void;
 }) {
+  const sheetFade = useScrollFade();
+  const router = useRouter();
+  const focused = useIsFocused();
   const { t } = useI18n();
   const db = useSQLiteContext();
   const { iconSizes } = useAppTheme();
@@ -67,79 +75,101 @@ export function HomeStatsScreen({
 
   return (
     <>
-      <BottomSheetPage
-        backRoute="/"
-        title={t('home.insightsTitle')}
-        scrollFade
-        contentKey={year}
-        contentFullBleed
-      >
-        <View className="gap-6">
-          <View className="gap-14">
-            {sections.map((section) => (
-              <View
-                key={section.id}
-                className={
-                  section.fullBleed && section.queries.every((query) => query.data)
-                    ? undefined
-                    : 'px-[5%]'
-                }
-              >
-                <View
-                  className={
-                    section.fullBleed && section.queries.every((query) => query.data)
-                      ? undefined
-                      : 'px-1'
-                  }
-                >
-                  {section.queries.some((query) => query.isError && !query.data) ? (
-                    <QueryError
-                      className="min-h-32"
-                      message={t('home.sectionFailed', { title: section.label })}
-                      retryAccessibilityLabel={t('home.sectionRetry', { title: section.label })}
-                      onRetry={() => {
-                        section.queries.forEach((query) => {
-                          if (query.isError) void query.refetch();
-                        });
-                      }}
-                    />
-                  ) : section.queries.some((query) => !query.data) ? (
-                    <HomeStatsSkeleton />
-                  ) : (
-                    section.content
-                  )}
-                </View>
-              </View>
-            ))}
-
-            <View className="px-[5%]">
-              <View className="px-1">
-                <View className="gap-2 px-2">
-                  <Text className="text-xl font-bold">{t('home.otherYearTitle')}</Text>
-                  <Text className="text-base text-theme-text-secondary">
-                    {t('home.otherYearDescription')}
-                  </Text>
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={t('home.yearChoice', { count: year })}
-                    onPress={() => setPicker(true)}
-                    className="py-2 my-3 self-end flex-row items-center justify-center gap-2 active:opacity-70"
+      <View className="flex-1 pt-2">
+        <View className="px-[5%]">
+          <SheetHeader
+            title={t('home.insightsTitle')}
+            onClose={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+          />
+        </View>
+        <View className="min-h-0 flex-1 overflow-hidden">
+          <ScrollView
+            onScroll={sheetFade.onScroll}
+            scrollEventThrottle={16}
+            onLayout={sheetFade.onLayout}
+            onContentSizeChange={sheetFade.onContentSizeChange}
+            key={year}
+            className="flex-1"
+            contentContainerClassName="gap-7 py-8 pb-12"
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+          >
+            <View className="gap-6">
+              <View className="gap-14">
+                {sections.map((section) => (
+                  <View
+                    key={section.id}
+                    className={
+                      section.fullBleed && section.queries.every((query) => query.data)
+                        ? undefined
+                        : 'px-[5%]'
+                    }
                   >
-                    <Text className="text-base font-semibold text-theme-accent-deep">
-                      {t('home.chooseYear')}
-                    </Text>
-                    <AppIcon
-                      name="arrow-forward"
-                      size={iconSizes.md}
-                      className="text-theme-accent-deep"
-                    />
-                  </Pressable>
+                    <View
+                      className={
+                        section.fullBleed && section.queries.every((query) => query.data)
+                          ? undefined
+                          : 'px-1'
+                      }
+                    >
+                      {section.queries.some((query) => query.isError && !query.data) ? (
+                        <QueryError
+                          className="min-h-32"
+                          message={t('home.sectionFailed', { title: section.label })}
+                          retryAccessibilityLabel={t('home.sectionRetry', { title: section.label })}
+                          onRetry={() => {
+                            section.queries.forEach((query) => {
+                              if (query.isError) void query.refetch();
+                            });
+                          }}
+                        />
+                      ) : section.queries.some((query) => !query.data) ? (
+                        <HomeStatsSkeleton />
+                      ) : (
+                        section.content
+                      )}
+                    </View>
+                  </View>
+                ))}
+
+                <View className="px-[5%]">
+                  <View className="px-1">
+                    <View className="gap-2 px-2">
+                      <Text className="text-xl font-bold">{t('home.otherYearTitle')}</Text>
+                      <Text className="text-base text-theme-text-secondary">
+                        {t('home.otherYearDescription')}
+                      </Text>
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={t('home.yearChoice', { count: year })}
+                        onPress={() => setPicker(true)}
+                        className="py-2 my-3 self-end flex-row items-center justify-center gap-2 active:opacity-70"
+                      >
+                        <Text className="text-base font-semibold text-theme-accent-deep">
+                          {t('home.chooseYear')}
+                        </Text>
+                        <AppIcon
+                          name="arrow-forward"
+                          size={iconSizes.md}
+                          className="text-theme-accent-deep"
+                        />
+                      </Pressable>
+                    </View>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
+          </ScrollView>
+          <ScrollEdgeFade edge="top" visible={sheetFade.topVisible} />
+          <ScrollEdgeFade
+            edge="bottom"
+            visible={sheetFade.bottomVisible}
+            includeBottomInset={false}
+            includeToolbar={false}
+          />
         </View>
-      </BottomSheetPage>
+        <NoticeHost modal active={focused} />
+      </View>
       {picker && (
         <HomeYearPicker
           year={year}
@@ -148,7 +178,6 @@ export function HomeStatsScreen({
           onClose={() => setPicker(false)}
           onApply={(value) => {
             onYearChange(value);
-            setPicker(false);
           }}
         />
       )}

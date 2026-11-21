@@ -1,3 +1,8 @@
+import { ScrollEdgeFade } from '../components/ScrollEdgeFade';
+import { useScrollFade } from '../hooks/useScrollFade';
+import { useIsFocused } from 'expo-router/react-navigation';
+import { useRouter } from 'expo-router';
+import { NoticeHost } from '../components/NoticeProvider';
 import { FormTextInput } from '../components/FormTextInput';
 import { formatDisplayDate } from '../i18n/format';
 import { formatSoberGoal } from '../i18n/sober';
@@ -6,8 +11,8 @@ import { useQuery } from '@tanstack/react-query';
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
-import { Switch, TextInput, View } from 'react-native';
-import { BottomSheetPage } from '../components/bottom-sheet/BottomSheetPage';
+import { ScrollView, Switch, TextInput, View } from 'react-native';
+import { SheetHeader } from '../components/SheetHeader';
 import { HeaderAction } from '../components/HeaderAction';
 import { CharacterCount } from '../components/CharacterCount';
 import { DateTimePicker } from '../components/DateTimePicker';
@@ -32,6 +37,9 @@ import { SoberGoalPicker } from './sober/SoberGoalPicker';
 import { SoberIconPicker } from './sober/SoberIconPicker';
 
 export function SoberForm({ id }: { id?: number }) {
+  const sheetFade = useScrollFade();
+  const router = useRouter();
+  const focused = useIsFocused();
   const { t, language, formatLocale } = useI18n();
 
   const db = useSQLiteContext();
@@ -76,29 +84,53 @@ export function SoberForm({ id }: { id?: number }) {
   const iconBackgroundColor =
     draft.icon_color === 'theme' ? colors.accent : HABIT_ICON_COLORS[draft.icon_color].value;
   const title = id ? t('sober.edit') : t('sober.add');
-  const onClosed = saved
-    ? () =>
-        showNotice({
-          tone: 'success',
-          title: id ? t('sober.edited') : t('sober.saved'),
-        })
-    : undefined;
+  const didClose = useRef(false);
+  useEffect(() => {
+    if (!saved || mutation.isPending || didClose.current) return;
+    didClose.current = true;
+    if (router.canGoBack()) router.back();
+    else router.replace('/sober');
+    showNotice({
+      tone: 'success',
+      title: id ? t('sober.edited') : t('sober.saved'),
+    });
+  }, [saved, mutation.isPending, router, showNotice, id, t]);
   if (id !== undefined && (query.isPending || query.error || !query.data || !loaded))
     return (
-      <BottomSheetPage
-        closeRequested={saved && !mutation.isPending}
-        onClosed={onClosed}
-        backRoute="/sober"
-        title={title}
-      >
-        <QueryState query={query} />
-        {!query.isPending && !query.error && <Text className="px-6">{t('sober.notFound')}</Text>}
-      </BottomSheetPage>
+      <View className="flex-1 px-[5%] pt-2">
+        <SheetHeader
+          title={title}
+          onClose={() => (router.canGoBack() ? router.back() : router.replace('/sober'))}
+        />
+        <View className="mx-1 min-h-0 flex-1 overflow-hidden">
+          <ScrollView
+            onScroll={sheetFade.onScroll}
+            scrollEventThrottle={16}
+            onLayout={sheetFade.onLayout}
+            onContentSizeChange={sheetFade.onContentSizeChange}
+            className="flex-1"
+            contentContainerClassName="gap-7 py-8 pb-12"
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+          >
+            <QueryState query={query} />
+            {!query.isPending && !query.error && (
+              <Text className="px-6">{t('sober.notFound')}</Text>
+            )}
+          </ScrollView>
+          <ScrollEdgeFade edge="top" visible={sheetFade.topVisible} />
+          <ScrollEdgeFade
+            edge="bottom"
+            visible={sheetFade.bottomVisible}
+            includeBottomInset={false}
+            includeToolbar={false}
+          />
+        </View>
+        <NoticeHost modal active={focused} />
+      </View>
     );
   return (
     <RecordFormLayout
-      closeRequested={saved && !mutation.isPending}
-      onClosed={onClosed}
       title={title}
       backRoute="/sober"
       onBeforeClose={() => {
@@ -122,14 +154,21 @@ export function SoberForm({ id }: { id?: number }) {
               return;
             }
             if (draft.name.trim().length > SOBER_NAME_MAX_LENGTH) {
-              showNotice({ tone: 'info', title: t('sober.nameTooLong', { count: SOBER_NAME_MAX_LENGTH }) });
+              showNotice({
+                tone: 'info',
+                title: t('sober.nameTooLong', { count: SOBER_NAME_MAX_LENGTH }),
+              });
               nameInput.current?.focus();
               return;
             }
             try {
               assertDateTime(draft.initial_started_at, Date.now());
             } catch (error) {
-              showNotice({ tone: 'error', title: t('sober.saveFailed'), message: (error as Error).message });
+              showNotice({
+                tone: 'error',
+                title: t('sober.saveFailed'),
+                message: (error as Error).message,
+              });
               return;
             }
             saving.current = true;
@@ -200,7 +239,10 @@ export function SoberForm({ id }: { id?: number }) {
       </View>
       <View className="gap-3">
         <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
-          {t('sober.descriptionTitle')} <Text className="text-base font-normal text-theme-text-tertiary">{t('sober.descriptionOptional')}</Text>
+          {t('sober.descriptionTitle')}{' '}
+          <Text className="text-base font-normal text-theme-text-tertiary">
+            {t('sober.descriptionOptional')}
+          </Text>
         </Text>
         <View className="gap-3 px-2">
           <FormTextInput

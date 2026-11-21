@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useI18n } from '../../src/i18n/react';
 import { selectionSummary } from '../../src/domain/selection';
 import {
@@ -16,11 +17,9 @@ import { QueryError } from '../../src/components/QueryError';
 import { useNotice } from '../../src/components/NoticeProvider';
 import { ColorView } from '../../src/components/ColorTransition';
 import { EmptyState } from '../../src/components/EmptyState';
-import { RecordSortPicker } from '../../src/components/RecordSortPicker';
 import { ScrollEdgeFade } from '../../src/components/ScrollEdgeFade';
 import { TabBottomSpacer } from '../../src/components/TabBottomSpacer';
 import { ToolbarAddButton } from '../../src/components/ToolbarAddButton';
-import { useModalNavigation } from '../../src/navigation/ModalNavigationProvider';
 import { Toolbar } from '../../src/components/Toolbar';
 import { ToolbarFilterButton } from '../../src/components/ToolbarFilterButton';
 import { ToolbarSortButton } from '../../src/components/ToolbarSortButton';
@@ -30,6 +29,7 @@ import { diaryQueries, useToday } from '../../src/queries';
 import { DiaryCard } from '../../src/screens/diary/DiaryCard';
 import { DiaryFilterPicker } from '../../src/screens/diary/DiaryFilterPicker';
 import { DiaryListSkeleton } from '../../src/screens/diary/DiaryListSkeleton';
+import { DiarySortPicker } from '../../src/screens/diary/DiarySortPicker';
 import { useSettings } from '../../src/settings/SettingsProvider';
 import { useAppTheme } from '../../src/theme/AppThemeProvider';
 import { PAGE_CLASS_NAME } from '../../src/theme/classes';
@@ -49,7 +49,7 @@ export default function DiaryList() {
   const db = useSQLiteContext();
   const fade = useScrollFade();
   const today = useToday();
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const { settings, updateSettings } = useSettings();
   const scroll = useRef<FlatList<Row>>(null);
   useScrollToTop(scroll);
@@ -134,7 +134,7 @@ export default function DiaryList() {
                   sort={settings.diarySort}
                   sortLabel={t('diary.dateLabel')}
                   accessibilityLabel={t('diary.sortTitle')}
-                  onPress={() => setPicker('sort')}
+                  onPress={() => setPicker((current) => current ?? 'sort')}
                 />
                 <ToolbarFilterButton
                   label={
@@ -166,12 +166,12 @@ export default function DiaryList() {
                       t('diary.allEmotions'),
                     ),
                   })}
-                  onPress={() => setPicker('filter')}
+                  onPress={() => setPicker((current) => current ?? 'filter')}
                 />
                 <ToolbarAddButton
                   label={t('diary.add')}
                   onPress={() =>
-                    openModal({ pathname: '/diary/new' })
+                    router.navigate({ pathname: '/diary/new' })
                   }
                 />
               </Toolbar>
@@ -225,15 +225,10 @@ export default function DiaryList() {
       <ScrollEdgeFade edge="bottom" visible={fade.bottomVisible} heightRem={4} includeToolbar={false} includeBottomInset={false} />
 
       {picker === 'sort' && (
-        <RecordSortPicker
-          title={t('diary.sortTitle')}
-          showCriteriaSort
-          sortLabel={t('diary.dateSort')}
+        <DiarySortPicker
           sort={settings.diarySort}
           onClose={() => setPicker(null)}
           onApply={(sort) => {
-            setPicker(null);
-            if (sort === 'CUSTOM') return;
             void updateSettings({ diarySort: sort })
               .then(() => scroll.current?.scrollToOffset({ offset: 0, animated: true }))
               .catch((error: Error) =>
@@ -258,7 +253,6 @@ export default function DiaryList() {
             setYear(value);
             setSeasons(selectedSeasons);
             setEmotionGroups(selectedEmotionGroups);
-            setPicker(null);
             scroll.current?.scrollToOffset({ offset: 0, animated: true });
           }}
         />

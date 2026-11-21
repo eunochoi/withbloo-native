@@ -30,18 +30,18 @@ const routes = walk(path.join(root, 'app'));
 assert(!routes.some((file) => /intro|login|account|@panel/.test(path.relative(root, file))));
 assert(fs.existsSync(path.join(root, 'app/(tabs)/index.tsx')));
 const privacy = fs.readFileSync(path.join(root, 'app/privacy.tsx'), 'utf8');
-assert(privacy.includes('<BottomSheetPage') && privacy.includes('<Text'));
-const sheetPage = fs.readFileSync(path.join(root, 'src/components/bottom-sheet/BottomSheetPage.tsx'), 'utf8');
-const sheetModal = fs.readFileSync(path.join(root, 'src/components/bottom-sheet/BottomSheetModal.tsx'), 'utf8');
-const sheetViewport = fs.readFileSync(
-  path.join(root, 'src/components/bottom-sheet/BottomSheetContent.tsx'),
-  'utf8',
-);
-assert(
-  sheetPage.includes('<BottomSheetModal') &&
-    sheetModal.includes('<BottomSheetContent') &&
-    sheetViewport.includes('<BottomSheetScrollViewport'),
-);
+assert(privacy.includes('<SheetHeader') && privacy.includes('<Text'));
+const layout = fs.readFileSync(path.join(root, 'app/_layout.tsx'), 'utf8');
+assert(layout.includes("presentation: 'formSheet'"));
+for (const file of [...source, ...routes]) {
+  const text = fs.readFileSync(file, 'utf8');
+  assert(!/BottomSheetPage|ModalNavigationProvider|useBottomSheet(?:Motion|Lifecycle)/.test(text),
+    `Retired custom sheet infrastructure: ${file}`);
+  if (file !== path.join(root, 'src/components/SheetModal.tsx')) {
+    assert(!/^\s*<BottomSheetModal(?:\s|>)/m.test(text),
+      `Render Expo bottom sheets through SheetModal: ${file}`);
+  }
+}
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
 assert(!pkg.dependencies['react-native-webview']);
 assert(!pkg.dependencies['next']);

@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { ScrollableName } from '../../components/ScrollableName';
 import { AnalysisSubtitle } from './AnalysisSubtitle';
 import { getSoberSummary, SOBER_DAY_MS } from '../../domain/sober';
@@ -13,7 +14,6 @@ import { DotTabs } from '../../components/DotTabs';
 import type { Sober, SoberRestart } from '../../db/types';
 import { getSoberStreaks } from '../../domain/sober';
 import { useCurrentMinute } from '../../hooks/useCurrentMinute';
-import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 import { MUTED_CARD_BORDER_CLASS_NAME } from '../../theme/classes';
 import { AnalysisHeader } from './AnalysisHeader';
@@ -21,7 +21,7 @@ import { AnalysisHeader } from './AnalysisHeader';
 export function SoberAnalysis({ sobers, restarts }: { sobers: Sober[]; restarts: SoberRestart[] }) {
   const { t, language, formatLocale } = useI18n();
 
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const now = useCurrentMinute();
   const { rem: appRem } = useAppTheme();
   const [tab, setTab] = useState<'top' | 'bottom'>('top');
@@ -141,7 +141,7 @@ export function SoberAnalysis({ sobers, restarts }: { sobers: Sober[]; restarts:
                   setting: range,
                 })}
                 onPress={() => {
-                  openModal(`/sober/${sober.id}`);
+                  router.navigate(`/sober/${sober.id}`);
                 }}
                 className={`flex-row items-center gap-4 min-h-12 ${index > 0 ? 'pt-6' : ''} ${index < visibleRecords.length - 1 ? 'pb-6 border-b border-theme-border/50' : ''}`}
               >

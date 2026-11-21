@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useI18n } from '../../src/i18n/react';
 import { useQuery } from '@tanstack/react-query';
 import { useScrollToTop } from 'expo-router';
@@ -24,7 +25,6 @@ import { shiftDate } from '../../src/domain/date';
 import { MAX_HABIT_COUNT } from '../../src/domain/limits';
 import { selectionSummary } from '../../src/domain/selection';
 import { useScrollFade } from '../../src/hooks/useScrollFade';
-import { useModalNavigation } from '../../src/navigation/ModalNavigationProvider';
 import { habitQueries, useRecordMutation, useToday } from '../../src/queries';
 import { HabitBox } from '../../src/screens/habit/HabitBox';
 import { DEFAULT_HABIT_FILTER, HabitFilterPicker } from '../../src/screens/habit/HabitFilterPicker';
@@ -43,7 +43,7 @@ export default function HabitList() {
   const { colors, rem: appRem } = useAppTheme();
   const db = useSQLiteContext();
   const fade = useScrollFade();
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const today = useToday();
   const scroll = useRef<ScrollView>(null);
   useScrollToTop(scroll);
@@ -101,10 +101,7 @@ export default function HabitList() {
   const failed = list.isError || completions.isError;
   const gridEntries =
     ready && sorted.length > 0
-      ? [
-          ...filtered,
-          ...(sorted.length < MAX_HABIT_COUNT ? ['add' as const] : []),
-        ]
+      ? [...filtered, ...(sorted.length < MAX_HABIT_COUNT ? ['add' as const] : [])]
       : [];
   const gridItems = [...gridEntries, ...(gridEntries.length % 2 ? [null] : [])];
   const emptyContent = failed ? (
@@ -182,7 +179,7 @@ export default function HabitList() {
                 });
                 return;
               }
-              openModal('/habit/new');
+              router.navigate('/habit/new');
             }}
           />
         </Toolbar>
@@ -202,7 +199,8 @@ export default function HabitList() {
                       accessibilityLabel={t('habit.add')}
                       disabled={failed}
                       onPress={() => {
-                        if (!failed && sorted.length < MAX_HABIT_COUNT) openModal('/habit/new');
+                        if (!failed && sorted.length < MAX_HABIT_COUNT)
+                          router.navigate('/habit/new');
                       }}
                       className={`flex-1 min-h-56 items-center justify-center gap-2 bg-theme-surface px-2 py-4 active:opacity-65 ${failed ? 'opacity-40' : ''}`}
                     >
@@ -238,7 +236,13 @@ export default function HabitList() {
         </View>
         <TabBottomSpacer />
       </ScrollView>
-      <ScrollEdgeFade edge="bottom" visible={fade.bottomVisible} heightRem={4} includeToolbar={false} includeBottomInset={false} />
+      <ScrollEdgeFade
+        edge="bottom"
+        visible={fade.bottomVisible}
+        heightRem={4}
+        includeToolbar={false}
+        includeBottomInset={false}
+      />
 
       {filterOpen && (
         <HabitFilterPicker
@@ -246,14 +250,11 @@ export default function HabitList() {
           onClose={() => setFilterOpen(false)}
           onApply={(next) => {
             setFilter(next);
-            setFilterOpen(false);
             scroll.current?.scrollTo({ y: 0, animated: true });
           }}
         />
       )}
-      {sortOpen && (
-        <HabitSortPicker visible onClose={() => setSortOpen(false)} />
-      )}
+      {sortOpen && <HabitSortPicker visible onClose={() => setSortOpen(false)} />}
     </ColorView>
   );
 }

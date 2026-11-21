@@ -1,9 +1,9 @@
+import { useRouter } from 'expo-router';
 import { useI18n } from '../../i18n/react';
 import { Pressable, View } from 'react-native';
 import { AppIcon } from '../../components/AppIcon';
 import { Text } from '../../components/Text';
 import type { DiaryDetail } from '../../db/types';
-import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 import { BODY_TEXT_CLASS_NAME } from '../../theme/classes';
 import { DiaryGallery } from '../diary/DiaryGallery';
@@ -21,10 +21,10 @@ export function DayInfoDiarySection({
   const { t } = useI18n();
 
   const { colors, rem: appRem } = useAppTheme();
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const open = () => {
     if (!diary) return;
-    openModal(`/diary/${diary.id}`);
+    router.navigate(`/diary/${diary.id}`);
   };
   return (
     <View className="shrink-0 px-1 pb-1">
@@ -73,7 +73,7 @@ export function DayInfoDiarySection({
             <Pressable
               accessibilityRole="button"
               onPress={() => {
-                openModal({ pathname: '/diary/new', params: { date } });
+                router.navigate({ pathname: '/diary/new', params: { date } });
               }}
               className="mt-6 flex-row min-h-9 items-center gap-1.5 ios:curve-continuous rounded-full border border-theme-accent-deep bg-theme-accent px-4"
             >

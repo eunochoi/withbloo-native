@@ -122,7 +122,8 @@ function form(kind: string, router: unknown, isNew = false) {
             useCallback: (callback: unknown) => callback,
           };
         if (dependency === 'expo-router') return { useRouter: () => router };
-        if (dependency === 'expo-router/react-navigation') return { usePreventRemove: () => {} };
+        if (dependency === 'expo-router/react-navigation') return { usePreventRemove: () => {}, useIsFocused: () => true };
+        if (dependency.endsWith('/useScrollFade')) return { useScrollFade: () => ({}) };
         if (dependency === 'expo-sqlite') return { useSQLiteContext: () => ({}) };
         if (dependency === '@tanstack/react-query')
           return { useQuery: () => ({ isPending: true }) };
@@ -166,49 +167,12 @@ function form(kind: string, router: unknown, isNew = false) {
       },
     },
   );
-  const pageExports: Record<string, Function> = {};
-  runInNewContext(
-    ts.transpileModule(
-      readFileSync(new URL('../src/components/bottom-sheet/BottomSheetPage.tsx', import.meta.url), 'utf8'),
-      { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX } },
-    ).outputText,
-    {
-      exports: pageExports,
-      require: (dependency: string) => {
-        if (dependency.endsWith('/i18n/sober')) return soberI18n;
-        if (dependency.endsWith('/i18n/react')) return mockI18n();
-        if (dependency.endsWith('/i18n/format')) return { formatDisplayDate };
-        if (dependency === 'react/jsx-runtime') return { jsx, jsxs: jsx };
-        if (dependency === 'react')
-          return { useRef: (current: unknown) => ({ current }), useLayoutEffect: () => {} };
-        if (dependency.endsWith('/ModalNavigationProvider'))
-          return {
-            useModalTransition: () => ({
-              beginOpening: () => 1,
-              beginClosing: () => 2,
-              finishTransition: () => {},
-            }),
-          };
-        if (dependency === 'expo-router') return { useRouter: () => router };
-        if (dependency === 'expo-router/react-navigation')
-          return {
-            useIsFocused: () => true,
-            useRoute: () => ({ key: 'sheet' }),
-            useNavigationState: (select: Function) =>
-              select({ routes: [{ key: 'sheet', name: 'habit/[id]/edit' }] }),
-          };
-        if (dependency === 'react-native')
-          return { View: 'View', useWindowDimensions: () => ({ height: 800 }) };
-        return { BottomSheetModal: 'BottomSheetModal' };
-      },
-    },
-  );
   const render = () => {
     cursor = 0;
     effects = [];
     const page = exports[`${name}Form`]({ id: isNew ? undefined : 42 });
     effects.forEach((effect) => effect());
-    return pageExports.BottomSheetPage(page.props).props.children;
+    return page;
   };
   return {
     render,
@@ -222,28 +186,24 @@ function form(kind: string, router: unknown, isNew = false) {
 }
 
 for (const kind of ['diary', 'habit', 'sober']) {
-  test(`${kind} creation notices appear after closing; cancel and failure never report success`, () => {
+  test(`${kind} creation requests a route pop before showing success; failure keeps the form open`, () => {
     const nav = navigation(kind, ['(tabs)', `${kind}/new`]);
     const screen = form(kind, nav.router, true);
-    const initial = screen.render();
-    assert.equal(initial.props.onClosed, undefined);
+    screen.render();
     screen.fail();
     assert.equal(screen.notices.length, 1);
     assert.equal(screen.notices[0].tone, 'error');
-    assert.equal(screen.render().props.visible, true);
+    screen.render();
+    assert.deepEqual(nav.actions, []);
     screen.finish();
-    const closing = screen.render();
-    assert.equal(screen.notices.length, 1);
-    closing.props.onClose();
+    screen.render();
+    assert.deepEqual(nav.actions, ['POP']);
     assert.equal(screen.notices.length, 2);
     assert.equal(screen.notices[1].tone, 'success');
     assert.match(screen.notices[1].title, kind === 'diary' ? /저장했어요/ : /추가했어요/);
-    const cancelled = form(kind, navigation(kind, ['(tabs)', `${kind}/new`]).router, true);
-    cancelled.render().props.onClose();
-    assert.equal(cancelled.notices.length, 0);
   });
 
-  test(`${kind} save animates the form close before returning to the original detail`, () => {
+  test(`${kind} save pops the form only after the pending mutation finishes`, () => {
     const nav = navigation(kind, ['(tabs)', `${kind}/[id]/index`, `${kind}/[id]/edit`]);
     const screen = form(kind, nav.router);
     screen.render();
@@ -253,13 +213,7 @@ for (const kind of ['diary', 'habit', 'sober']) {
     screen.render();
     assert.deepEqual(nav.actions, []);
     screen.pending(false);
-    const closingSheet = screen.render();
-    assert.equal(closingSheet.props.visible, false);
-    assert.deepEqual(nav.actions, []);
-    assert.equal(nav.state().routes.length, 3);
-    // The lifecycle invokes onClose only when its downward animation finishes.
-    assert.equal(screen.notices.length, 0);
-    closingSheet.props.onClose();
+    screen.render();
     assert.equal(screen.notices.length, 1);
     assert.equal(screen.notices[0].tone, 'success');
     assert.match(screen.notices[0].title, /수정했어요/);
@@ -277,10 +231,7 @@ for (const kind of ['diary', 'habit', 'sober']) {
       const screen = form(kind, nav.router);
       screen.render();
       screen.finish();
-      const closingSheet = screen.render();
-      assert.equal(closingSheet.props.visible, false);
-      assert.deepEqual(nav.actions, []);
-      closingSheet.props.onClose();
+      screen.render();
       assert.deepEqual(
         nav.state().routes.map((route: any) => route.name),
         ['(tabs)'],
@@ -294,9 +245,7 @@ for (const kind of ['diary', 'habit', 'sober']) {
     const screen = form(kind, nav.router);
     screen.render();
     screen.finish();
-    const closingSheet = screen.render();
-    assert.equal(nav.state().routes.length, 3);
-    closingSheet.props.onClose();
+    screen.render();
     assert.deepEqual(
       nav.state().routes.map((route: any) => route.name),
       ['(tabs)', 'calendar/[date]'],
@@ -314,7 +263,7 @@ for (const kind of ['diary', 'habit', 'sober']) {
     const screen = form(kind, nav.router);
     screen.render();
     screen.finish();
-    screen.render().props.onClose();
+    screen.render();
     assert.equal(nav.state().routes.at(-1).name, nav.detail);
     nav.router.back();
     assert.equal(nav.state().routes.at(-1).name, 'home/[year]/stats');
@@ -326,10 +275,7 @@ for (const kind of ['diary', 'habit', 'sober']) {
     const screen = form(kind, nav.router);
     screen.render();
     screen.finish();
-    const closingSheet = screen.render();
-    assert.equal(closingSheet.props.visible, false);
-    assert.deepEqual(nav.actions, []);
-    closingSheet.props.onClose();
+    screen.render();
     assert.deepEqual(nav.actions, ['REPLACE']);
     assert.deepEqual(
       nav.state().routes.map((route: any) => route.name),

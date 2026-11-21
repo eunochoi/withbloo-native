@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { ScrollableName } from '../../components/ScrollableName';
 import { useI18n } from '../../i18n/react';
 import { Pressable, View } from 'react-native';
@@ -7,7 +8,6 @@ import { Text } from '../../components/Text';
 import type { Habit } from '../../db/types';
 import { resolveIconColor } from '../../domain/constants';
 import { canCheckHabit, localDate, shiftDate } from '../../domain/date';
-import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 import { HabitStars } from '../habit/HabitStars';
 
@@ -27,7 +27,7 @@ export function DayInfoHabitSection({
   const { t } = useI18n();
 
   const { colors, iconSizes } = useAppTheme();
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const editable = date >= shiftDate(today, -3) && date <= today;
   const counted = habits.filter((habit) => habit.priority > 0);
   const done = counted.filter((habit) => habit.completed).length;
@@ -74,7 +74,7 @@ export function DayInfoHabitSection({
           accessibilityRole="button"
           accessibilityLabel={t('calendar.habitLink', { value: habit.name })}
           onPress={() => {
-            openModal(`/habit/${habit.id}`);
+            router.navigate(`/habit/${habit.id}`);
           }}
           className="h-6 w-6 items-center justify-center"
         >

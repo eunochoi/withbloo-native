@@ -1,8 +1,8 @@
+import { useRouter } from 'expo-router';
 import { useWidgetDetail } from '../../src/navigation/useWidgetDetail';
 import { useI18n } from '../../src/i18n/react';
 import { PageTopSection } from '../../src/components/PageTopSection';
 import { EmptyState } from '../../src/components/EmptyState';
-import { useModalNavigation } from '../../src/navigation/ModalNavigationProvider';
 import { EMPTY_STATE_CLASS_NAME, PAGE_CLASS_NAME } from '../../src/theme/classes';
 
 import { useQuery } from '@tanstack/react-query';
@@ -50,7 +50,7 @@ export default function SoberList() {
 
   const db = useSQLiteContext();
   const { colors, rem: appRem } = useAppTheme();
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const list = useQuery(soberQueries.list(db));
   const restarts = useQuery(soberQueries.restarts(db));
   const { settings } = useSettings();
@@ -151,7 +151,7 @@ export default function SoberList() {
                       });
                       return;
                     }
-                    openModal('/sober/new');
+                    router.navigate('/sober/new');
                   }}
                 />
               </Toolbar>
@@ -205,7 +205,8 @@ export default function SoberList() {
                   accessibilityLabel={t('sober.add')}
                   disabled={disabledAdd}
                   onPress={() => {
-                    if (!disabledAdd && sorted.length < MAX_SOBER_COUNT) openModal('/sober/new');
+                    if (!disabledAdd && sorted.length < MAX_SOBER_COUNT)
+                      router.navigate('/sober/new');
                   }}
                   className={`min-h-40 items-center justify-center gap-2 border-t border-theme-border/50 bg-theme-surface px-2 py-5 active:opacity-65 ${disabledAdd ? 'opacity-40' : ''}`}
                 >
@@ -230,7 +231,13 @@ export default function SoberList() {
           </>
         }
       />
-      <ScrollEdgeFade edge="bottom" visible={fade.bottomVisible} heightRem={4} includeToolbar={false} includeBottomInset={false} />
+      <ScrollEdgeFade
+        edge="bottom"
+        visible={fade.bottomVisible}
+        heightRem={4}
+        includeToolbar={false}
+        includeBottomInset={false}
+      />
 
       {filterOpen && (
         <SoberFilterPicker
@@ -238,13 +245,16 @@ export default function SoberList() {
           onClose={() => setFilterOpen(false)}
           onApply={(next) => {
             setFilter(next);
-            setFilterOpen(false);
             scroll.current?.scrollToOffset({ offset: 0, animated: true });
           }}
         />
       )}
       {sortOpen && (
-        <SoberSortPicker visible={sortOpen} onClose={() => setSortOpen(false)} onApplied={() => scroll.current?.scrollToOffset({ offset: 0, animated: true })} />
+        <SoberSortPicker
+          visible={sortOpen}
+          onClose={() => setSortOpen(false)}
+          onApplied={() => scroll.current?.scrollToOffset({ offset: 0, animated: true })}
+        />
       )}
     </ColorView>
   );

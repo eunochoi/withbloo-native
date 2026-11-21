@@ -1,11 +1,16 @@
+import { ScrollEdgeFade } from '../components/ScrollEdgeFade';
+import { useScrollFade } from '../hooks/useScrollFade';
+import { useIsFocused } from 'expo-router/react-navigation';
+import { useRouter } from 'expo-router';
+import { NoticeHost } from '../components/NoticeProvider';
 import { formatDisplayDate } from '../i18n/format';
 import { useI18n } from '../i18n/react';
 import { useQuery } from '@tanstack/react-query';
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
-import { TextInput, View } from 'react-native';
-import { BottomSheetPage } from '../components/bottom-sheet/BottomSheetPage';
+import { ScrollView, TextInput, View } from 'react-native';
+import { SheetHeader } from '../components/SheetHeader';
 import { CharacterCount } from '../components/CharacterCount';
 import { DateTimePicker } from '../components/DateTimePicker';
 import { FormTextInput } from '../components/FormTextInput';
@@ -36,6 +41,9 @@ import { HabitPriorityPicker } from './habit/HabitPriorityPicker';
 import { HabitStars } from './habit/HabitStars';
 
 export function HabitForm({ id }: { id?: number }) {
+  const sheetFade = useScrollFade();
+  const router = useRouter();
+  const focused = useIsFocused();
   const { t, formatLocale } = useI18n();
   const priorityLabels = [t('habit.free'), t('habit.low'), t('habit.normal'), t('habit.high')];
 
@@ -95,29 +103,53 @@ export function HabitForm({ id }: { id?: number }) {
   const iconLabel = t(`habitIcons.${icon}`);
   const colorLabel =
     iconColor === 'theme' ? t('habit.defaultThemeColor') : t(`iconColors.${iconColor}`);
-  const onClosed = saved
-    ? () =>
-        showNotice({
-          tone: 'success',
-          title: id ? t('habit.edited') : t('habit.added'),
-        })
-    : undefined;
+  const didClose = useRef(false);
+  useEffect(() => {
+    if (!saved || mutation.isPending || didClose.current) return;
+    didClose.current = true;
+    if (router.canGoBack()) router.back();
+    else router.replace('/habit');
+    showNotice({
+      tone: 'success',
+      title: id ? t('habit.edited') : t('habit.added'),
+    });
+  }, [saved, mutation.isPending, router, showNotice, id, t]);
   if (id !== undefined && (query.isPending || query.error || !query.data || !loaded.current))
     return (
-      <BottomSheetPage
-        closeRequested={saved && !mutation.isPending}
-        onClosed={onClosed}
-        backRoute="/habit"
-        title={title}
-      >
-        <QueryState query={query} />
-        {!query.isPending && !query.error && <Text className="px-6">{t('habit.notFound')}</Text>}
-      </BottomSheetPage>
+      <View className="flex-1 px-[5%] pt-2">
+        <SheetHeader
+          title={title}
+          onClose={() => (router.canGoBack() ? router.back() : router.replace('/habit'))}
+        />
+        <View className="mx-1 min-h-0 flex-1 overflow-hidden">
+          <ScrollView
+            onScroll={sheetFade.onScroll}
+            scrollEventThrottle={16}
+            onLayout={sheetFade.onLayout}
+            onContentSizeChange={sheetFade.onContentSizeChange}
+            className="flex-1"
+            contentContainerClassName="gap-7 py-8 pb-12"
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+          >
+            <QueryState query={query} />
+            {!query.isPending && !query.error && (
+              <Text className="px-6">{t('habit.notFound')}</Text>
+            )}
+          </ScrollView>
+          <ScrollEdgeFade edge="top" visible={sheetFade.topVisible} />
+          <ScrollEdgeFade
+            edge="bottom"
+            visible={sheetFade.bottomVisible}
+            includeBottomInset={false}
+            includeToolbar={false}
+          />
+        </View>
+        <NoticeHost modal active={focused} />
+      </View>
     );
   return (
     <RecordFormLayout
-      closeRequested={saved && !mutation.isPending}
-      onClosed={onClosed}
       title={title}
       backRoute="/habit"
       onBeforeClose={() => {
@@ -139,7 +171,10 @@ export function HabitForm({ id }: { id?: number }) {
               return;
             }
             if (name.trim().length > HABIT_NAME_MAX_LENGTH) {
-              showNotice({ tone: 'info', title: t('habit.nameTooLong', { count: HABIT_NAME_MAX_LENGTH }) });
+              showNotice({
+                tone: 'info',
+                title: t('habit.nameTooLong', { count: HABIT_NAME_MAX_LENGTH }),
+              });
               nameInput.current?.focus();
               return;
             }
@@ -147,7 +182,11 @@ export function HabitForm({ id }: { id?: number }) {
               try {
                 assertDateTime(initialStartedAt, Date.now());
               } catch (error) {
-                showNotice({ tone: 'error', title: t('habit.processFailed'), message: (error as Error).message });
+                showNotice({
+                  tone: 'error',
+                  title: t('habit.processFailed'),
+                  message: (error as Error).message,
+                });
                 return;
               }
             }
@@ -212,10 +251,25 @@ export function HabitForm({ id }: { id?: number }) {
       </View>
       <View className="gap-3">
         <Text accessibilityRole="header" className={SECTION_TITLE_CLASS_NAME}>
-          {t('habit.descriptionTitle')} <Text className="text-base font-normal text-theme-text-tertiary">{t('habit.descriptionOptional')}</Text>
+          {t('habit.descriptionTitle')}{' '}
+          <Text className="text-base font-normal text-theme-text-tertiary">
+            {t('habit.descriptionOptional')}
+          </Text>
         </Text>
         <View className="gap-3 px-2">
-          <FormTextInput accessibilityLabel={t('habit.descriptionLabel')} value={description} onChangeText={setDescription} editable={!mutation.isPending} maxLength={50} multiline scrollEnabled textAlignVertical="top" placeholder={t('habit.descriptionPlaceholder')} placeholderTextColor={colors.textTertiary} className={`h-28 ${FORM_TEXT_INPUT_CLASS_NAME}`} />
+          <FormTextInput
+            accessibilityLabel={t('habit.descriptionLabel')}
+            value={description}
+            onChangeText={setDescription}
+            editable={!mutation.isPending}
+            maxLength={50}
+            multiline
+            scrollEnabled
+            textAlignVertical="top"
+            placeholder={t('habit.descriptionPlaceholder')}
+            placeholderTextColor={colors.textTertiary}
+            className={`h-28 ${FORM_TEXT_INPUT_CLASS_NAME}`}
+          />
           <CharacterCount length={description.length} maxLength={50} />
         </View>
       </View>

@@ -1,9 +1,12 @@
+import { NoticeHost } from './NoticeProvider';
+import { SheetHeader } from './SheetHeader';
 import { useI18n } from '../i18n/react';
 import { InfoNotice } from './InfoNotice';
-import { useState } from 'react';
-import { Switch, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ScrollView, Switch, View } from 'react-native';
 import { useAppTheme } from '../theme/AppThemeProvider';
-import { BottomSheetModal } from './bottom-sheet/BottomSheetModal';
+import { SheetModal } from './SheetModal';
+import type { BottomSheetModal } from '@expo/ui/community/bottom-sheet';
 import { HeaderAction } from './HeaderAction';
 import { ContentBottomButton } from './ContentBottomButton';
 import { PickerOption } from './PickerOption';
@@ -17,7 +20,6 @@ export function RecordSortPicker({
   allowCustom = false,
   ascendingLabel,
   sortLabel,
-  showCriteriaSort = false,
   onClose,
   onApply,
 }: {
@@ -28,7 +30,6 @@ export function RecordSortPicker({
   allowCustom?: boolean;
   ascendingLabel?: string;
   sortLabel?: string;
-  showCriteriaSort?: boolean;
   onClose: () => void;
   onApply: (
     sort: 'ASC' | 'DESC' | 'CUSTOM',
@@ -50,7 +51,7 @@ export function RecordSortPicker({
   ] as { value: 'ASC' | 'DESC' | 'CUSTOM'; label: string }[];
   const prioritySection = priorityFirst !== undefined && (
     <View className="flex-row items-center justify-between gap-3">
-      <Text className="text-lg font-semibold">{t('ui.priorityFirst')}</Text>
+      <Text className="text-base font-semibold">{t('ui.priorityFirst')}</Text>
       <Switch
         accessibilityLabel={t('ui.priorityFirst')}
         value={draftPriority}
@@ -58,34 +59,49 @@ export function RecordSortPicker({
           if (value && draftSort === 'CUSTOM') setSort('DESC');
           setPriority(value);
         }}
-        ios_backgroundColor={colors.switchTrack} trackColor={{ false: colors.switchTrack, true: colors.accent }}
+        ios_backgroundColor={colors.switchTrack}
+        trackColor={{ false: colors.switchTrack, true: colors.accent }}
         thumbColor={colors.switchThumb}
       />
     </View>
   );
+  const sheet = useRef<BottomSheetModal>(null);
+  useEffect(() => {
+    sheet.current?.present();
+  }, []);
+  const closeSheet = () => sheet.current?.dismiss();
   return (
-    <BottomSheetModal
-      visible
-      title={title}
-      onClose={onClose}
-      headerButton={(closePicker) => (
-        <HeaderAction
-          label={t('common.apply')}
-          onPress={() => {
-            const priority = draftSort === 'CUSTOM' ? false : draftPriority;
-            if (recordSort) onApply(draftSort, priority, draftRecordSort);
-            else onApply(draftSort, priority);
-            closePicker();
-          }}
-        />
-      )}
-    >
-      <View className={showCriteriaSort ? 'gap-8' : 'gap-7'}>
+    <SheetModal
+      ref={sheet}
+      onDismiss={onClose}
 
+    >
+      <SheetHeader
+        title={title}
+        headerButton={
+          <HeaderAction
+            label={t('common.apply')}
+            onPress={() => {
+              const priority = draftSort === 'CUSTOM' ? false : draftPriority;
+              if (recordSort) onApply(draftSort, priority, draftRecordSort);
+              else onApply(draftSort, priority);
+              closeSheet();
+            }}
+          />
+        }
+        onClose={closeSheet}
+      />
+
+      <ScrollView
+        className="mx-1 shrink grow-0"
+        contentContainerClassName="gap-7 py-8"
+        nestedScrollEnabled
+        showsVerticalScrollIndicator={false}
+      >
         {prioritySection}
         {recordSort && (
           <View className="gap-3">
-            <Text className="text-lg font-semibold">{t('ui.records')}</Text>
+            <Text className="text-base font-semibold">{t('ui.records')}</Text>
             <View className="flex-row gap-3">
               {(['DESC', 'ASC'] as const).map((value) => (
                 <View key={value} className="flex-1">
@@ -110,8 +126,10 @@ export function RecordSortPicker({
             </View>
           </View>
         )}
-        <View className={`gap-3 ${showCriteriaSort ? 'px-2' : ''}`}>
-          <Text className={`${showCriteriaSort ? 'text-base' : 'text-lg'} font-semibold`}>{sortLabel ?? t('ui.createdDateSort')}</Text>
+        <View className="gap-3">
+          <Text className="text-base font-semibold">
+            {sortLabel ?? t('ui.createdDateSort')}
+          </Text>
           <View className="flex-row gap-3">
             {options.map((option) => (
               <View key={option.value} className="flex-1">
@@ -136,17 +154,19 @@ export function RecordSortPicker({
             ))}
           </View>
         </View>
-        <View className={`gap-1 ${showCriteriaSort ? 'px-2' : ''}`}>
-          <InfoNotice>
+        <View className="gap-1">
+          <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
             {draftSort === 'CUSTOM'
               ? t('ui.customDescription')
               : recordSort
-                ? t('ui.recordsDescription', { value: draftPriority ? t('ui.priorityPrefix') : '' })
+                ? t('ui.recordsDescription', {
+                    value: draftPriority ? t('ui.priorityPrefix') : '',
+                  })
                 : t('ui.sortDescription', {
                     value: `${draftPriority ? t('ui.importantPrefix') : ''}${(sortLabel ?? t('ui.createdDateSort')).replace(/(?:순)? 정렬$/, '')}`,
                   })}
           </InfoNotice>
-          {allowCustom && <InfoNotice>{t('ui.sortPriorityConflict')}</InfoNotice>}
+          {allowCustom && <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>{t('ui.sortPriorityConflict')}</InfoNotice>}
         </View>
         <ContentBottomButton
           label={t('ui.reset')}
@@ -157,7 +177,9 @@ export function RecordSortPicker({
             setRecordSort(recordSort ? 'DESC' : undefined);
           }}
         />
-      </View>
-    </BottomSheetModal>
+      </ScrollView>
+
+      <NoticeHost modal />
+    </SheetModal>
   );
 }

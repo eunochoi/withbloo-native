@@ -13,7 +13,7 @@ export function WelcomePage() {
   const { t } = useI18n();
   const [mood, setMood] = useState(1);
   return (
-    <View className="w-full max-w-lg grow self-center justify-evenly gap-6 px-6 py-6">
+    <View className="w-full max-w-lg grow self-center justify-evenly gap-6 py-6">
       <View className="shrink-0 gap-1 items-center">
         <Text autoLineHeight
           accessibilityRole="header"

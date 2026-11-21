@@ -1,10 +1,10 @@
+import { useRouter } from 'expo-router';
 import { useI18n } from '../../i18n/react';
 import { useQuery } from '@tanstack/react-query';
 import { useSQLiteContext } from 'expo-sqlite';
 import { AppIcon } from '../../components/AppIcon';
 import { EmotionImage } from '../../components/EmotionImage';
 import { EMOTIONS } from '../../domain/constants';
-import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { diaryQueries } from '../../queries';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 import { HomeTodayItem } from './HomeTodayItem';
@@ -13,7 +13,7 @@ export function HomeTodayDiary({ today }: { today: string }) {
   const { t } = useI18n();
   const db = useSQLiteContext();
   const { rem } = useAppTheme();
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const diary = useQuery(diaryQueries.byDate(db, today));
   const emotion = diary.data?.emotion ?? null;
   const status = diary.isError
@@ -30,7 +30,7 @@ export function HomeTodayDiary({ today }: { today: string }) {
       disabled={diary.isPending || diary.isError}
       accessibilityLabel={t('home.diaryLink', { value: status })}
       onPress={() =>
-        openModal(
+        router.navigate(
           diary.data
             ? `/diary/${diary.data.id}`
             : { pathname: '/diary/new', params: { date: today } },

@@ -9,7 +9,6 @@ import { sortSobers } from '../../db/sober';
 import { resolveIconColor } from '../../domain/constants';
 import { getSoberSummary, SOBER_DAY_MS } from '../../domain/sober';
 import { useCurrentMinute } from '../../hooks/useCurrentMinute';
-import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { soberQueries } from '../../queries';
 import { useSettings } from '../../settings/SettingsProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
@@ -21,7 +20,7 @@ export function HomeTodaySober() {
   const router = useRouter();
   const { settings } = useSettings();
   const { colors, rem } = useAppTheme();
-  const { openModal } = useModalNavigation();
+
   const now = useCurrentMinute();
   const sobers = useQuery(soberQueries.list(db));
   const restarts = useQuery({
@@ -54,11 +53,13 @@ export function HomeTodaySober() {
       accessibilityLabel={t('home.soberLinkStatus', {
         value: `${status}${days !== null ? `, ${t('home.dayOrdinal', { count: days })}` : ''}`,
       })}
-      onPress={() => (sober ? openModal(`/sober/${sober.id}`) : router.push('/sober'))}
+      onPress={() => (sober ? router.navigate(`/sober/${sober.id}`) : router.push('/sober'))}
     >
       {days !== null ? (
         <View className="w-full flex-row items-baseline justify-center">
-          {!!dayPrefix && <Text className="text-sm font-normal text-theme-text-secondary">{dayPrefix}</Text>}
+          {!!dayPrefix && (
+            <Text className="text-sm font-normal text-theme-text-secondary">{dayPrefix}</Text>
+          )}
           <Text
             numberOfLines={1}
             adjustsFontSizeToFit
@@ -68,7 +69,9 @@ export function HomeTodaySober() {
           >
             {days}
           </Text>
-          {!!daySuffix && <Text className="text-sm font-normal text-theme-text-secondary">{daySuffix}</Text>}
+          {!!daySuffix && (
+            <Text className="text-sm font-normal text-theme-text-secondary">{daySuffix}</Text>
+          )}
         </View>
       ) : (
         <AppIcon name="sober" size={rem * 3.5} className="text-theme-text-disabled" />

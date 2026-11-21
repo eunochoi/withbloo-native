@@ -8,10 +8,12 @@ import { EMOTIONS } from '../src/domain/constants';
 
 const require = createRequire(import.meta.url);
 const ts = require('typescript');
-const jsx = (type: unknown, props: any) => ({ type, props });
+const jsx = (type: unknown, props: any) =>
+  typeof type === 'function' && type.name === 'SheetModal' ? type(props) : { type, props };
 function nodes(node: any): any[] {
   if (Array.isArray(node)) return node.flatMap(nodes);
   if (!node || typeof node !== 'object') return [];
+  if (node.type === 'ExpoDynamicBottomSheet' && !node.props.ref.presented) return [node];
   return [node, ...nodes(node.props?.children)];
 }
 function textContent(node: any): string {
@@ -41,6 +43,8 @@ function picker(path: string, name: string, initial: Record<string, unknown>) {
           if (dependency.endsWith('/i18n/react')) return mockI18n(() => language);
           if (dependency.endsWith('/ToolbarButton'))
             return evaluate('src/components/ToolbarButton.tsx');
+          if (dependency.endsWith('/SheetModal'))
+            return evaluate('src/components/SheetModal.tsx');
           if (dependency.endsWith('/HabitPriorityPicker'))
             return { HABIT_PRIORITY_LABELS: ['자유 기록', '낮음', '보통', '높음'] };
           if (dependency.endsWith('/FilterSheet')) {
@@ -72,12 +76,43 @@ function picker(path: string, name: string, initial: Record<string, unknown>) {
           if (dependency.endsWith('domain/diaryFilters'))
             return require('../src/domain/diaryFilters');
           if (dependency === 'tailwind-merge') return require(dependency);
+          if (dependency.endsWith('/useScrollFade')) return { useScrollFade: () => ({}) };
           if (dependency.endsWith('theme/classes')) return require('../src/theme/classes');
+          if (dependency.endsWith('theme/tokens.json')) return require('../src/theme/tokens.json');
           if (dependency.endsWith('domain/selection')) return require('../src/domain/selection');
           if (dependency === 'react/jsx-runtime') return { jsx, jsxs: jsx, Fragment: 'Fragment' };
+          if (dependency === '@expo/ui/community/bottom-sheet')
+            return { BottomSheetModal: 'ExpoDynamicBottomSheet' };
+          if (dependency === 'react-native-safe-area-context')
+            return { useSafeAreaInsets: () => ({ top: 30, bottom: 24 }) };
           if (dependency === 'react')
             return {
               Fragment: 'Fragment',
+              useRef: () => {
+                const index = cursor++;
+                if (!(index in state)) {
+                  const ref = {
+                    presented: false,
+                    onDismiss: undefined as (() => void) | undefined,
+                    current: {
+                      present: () => { ref.presented = true; },
+                      dismiss: () => {
+                        if (!ref.presented) return;
+                        ref.presented = false;
+                        ref.onDismiss?.();
+                      },
+                    },
+                  };
+                  state[index] = ref;
+                }
+                return state[index];
+              },
+              useEffect: (effect: () => void) => {
+                const index = cursor++;
+                if (index in state) return;
+                state[index] = true;
+                effect();
+              },
               useState: (value: unknown) => {
                 const index = cursor++;
                 if (!(index in state)) state[index] = value;
@@ -95,9 +130,11 @@ function picker(path: string, name: string, initial: Record<string, unknown>) {
           if (dependency === 'react-native')
             return {
               View: 'View',
+              ScrollView: 'ScrollView',
               Switch: 'Switch',
               Pressable: 'Pressable',
-              useWindowDimensions: () => ({ height: 900 }),
+              useWindowDimensions: () => ({ width: 400, height: 900 }),
+              Platform: { OS: 'android' },
             };
           const component = dependency.split('/').at(-1)!;
           return { [component]: component };
@@ -129,11 +166,18 @@ function picker(path: string, name: string, initial: Record<string, unknown>) {
           action?.();
         }),
       );
+    const sheetNodes = nodes(shell);
+    for (const node of sheetNodes) {
+      if (node.type === 'ExpoDynamicBottomSheet') node.props.ref.onDismiss = node.props.onDismiss;
+    }
     return {
       shell,
       content: nodes([
         ...nestedContent,
         shell.props.headerAction,
+        ...sheetNodes
+          .filter((node) => node.type === 'SheetHeader')
+          .map((node) => node.props.headerButton),
         typeof shell.props.children === 'function' ? shell.props.children(close) : shell,
         typeof shell.props.footer === 'function' ? shell.props.footer(close) : shell.props.footer,
       ]),
@@ -375,7 +419,15 @@ test('sort hints describe the actual criteria and custom restriction without per
 });
 
 test('diary sorting exposes date order only and cancel does not persist drafts', () => {
-  const ui = sortPicker({});
+  const diarySort = () =>
+    picker('src/screens/diary/DiarySortPicker.tsx', 'DiarySortPicker', { sort: 'DESC' });
+  const ui = diarySort();
+  const { shell, content } = ui.render();
+  assert.equal(shell.type, 'ExpoDynamicBottomSheet');
+  assert.equal(shell.props.ref.presented, true);
+  assert.equal(shell.props.backgroundStyle.borderRadius, 36);
+  assert(shell.props.children.props.className.split(' ').includes('px-[5%]'));
+  assert.equal(content.find((node) => node.type === 'ScrollView').props.showsVerticalScrollIndicator, false);
   assert(
     !ui
       .render()
@@ -384,34 +436,51 @@ test('diary sorting exposes date order only and cancel does not persist drafts',
       ),
   );
   ui.press('과거순');
-  ui.render().shell.props.onClose();
-  ui.finish();
+  ui.render().shell.props.onDismiss();
   assert.equal(ui.applied.length, 0);
-  const reopened = sortPicker({});
+  const reopened = diarySort();
   assert.equal(
     reopened.render().content.find((node) => node.props.accessibilityLabel === '최신순').props
       .selected,
     true,
   );
+  reopened.press('과거순');
+  reopened.press('적용');
+  assert.deepEqual(reopened.applied, [['ASC']]);
+  assert.equal(reopened.closed, 1);
 });
 
-test('year, season and emotion apply together only after closing', () => {
+test('diary filter opens at its content height and only caps the combined layout', () => {
+  const { shell, content } = filterPicker().render();
+  assert.equal(shell.type, 'ExpoDynamicBottomSheet');
+  assert.equal(shell.props.ref.presented, true);
+  assert.equal(shell.props.enableDynamicSizing, true);
+  assert.equal(shell.props.snapPoints, undefined);
+  assert.equal(shell.props.backgroundStyle.borderRadius, 36);
+  assert.equal(shell.props.children.props.style.maxHeight, 900 - 40 - 24);
+  assert.equal(shell.props.children.props.style.height, undefined);
+  const scroll = content.find((node) => node.type === 'ScrollView');
+  assert.equal(scroll.props.style, undefined);
+  assert.equal(scroll.props.showsVerticalScrollIndicator, false);
+  assert(scroll.props.className.split(' ').includes('shrink'));
+});
+
+test('diary filter applies year, season and emotion together and requests close once', () => {
   const ui = filterPicker();
   chooseDiaryYear(ui, 2025);
   ui.press('겨울');
   ui.press('긍정');
   assert.equal(ui.applied.length, 0);
   ui.press('일기 필터 적용');
-  assert.equal(ui.applied.length, 0);
-  ui.finish();
   assert.deepEqual(ui.applied, [[2025, ['winter'], ['positive']]]);
+  assert.equal(ui.closed, 1);
 });
 
 test('selecting all years preserves independent seasons and cancel preserves saved conditions', () => {
   const ui = filterPicker({ year: 2025, seasons: ['summer'], emotionGroups: ['positive'] });
   chooseDiaryYear(ui, null);
   ui.press('긍정');
-  ui.render().shell.props.onClose();
+  ui.render().shell.props.onDismiss();
   ui.finish();
   assert.equal(ui.applied.length, 0);
   const applied = filterPicker({ year: 2025, seasons: ['summer'], emotionGroups: ['positive'] });
@@ -421,23 +490,16 @@ test('selecting all years preserves independent seasons and cancel preserves sav
   assert.deepEqual(applied.applied, [[null, ['summer'], ['positive']]]);
 });
 
-test('header reset clears all diary drafts without applying until confirmation', () => {
+test('diary filter reset clears drafts without applying until confirmation', () => {
   const ui = filterPicker({ year: 2025, seasons: ['winter'], emotionGroups: ['negative'] });
   const view = ui.render();
   assert(
-    nodes(view.shell.props.headerAction).some(
-      (node) => node.props.accessibilityLabel === '선택 초기화',
-    ),
+    view.content.some((node) => node.props.accessibilityLabel === '선택 초기화'),
   );
-  assert.equal(view.shell.props.title, '일기 필터');
+  assert.equal(view.content.find((node) => node.type === 'SheetHeader').props.title, '일기 필터');
   assert(
     !nodes(view.shell.props.children).some(
       (node) => node.props.accessibilityRole === 'header' && node.props.children === '일기 필터',
-    ),
-  );
-  assert(
-    !nodes(view.shell.props.footer(() => {})).some(
-      (node) => node.props.accessibilityLabel === '선택 초기화',
     ),
   );
   ui.press('선택 초기화');
@@ -714,7 +776,7 @@ test('canceling the year picker leaves an all-year seasonal filter unchanged', (
   const ui = filterPicker();
   ui.press('연도 선택');
   ui.render()
-    .content.find((node) => node.type === 'BottomSheetModal' && node.props.title === '연도 선택')
+    .content.find((node) => node.type === 'SheetHeader' && node.props.title === '연도 선택')
     .props.onClose();
   ui.press('봄');
   ui.press('일기 필터 적용');
@@ -809,7 +871,7 @@ test('diary year list includes only recorded years plus all years and marks one 
   assert.deepEqual(ui.applied, [[1900, [], []]]);
 });
 
-test('future input years clear without dropping an independent season', () => {
+test('future diary input years clear without dropping an independent season', () => {
   const ui = filterPicker({ year: 2027, seasons: ['winter'] });
   ui.press('일기 필터 적용');
   ui.finish();
@@ -1052,7 +1114,7 @@ test('habit priority picker has four choices in two rows and explains exclusion'
           node.props.children === '자유 기록 항목은 완료율과 달성 개수 계산에 포함되지 않아요.',
       ),
   );
-  ui.press('선택 완료');
+  ui.press('완료');
   ui.finish();
   assert.deepEqual(ui.applied, [[0]]);
 });
@@ -1082,7 +1144,7 @@ test('English diary filters preserve seasonal and emotion-group values when swit
     currentYear: 2026,
   });
   ui.setLanguage('en');
-  assert.equal(ui.render().shell.props.title, 'Diary filters');
+  assert.equal(ui.render().content.find((node) => node.type === 'SheetHeader').props.title, 'Diary filters');
   ui.press('Winter');
   ui.press('Neutral');
   const content = ui
@@ -1101,7 +1163,7 @@ test('English diary filters preserve seasonal and emotion-group values when swit
       .render()
       .content.some((node) => node.props.accessibilityLabel === '겨울' && node.props.selected),
   );
-  ui.press('적용하기');
+  ui.press('일기 필터 적용');
   ui.finish();
   assert.deepEqual(ui.applied, [[null, ['winter'], ['neutral']]]);
 });
@@ -1122,7 +1184,7 @@ test('English habit filters and priority picker keep their persisted numeric val
     value: 2,
   });
   priority.setLanguage('en');
-  priority.press('None · Free entry');
+  priority.press('Free entry');
   priority.press('Done');
   priority.finish();
   assert.deepEqual(priority.applied, [[0]]);

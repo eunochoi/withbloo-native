@@ -1,6 +1,9 @@
-import { useRef, useState, type ComponentProps } from 'react';
-import { BottomSheetModal } from './bottom-sheet/BottomSheetModal';
-import { View } from 'react-native';
+import { NoticeHost } from './NoticeProvider';
+import { SheetHeader } from './SheetHeader';
+import { useEffect, useRef, useState, type ComponentProps } from 'react';
+import { SheetModal } from './SheetModal';
+import type { BottomSheetModal } from '@expo/ui/community/bottom-sheet';
+import { ScrollView, View } from 'react-native';
 import { useI18n } from '../i18n/react';
 import { PickerAction } from './PickerAction';
 
@@ -31,19 +34,45 @@ export function ConfirmModal({
   const [busy, setBusy] = useState(false);
   const pending = useRef(false);
   const confirmed = useRef(false);
+  const sheet = useRef<BottomSheetModal>(null);
+  useEffect(() => {
+    if (visible) sheet.current?.present();
+    else sheet.current?.dismiss();
+  }, [visible]);
+  const closeSheet = () => {
+    if (!(() => !pending.current)()) return false;
+    sheet.current?.dismiss();
+    return true;
+  };
   return (
-    <BottomSheetModal
-      visible={visible}
-      title={title}
-      onBeforeClose={() => !pending.current}
-      onClose={() => {
+    <SheetModal
+      ref={sheet}
+      onDismiss={() => {
         const accepted = confirmed.current;
         confirmed.current = false;
         onCancel();
         if (accepted) onConfirmed?.();
       }}
+      enablePanDownToClose={!busy}
+
     >
-      {(close) => (
+      <SheetHeader
+        title={title}
+        onClose={
+          !busy
+            ? () => {
+                if (!busy) closeSheet();
+              }
+            : undefined
+        }
+      />
+
+      <ScrollView
+        className="mx-1 shrink grow-0"
+        contentContainerClassName="gap-7 py-8"
+        nestedScrollEnabled
+        showsVerticalScrollIndicator={false}
+      >
         <View className="gap-3">
           <PickerAction
             icon={icon}
@@ -59,7 +88,7 @@ export function ConfirmModal({
                 await onConfirm();
                 confirmed.current = true;
                 pending.current = false;
-                close();
+                closeSheet();
               } catch {
                 // The caller displays the operation error; keep the confirmation open.
               } finally {
@@ -73,10 +102,12 @@ export function ConfirmModal({
             title={cancelLabel ?? t('common.cancel')}
             description={t('common.cancelDescription')}
             disabled={busy}
-            onPress={() => close()}
+            onPress={() => closeSheet()}
           />
         </View>
-      )}
-    </BottomSheetModal>
+      </ScrollView>
+
+      <NoticeHost modal />
+    </SheetModal>
   );
 }

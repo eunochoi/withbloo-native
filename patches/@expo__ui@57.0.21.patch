@@ -1,0 +1,96 @@
+diff --git a/android/src/main/java/expo/modules/ui/ModalBottomSheetView.kt b/android/src/main/java/expo/modules/ui/ModalBottomSheetView.kt
+index e90edd3fd682f1a53a0950526ae63fe20f3efd24..ee782759143e0a7198de865d05f6426c67ea7679 100644
+--- a/android/src/main/java/expo/modules/ui/ModalBottomSheetView.kt
++++ b/android/src/main/java/expo/modules/ui/ModalBottomSheetView.kt
+@@ -8,6 +8,7 @@ import android.content.Context
+ import android.graphics.Color
+ import android.view.KeyEvent
+ import android.view.inputmethod.InputMethodManager
++import androidx.compose.foundation.shape.RoundedCornerShape
+ import androidx.compose.material3.BottomSheetDefaults
+ import androidx.compose.material3.ExperimentalMaterial3Api
+ import androidx.compose.material3.ModalBottomSheet
+@@ -19,6 +20,7 @@ import androidx.compose.runtime.DisposableEffect
+ import androidx.compose.runtime.LaunchedEffect
+ import androidx.compose.runtime.rememberCoroutineScope
+ import androidx.compose.ui.platform.LocalView
++import androidx.compose.ui.unit.dp
+ import androidx.compose.ui.window.DialogWindowProvider
+ import expo.modules.kotlin.records.Field
+ import expo.modules.kotlin.records.Record
+@@ -41,6 +43,7 @@ data class ModalBottomSheetViewProps(
+   val skipPartiallyExpanded: Boolean = false,
+   val initialFullyExpanded: Boolean = false,
+   val containerColor: Color? = null,
++  val topCornerRadius: Double? = null,
+   val contentColor: Color? = null,
+   val scrimColor: Color? = null,
+   val showDragHandle: Boolean = true,
+@@ -138,11 +141,16 @@ fun FunctionalComposableScope.ModalBottomSheetContent(
+   val resolvedContentColor = props.contentColor.composeOrNull ?: contentColorFor(resolvedContainerColor)
+   val resolvedScrimColor = props.scrimColor.composeOrNull ?: BottomSheetDefaults.ScrimColor
+   val dragHandleSlotView = findChildSlotView(view, "dragHandle")
++  val shape = props.topCornerRadius?.let { radius ->
++    val topRadius = radius.coerceAtLeast(0.0).dp
++    RoundedCornerShape(topStart = topRadius, topEnd = topRadius, bottomStart = 0.dp, bottomEnd = 0.dp)
++  } ?: BottomSheetDefaults.ExpandedShape
+ 
+   ModalBottomSheet(
+     sheetState = sheetState,
+     onDismissRequest = onDismissRequest,
+     containerColor = resolvedContainerColor,
++    shape = shape,
+     contentColor = resolvedContentColor,
+     scrimColor = resolvedScrimColor,
+     sheetGesturesEnabled = props.sheetGesturesEnabled,
+diff --git a/src/community/bottom-sheet/BottomSheet.android.tsx b/src/community/bottom-sheet/BottomSheet.android.tsx
+index ac8ae4af0a1fee8afbea2b9a5393d8eae271b108..cc6eb6d2d143240c45f2ee08865aeee2d61358b4 100644
+--- a/src/community/bottom-sheet/BottomSheet.android.tsx
++++ b/src/community/bottom-sheet/BottomSheet.android.tsx
+@@ -11,13 +11,6 @@ import { RNHostView } from '../../jetpack-compose/RNHostView';
+ 
+ export { useBottomSheet } from './context';
+ 
+-function extractBackgroundColor(
+-  backgroundStyle: BottomSheetProps['backgroundStyle']
+-): string | undefined {
+-  if (!backgroundStyle) return undefined;
+-  return (StyleSheet.flatten(backgroundStyle) as any)?.backgroundColor;
+-}
+-
+ function findNearestSnapPointIndex(
+   snapPoints: BottomSheetProps['snapPoints'],
+   position: string | number
+@@ -72,7 +65,8 @@ export function BottomSheet(props: BottomSheetProps) {
+   const fitToContents = enableDynamicSizing && (!snapPointsProp || snapPointsProp.length === 0);
+   const skipPartially = fitToContents || !hasMultipleSnapPoints;
+   const maxIndex = snapPointsProp ? snapPointsProp.length - 1 : 0;
+-  const containerColor = extractBackgroundColor(backgroundStyle);
++  const surfaceStyle = StyleSheet.flatten(backgroundStyle);
++  const cornerRadius = surfaceStyle?.borderRadius;
+   const internalContextValue = useMemo(() => ({ fitToContents }), [fitToContents]);
+   const clampIndex = useCallback(
+     (index: number) => Math.min(Math.max(index, 0), maxIndex),
+@@ -194,7 +188,8 @@ export function BottomSheet(props: BottomSheetProps) {
+             initialFullyExpanded={hasMultipleSnapPoints && pendingIndexRef.current === maxIndex}
+             showDragHandle={handleComponent !== null}
+             sheetGesturesEnabled={enablePanDownToClose}
+-            containerColor={containerColor}
++            containerColor={surfaceStyle?.backgroundColor}
++            topCornerRadius={typeof cornerRadius === 'number' ? cornerRadius : undefined}
+             properties={{
+               shouldDismissOnBackPress: enablePanDownToClose,
+               shouldDismissOnClickOutside: enablePanDownToClose,
+diff --git a/src/jetpack-compose/ModalBottomSheet/index.tsx b/src/jetpack-compose/ModalBottomSheet/index.tsx
+index c3225b1d9c7c0636d366203e2b23f536fec9e54e..eb389b7341354c1e6e353b73155b307b050b6a36 100644
+--- a/src/jetpack-compose/ModalBottomSheet/index.tsx
++++ b/src/jetpack-compose/ModalBottomSheet/index.tsx
+@@ -73,6 +73,8 @@ export interface ModalBottomSheetProps {
+    * The background color of the bottom sheet.
+    */
+   containerColor?: ColorValue;
++  /** The radius of the two top corners in dp. */
++  topCornerRadius?: number;
+   /**
+    * The preferred color of the content inside the bottom sheet.
+    */

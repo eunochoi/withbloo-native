@@ -1,7 +1,15 @@
+import { NoticeHost } from '../../components/NoticeProvider';
+import { SheetHeader } from '../../components/SheetHeader';
 import { useI18n } from '../../i18n/react';
 import { MUTED_CARD_BORDER_CLASS_NAME } from '../../theme/classes';
-import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, BackHandler, ScrollView, Text as NativeText, View } from 'react-native';
+import { useRef, useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  BackHandler,
+  ScrollView,
+  Text as NativeText,
+  View,
+} from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
@@ -16,7 +24,8 @@ import { Text } from '../../components/Text';
 import { Button } from '../../components/Button';
 import { PickerOption } from '../../components/PickerOption';
 import { ScrollableName } from '../../components/ScrollableName';
-import { BottomSheetModal } from '../../components/bottom-sheet/BottomSheetModal';
+import { SheetModal } from '../../components/SheetModal';
+import type { BottomSheetModal } from '@expo/ui/community/bottom-sheet';
 import { defaultWidgetSettings, type SoberWidgetSettings } from './model';
 import { loadWidgetSettings, saveWidgetSettings } from './storage';
 import { renderSoberWidget } from './task';
@@ -129,6 +138,12 @@ function ConfigurationContent({
       setSaving(false);
     }
   };
+  const sheet = useRef<BottomSheetModal>(null);
+  useEffect(() => {
+    if (picker) sheet.current?.present();
+    else sheet.current?.dismiss();
+  }, [picker]);
+  const closeSheet = () => sheet.current?.dismiss();
   return (
     <SafeAreaView className="flex-1 bg-theme-background">
       <ScrollView contentContainerClassName="px-[5%] pt-6 pb-8 gap-8">
@@ -186,12 +201,19 @@ function ConfigurationContent({
           onPress={() => void save()}
         />
       </View>
-      <BottomSheetModal
-        visible={picker}
-        title={t('widget.chooseRecord')}
-        onClose={() => setPicker(false)}
+      <SheetModal
+        ref={sheet}
+        onDismiss={() => setPicker(false)}
+
       >
-        {(close) => (
+        <SheetHeader title={t('widget.chooseRecord')} onClose={closeSheet} />
+
+        <ScrollView
+          className="mx-1 shrink grow-0"
+          contentContainerClassName="gap-7 py-8"
+          nestedScrollEnabled
+          showsVerticalScrollIndicator={false}
+        >
           <View className="gap-3">
             {records.map((item) => (
               <PickerOption
@@ -200,7 +222,7 @@ function ConfigurationContent({
                 accessibilityLabel={item.name}
                 onPress={() => {
                   change({ soberId: item.id });
-                  close();
+                  closeSheet();
                 }}
               >
                 <ScrollableName
@@ -211,8 +233,10 @@ function ConfigurationContent({
               </PickerOption>
             ))}
           </View>
-        )}
-      </BottomSheetModal>
+        </ScrollView>
+
+        <NoticeHost modal />
+      </SheetModal>
     </SafeAreaView>
   );
 }

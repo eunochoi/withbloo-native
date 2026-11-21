@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useI18n } from '../../src/i18n/react';
 import { useQuery } from '@tanstack/react-query';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -7,7 +8,6 @@ import { ColorView } from '../../src/components/ColorTransition';
 import { PageTopSection } from '../../src/components/PageTopSection';
 import { Toolbar } from '../../src/components/Toolbar';
 import { calendarHabitProgressCounts } from '../../src/domain/calendar';
-import { useModalNavigation } from '../../src/navigation/ModalNavigationProvider';
 import { diaryQueries, habitQueries, useToday } from '../../src/queries';
 import { CalendarRecordCounts } from '../../src/screens/calendar/CalendarRecordCounts';
 import { CalendarPageSkeleton } from '../../src/screens/calendar/CalendarPageSkeleton';
@@ -21,7 +21,7 @@ export default function CalendarScreen() {
   const today = useToday();
   const db = useSQLiteContext();
   const { navigationBottom, navigationHeight, rem } = useAppTheme();
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const [selected, setSelected] = useState(today);
   const [month, setMonth] = useState(today.slice(0, 7));
   const scrollRef = useRef<ScrollView>(null);
@@ -63,10 +63,7 @@ export default function CalendarScreen() {
       >
         <PageTopSection title={t('calendar.title')} hashtags={t('calendar.tags')} />
         <Toolbar>
-          <CalendarRecordCounts
-            diaryCount={diaries.data?.length ?? 0}
-            counts={progressCounts}
-          />
+          <CalendarRecordCounts diaryCount={diaries.data?.length ?? 0} counts={progressCounts} />
         </Toolbar>
         <View
           className="grow"
@@ -88,7 +85,7 @@ export default function CalendarScreen() {
               onSelect={(date) => {
                 setSelected(date);
                 setMonth(date.slice(0, 7));
-                openModal({ pathname: '/calendar/[date]', params: { date } });
+                router.navigate({ pathname: '/calendar/[date]', params: { date } });
               }}
             />
           )}

@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@bacons/apple-targets": "5.0.0",
+    "@expo/ui": "~57.0.21",
     "@expo/vector-icons": "^15.0.2",
     "@noble/hashes": "^2.4.0",
     "@tanstack/react-query": "^5.104.1",
@@ -82,6 +83,13 @@
     "tsx": "^4.23.15",
     "typescript": "~6.0.3"
   },
+  "expo": {
+    "autolinking": {
+      "android": {
+        "buildFromSource": ["expo-ui"]
+      }
+    }
+  },
   "pnpm": {
     "overrides": {
       "expo-modules-core": "57.0.24"
@@ -89,7 +97,8 @@
     "patchedDependencies": {
       "react-native-android-widget@0.22.1": "patches/react-native-android-widget@0.22.1.patch",
       "expo-constants@57.0.20": "patches/expo-constants@57.0.20.patch",
-      "expo-updates@57.0.25": "patches/expo-updates@57.0.25.patch"
+      "expo-updates@57.0.25": "patches/expo-updates@57.0.25.patch",
+      "@expo/ui@57.0.21": "patches/@expo__ui@57.0.21.patch"
     }
   }
 }

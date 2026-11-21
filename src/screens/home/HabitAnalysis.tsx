@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { ScrollableName } from '../../components/ScrollableName';
 import { HabitFlowAnalysis } from './HabitFlowAnalysis';
 import { useI18n } from '../../i18n/react';
@@ -8,7 +9,6 @@ import { InfoNotice } from '../../components/InfoNotice';
 import { Text } from '../../components/Text';
 import { DotTabs } from '../../components/DotTabs';
 import type { getHabitStats } from '../../db/stats';
-import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 import { MUTED_CARD_BORDER_CLASS_NAME } from '../../theme/classes';
 import { HabitStars } from '../habit/HabitStars';
@@ -23,7 +23,7 @@ export function HabitAnalysis({
   const { t } = useI18n();
 
   const { rem: appRem } = useAppTheme();
-  const { openModal } = useModalNavigation();
+  const router = useRouter();
   const [tab, setTab] = useState<'top' | 'bottom'>('top');
   const habits = stats[tab].slice(0, 3);
   return (
@@ -50,7 +50,7 @@ export function HabitAnalysis({
             <Pressable
               key={habit.id}
               accessibilityRole="button"
-              onPress={() => openModal(`/habit/${habit.id}`)}
+              onPress={() => router.navigate(`/habit/${habit.id}`)}
               className={`flex-row items-center gap-4 min-h-12 ${index > 0 ? 'pt-6' : ''} ${index < habits.length - 1 ? 'pb-6 border-b border-theme-border/50' : ''}`}
             >
               <View className="h-9 w-9 shrink-0 items-center justify-center">

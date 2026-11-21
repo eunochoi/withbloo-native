@@ -10,7 +10,7 @@ export function StartPage() {
   const { t } = useI18n();
   const { showNotice } = useNotice();
   return (
-    <View className="w-full grow justify-evenly items-center gap-4 px-6 py-6">
+    <View className="w-full grow justify-evenly items-center gap-4 py-6">
       <Text autoLineHeight accessibilityRole="header" className="text-center text-[24px] font-semibold">
         {t('onboarding.startTitle')}
       </Text>

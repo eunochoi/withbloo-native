@@ -1,7 +1,7 @@
+import { useRouter } from 'expo-router';
 import { ScrollableName } from '../../components/ScrollableName';
 import { formatDisplayDate } from '../../i18n/format';
 import { useI18n } from '../../i18n/react';
-import { useModalNavigation } from '../../navigation/ModalNavigationProvider';
 import { HabitIcon } from '../../components/HabitIcon';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 import { Pressable, View } from 'react-native';
@@ -26,8 +26,8 @@ export function DiaryCard({
   const { t, formatLocale } = useI18n();
 
   const { rem: appRem, iconSizes } = useAppTheme();
-  const { openModal } = useModalNavigation();
-  const open = () => openModal(`/diary/${diary.id}`);
+  const router = useRouter();
+  const open = () => router.navigate(`/diary/${diary.id}`);
   return (
     <View className={`gap-4 ${last ? 'pb-0' : 'pb-6'} ${first ? 'pt-0' : 'pt-6'}`}>
       <View className="flex-row items-center gap-3">
@@ -81,7 +81,7 @@ export function DiaryCard({
                 key={habit.id}
                 accessibilityRole="button"
                 accessibilityLabel={t('diary.habitDetail', { value: habit.name })}
-                onPress={() => openModal(`/habit/${habit.id}`)}
+                onPress={() => router.navigate(`/habit/${habit.id}`)}
                 className="max-w-full flex-row items-center gap-1"
               >
                 <HabitIcon name={habit.icon_key} size={iconSizes.sm} colorKey={habit.icon_color} />

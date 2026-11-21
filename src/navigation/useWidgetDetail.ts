@@ -1,8 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { AppState } from 'react-native';
-import { useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import type { NavigationProp, ParamListBase } from 'expo-router/react-navigation';
-import { useModalTransition } from './ModalNavigationProvider';
 
 // The sober tab must be focused before a widget can open its detail sheet.
 export function useWidgetDetail() {
@@ -11,7 +10,7 @@ export function useWidgetDetail() {
     widgetRequest?: string;
   }>();
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
-  const { openModal } = useModalTransition();
+  const router = useRouter();
   const handled = useRef<string | null>(null);
   useFocusEffect(
     useCallback(() => {
@@ -37,10 +36,9 @@ export function useWidgetDetail() {
             handled.current === widgetRequest
           )
             return;
-          if (openModal({ pathname: '/sober/[id]', params: { id: String(id) } })) {
-            handled.current = widgetRequest;
-            navigation.setParams({ widgetSoberId: undefined, widgetRequest: undefined });
-          }
+          handled.current = widgetRequest;
+          navigation.setParams({ widgetSoberId: undefined, widgetRequest: undefined });
+          router.navigate({ pathname: '/sober/[id]', params: { id: String(id) } });
         });
       };
       open();
@@ -49,6 +47,6 @@ export function useWidgetDetail() {
         if (frame !== undefined) cancelAnimationFrame(frame);
         subscription.remove();
       };
-    }, [navigation, openModal, widgetSoberId, widgetRequest]),
+    }, [navigation, router, widgetSoberId, widgetRequest]),
   );
 }

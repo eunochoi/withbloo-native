@@ -2,14 +2,12 @@ import { useCallback } from 'react';
 import { ActivityIndicator, AppState, View } from 'react-native';
 import { useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useRoute, type NavigationProp, type ParamListBase } from 'expo-router/react-navigation';
-import { useModalTransition } from '../src/navigation/ModalNavigationProvider';
 import { useAppTheme } from '../src/theme/AppThemeProvider';
 
 export default function WidgetEntry() {
   const { soberId } = useLocalSearchParams<{ soberId?: string }>();
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const { key } = useRoute();
-  const { resetTransitions } = useModalTransition();
   const { colors } = useAppTheme();
   useFocusEffect(
     useCallback(() => {
@@ -24,7 +22,6 @@ export default function WidgetEntry() {
           const detail = Number.isSafeInteger(id) && id > 0;
           entered = true;
           // Only mount the tab here. Its focused screen owns the later modal push.
-          resetTransitions();
           const tabs = navigation.getState().routes.find((route) => route.name === '(tabs)');
           navigation.reset({
             index: 0,
@@ -52,7 +49,7 @@ export default function WidgetEntry() {
         if (frame !== undefined) cancelAnimationFrame(frame);
         subscription.remove();
       };
-    }, [navigation, soberId, key, resetTransitions]),
+    }, [navigation, soberId, key]),
   );
   return (
     <View className="flex-1 items-center justify-center bg-theme-surface">

@@ -1,10 +1,15 @@
+import { ScrollEdgeFade } from '../components/ScrollEdgeFade';
+import { useScrollFade } from '../hooks/useScrollFade';
+import { useIsFocused } from 'expo-router/react-navigation';
+import { useRouter } from 'expo-router';
+import { NoticeHost } from '../components/NoticeProvider';
 import { useQuery } from '@tanstack/react-query';
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Keyboard, Pressable, TextInput, View } from 'react-native';
+import { ScrollView, Keyboard, Pressable, TextInput, View } from 'react-native';
 import { AppIcon } from '../components/AppIcon';
-import { BottomSheetPage } from '../components/bottom-sheet/BottomSheetPage';
+import { SheetHeader } from '../components/SheetHeader';
 import { CharacterCount } from '../components/CharacterCount';
 import { EmotionImage } from '../components/EmotionImage';
 import { HeaderAction } from '../components/HeaderAction';
@@ -32,13 +37,10 @@ import { DiaryEmotionPicker } from './diary/DiaryEmotionPicker';
 import { ImageAttachments } from '../components/ImageAttachments';
 import { ImageAttachmentsHeader } from '../components/ImageAttachmentsHeader';
 
-export function DiaryForm({
-  id,
-  initialDate,
-}: {
-  id?: number;
-  initialDate?: string;
-}) {
+export function DiaryForm({ id, initialDate }: { id?: number; initialDate?: string }) {
+  const sheetFade = useScrollFade();
+  const router = useRouter();
+  const focused = useIsFocused();
   const { t, formatLocale } = useI18n();
 
   const { showNotice } = useNotice();
@@ -109,26 +111,50 @@ export function DiaryForm({
       return next;
     });
   }, []);
-  const onClosed = saved
-    ? () =>
-      showNotice({
-        tone: 'success',
-        title: id ? t('diary.edited') : t('diary.saved'),
-      })
-    : undefined;
+  const didClose = useRef(false);
+  useEffect(() => {
+    if (!saved || mutation.isPending || didClose.current) return;
+    didClose.current = true;
+    if (router.canGoBack()) router.back();
+    else router.replace('/diary');
+    showNotice({
+      tone: 'success',
+      title: id ? t('diary.edited') : t('diary.saved'),
+    });
+  }, [saved, mutation.isPending, router, showNotice, id, t]);
   if (id !== undefined && (query.isPending || query.error || !query.data))
     return (
-      <BottomSheetPage
-        title={t('diary.editTitle')}
-        backRoute="/diary"
-        closeRequested={saved && !mutation.isPending}
-        onClosed={onClosed}
-      >
-        <View className="items-center justify-center">
-          <QueryState query={query} />
-          {!query.isPending && !query.error && <Text>{t('diary.notFound')}</Text>}
+      <View className="flex-1 px-[5%] pt-2">
+        <SheetHeader
+          title={t('diary.editTitle')}
+          onClose={() => (router.canGoBack() ? router.back() : router.replace('/diary'))}
+        />
+        <View className="mx-1 min-h-0 flex-1 overflow-hidden">
+          <ScrollView
+            onScroll={sheetFade.onScroll}
+            scrollEventThrottle={16}
+            onLayout={sheetFade.onLayout}
+            onContentSizeChange={sheetFade.onContentSizeChange}
+            className="flex-1"
+            contentContainerClassName="gap-7 py-8 pb-12"
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+          >
+            <View className="items-center justify-center">
+              <QueryState query={query} />
+              {!query.isPending && !query.error && <Text>{t('diary.notFound')}</Text>}
+            </View>
+          </ScrollView>
+          <ScrollEdgeFade edge="top" visible={sheetFade.topVisible} />
+          <ScrollEdgeFade
+            edge="bottom"
+            visible={sheetFade.bottomVisible}
+            includeBottomInset={false}
+            includeToolbar={false}
+          />
         </View>
-      </BottomSheetPage>
+        <NoticeHost modal active={focused} />
+      </View>
     );
   return (
     <RecordFormLayout
@@ -142,7 +168,12 @@ export function DiaryForm({
               showNotice({ tone: 'info', title: t('diary.dateRequired') });
               return;
             }
-            if (emotion === null || !Number.isInteger(emotion) || emotion < 0 || emotion >= EMOTIONS.length) {
+            if (
+              emotion === null ||
+              !Number.isInteger(emotion) ||
+              emotion < 0 ||
+              emotion >= EMOTIONS.length
+            ) {
               showNotice({ tone: 'info', title: t('diary.emotionRequired') });
               return;
             }
@@ -152,7 +183,10 @@ export function DiaryForm({
               return;
             }
             if (text.length > DIARY_TEXT_MAX_LENGTH) {
-              showNotice({ tone: 'info', title: t('diary.storyTooLong', { count: DIARY_TEXT_MAX_LENGTH }) });
+              showNotice({
+                tone: 'info',
+                title: t('diary.storyTooLong', { count: DIARY_TEXT_MAX_LENGTH }),
+              });
               textInput.current?.focus();
               return;
             }
@@ -161,8 +195,6 @@ export function DiaryForm({
           label={mutation.isPending ? t('common.saving') : t('common.save')}
         />
       }
-      closeRequested={saved && !mutation.isPending}
-      onClosed={onClosed}
       title={id !== undefined ? t('diary.editTitle') : t('diary.createTitle')}
       onBeforeClose={() => {
         if (dragging) return false;
@@ -183,7 +215,6 @@ export function DiaryForm({
               onClose={() => setPicker(null)}
               onApply={(next) => {
                 setDate(next);
-                setPicker(null);
               }}
             />
           )}
@@ -193,21 +224,26 @@ export function DiaryForm({
               onClose={() => setPicker(null)}
               onApply={(value) => {
                 setEmotion(value);
-                setPicker(null);
               }}
             />
           )}
-
         </>
       }
     >
       <View className="shrink-0">
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={date ? t('diary.dateChoice', { title: formatDisplayDate(date, formatLocale, 'date') }) : t('diary.chooseDate')}
+          accessibilityLabel={
+            date
+              ? t('diary.dateChoice', { title: formatDisplayDate(date, formatLocale, 'date') })
+              : t('diary.chooseDate')
+          }
           accessibilityState={{ expanded: picker === 'date', disabled: busy || dragging }}
           disabled={busy || dragging || picker !== null}
-          onPress={() => { Keyboard.dismiss(); setPicker('date'); }}
+          onPress={() => {
+            Keyboard.dismiss();
+            setPicker('date');
+          }}
           className="min-h-12 flex-row items-center gap-3 active:opacity-70"
         >
           <View className="flex-1 min-w-0 gap-3">

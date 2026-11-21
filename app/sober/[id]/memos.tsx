@@ -1,3 +1,9 @@
+import { ScrollEdgeFade } from '../../../src/components/ScrollEdgeFade';
+import { useScrollFade } from '../../../src/hooks/useScrollFade';
+import { AnimatedFlatList } from '../../../src/components/AnimatedFlatList';
+import { useIsFocused } from 'expo-router/react-navigation';
+import { useRouter } from 'expo-router';
+import { NoticeHost } from '../../../src/components/NoticeProvider';
 import { ContentTopButton, ContentTopButtons } from '../../../src/components/ContentTopButton';
 import { formatDisplayDate } from '../../../src/i18n/format';
 import { useI18n } from '../../../src/i18n/react';
@@ -5,9 +11,9 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ScrollView, ActivityIndicator, View } from 'react-native';
 import { AppIcon } from '../../../src/components/AppIcon';
-import { BottomSheetPage } from '../../../src/components/bottom-sheet/BottomSheetPage';
+import { SheetHeader } from '../../../src/components/SheetHeader';
 import { QueryError } from '../../../src/components/QueryError';
 import { QueryState } from '../../../src/components/QueryState';
 import { RecordSortPicker } from '../../../src/components/RecordSortPicker';
@@ -22,6 +28,9 @@ import { useAppTheme } from '../../../src/theme/AppThemeProvider';
 type MemoRow = { record: SoberRestart; date: string; firstOfDate: boolean };
 
 export default function SoberMemos() {
+  const sheetFade = useScrollFade();
+  const router = useRouter();
+  const focused = useIsFocused();
   const { t, formatLocale } = useI18n();
 
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -81,83 +90,148 @@ export default function SoberMemos() {
     <SoberRestartActions key={soberId} soberId={soberId}>
       {({ pending, onMenu, onBeforeClose }) =>
         !validId || !sober.data ? (
-          <BottomSheetPage
-            title={t('sober.notesTitle')}
-            backRoute={backRoute}
-            onBeforeClose={onBeforeClose}
-          >
-            {validId && <QueryState query={sober} />}
-            {(!validId || (!sober.isPending && !sober.error)) && (
-              <Text className="text-center text-base">{t('sober.notFound')}</Text>
-            )}
-          </BottomSheetPage>
-        ) : (
-          <>
-            <BottomSheetPage
-              title={t('sober.notesName', { value: sober.data.name })}
-              scrollableTitle
-              onBeforeClose={onBeforeClose}
-              backRoute={backRoute}
-              contentKey={`${soberId}:${sort}`}
-              list={{
-                data: rows,
-                keyExtractor: (item: unknown) => String((item as MemoRow).record.id),
-                contentContainerClassName: 'py-8',
-                removeClippedSubviews: false,
-                initialNumToRender: 8,
-                maxToRenderPerBatch: 8,
-                windowSize: 5,
-                ListHeaderComponent: rows.length > 0 ? (
-                  <View className="gap-3 pb-6">
-                    <ContentTopButtons><ContentTopButton label={sort === 'DESC' ? t('ui.newest') : t('ui.oldest')} accessibilityLabel={t('sober.notesSortLabel', { value: sort === 'DESC' ? t('ui.newest') : t('ui.oldest') })} onPress={() => setSorting(true)} icon={<AppIcon name="sort" size={iconSizes.sm} color={colors.accent} />} /></ContentTopButtons>
-                  </View>
-                ) : null,
-                renderItem: ({ item: row, index }) => {
-                  const item = row as MemoRow;
-                  return (
-                    <View className="gap-3 pb-3">
-                      {item.firstOfDate && (
-                        <Text
-                          accessibilityRole="header"
-                          className={`text-base font-semibold ${index ? 'pt-6' : ''}`}
-                        >
-                          {formatDisplayDate(item.date, formatLocale, 'long')}
-                        </Text>
-                      )}
-                      <SoberRestartCard record={item.record} pending={pending} onMenu={onMenu} />
-                    </View>
-                  );
-                },
-                ListEmptyComponent: empty,
-                ListFooterComponent: (
-                  <View className="items-center gap-3">
-                    {list.isFetchingNextPage && (
-                      <ActivityIndicator
-                        color={colors.accent}
-                        accessibilityLabel={t('sober.notesMoreLoading')}
-                      />
-                    )}
-                    {list.isError && list.data && (
-                      <QueryError
-                        message={
-                          list.isFetchNextPageError
-                            ? t('sober.nextNotesFailed')
-                            : t('sober.refreshNotesFailed')
-                        }
-                        onRetry={() => {
-                          if (list.isFetchNextPageError) loadMore();
-                          else void list.refetch();
-                        }}
-                      />
-                    )}
-                  </View>
-                ),
-                onEndReached: () => {
-                  if (!list.isError) loadMore();
-                },
-                onEndReachedThreshold: 0.4,
+          <View className="flex-1 px-[5%] pt-2">
+            <SheetHeader
+              title={t('sober.notesTitle')}
+              onClose={() => {
+                if (onBeforeClose()) {
+                  router.canGoBack() ? router.back() : router.replace(backRoute);
+                }
               }}
             />
+            <View className="mx-1 min-h-0 flex-1 overflow-hidden">
+              <ScrollView
+                onScroll={sheetFade.onScroll}
+                scrollEventThrottle={16}
+                onLayout={sheetFade.onLayout}
+                onContentSizeChange={sheetFade.onContentSizeChange}
+                className="flex-1"
+                contentContainerClassName="gap-7 py-8 pb-12"
+                nestedScrollEnabled
+                showsVerticalScrollIndicator={false}
+              >
+                {validId && <QueryState query={sober} />}
+                {(!validId || (!sober.isPending && !sober.error)) && (
+                  <Text className="text-center text-base">{t('sober.notFound')}</Text>
+                )}
+              </ScrollView>
+              <ScrollEdgeFade edge="top" visible={sheetFade.topVisible} />
+              <ScrollEdgeFade
+                edge="bottom"
+                visible={sheetFade.bottomVisible}
+                includeBottomInset={false}
+                includeToolbar={false}
+              />
+            </View>
+            <NoticeHost modal active={focused} />
+          </View>
+        ) : (
+          <>
+            <View className="flex-1 px-[5%] pt-2">
+              <SheetHeader
+                title={t('sober.notesName', { value: sober.data.name })}
+                scrollableTitle={true}
+                onClose={() => {
+                  if (onBeforeClose()) {
+                    router.canGoBack() ? router.back() : router.replace(backRoute);
+                  }
+                }}
+              />
+              <View className="mx-1 min-h-0 flex-1 overflow-hidden">
+                <AnimatedFlatList
+                  onScroll={sheetFade.onScroll}
+                  scrollEventThrottle={16}
+                  onLayout={sheetFade.onLayout}
+                  onContentSizeChange={sheetFade.onContentSizeChange}
+                  key={`${soberId}:${sort}`}
+                  className="flex-1"
+                  nestedScrollEnabled
+                  showsVerticalScrollIndicator={false}
+                  {...{
+                    data: rows,
+                    keyExtractor: (item: unknown) => String((item as MemoRow).record.id),
+                    contentContainerClassName: 'py-8',
+                    removeClippedSubviews: false,
+                    initialNumToRender: 8,
+                    maxToRenderPerBatch: 8,
+                    windowSize: 5,
+                    ListHeaderComponent:
+                      rows.length > 0 ? (
+                        <View className="gap-3 pb-6">
+                          <ContentTopButtons>
+                            <ContentTopButton
+                              label={sort === 'DESC' ? t('ui.newest') : t('ui.oldest')}
+                              accessibilityLabel={t('sober.notesSortLabel', {
+                                value: sort === 'DESC' ? t('ui.newest') : t('ui.oldest'),
+                              })}
+                              onPress={() => setSorting(true)}
+                              icon={
+                                <AppIcon name="sort" size={iconSizes.sm} color={colors.accent} />
+                              }
+                            />
+                          </ContentTopButtons>
+                        </View>
+                      ) : null,
+                    renderItem: ({ item: row, index }) => {
+                      const item = row as MemoRow;
+                      return (
+                        <View className="gap-3 pb-3">
+                          {item.firstOfDate && (
+                            <Text
+                              accessibilityRole="header"
+                              className={`text-base font-semibold ${index ? 'pt-6' : ''}`}
+                            >
+                              {formatDisplayDate(item.date, formatLocale, 'long')}
+                            </Text>
+                          )}
+                          <SoberRestartCard
+                            record={item.record}
+                            pending={pending}
+                            onMenu={onMenu}
+                          />
+                        </View>
+                      );
+                    },
+                    ListEmptyComponent: empty,
+                    ListFooterComponent: (
+                      <View className="items-center gap-3">
+                        {list.isFetchingNextPage && (
+                          <ActivityIndicator
+                            color={colors.accent}
+                            accessibilityLabel={t('sober.notesMoreLoading')}
+                          />
+                        )}
+                        {list.isError && list.data && (
+                          <QueryError
+                            message={
+                              list.isFetchNextPageError
+                                ? t('sober.nextNotesFailed')
+                                : t('sober.refreshNotesFailed')
+                            }
+                            onRetry={() => {
+                              if (list.isFetchNextPageError) loadMore();
+                              else void list.refetch();
+                            }}
+                          />
+                        )}
+                      </View>
+                    ),
+                    onEndReached: () => {
+                      if (!list.isError) loadMore();
+                    },
+                    onEndReachedThreshold: 0.4,
+                  }}
+                />
+                <ScrollEdgeFade edge="top" visible={sheetFade.topVisible} />
+                <ScrollEdgeFade
+                  edge="bottom"
+                  visible={sheetFade.bottomVisible}
+                  includeBottomInset={false}
+                  includeToolbar={false}
+                />
+              </View>
+              <NoticeHost modal active={focused} />
+            </View>
             {sorting && (
               <RecordSortPicker
                 title={t('sober.sortNotes')}
@@ -165,7 +239,6 @@ export default function SoberMemos() {
                 sort={sort}
                 onClose={() => setSorting(false)}
                 onApply={(value) => {
-                  setSorting(false);
                   if (value !== 'CUSTOM') setSort(value);
                 }}
               />
