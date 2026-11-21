@@ -121,8 +121,13 @@ test('sheet header retains its close button, action and scrollable title', () =>
     onClose: () => closed++,
     headerButton: action,
   }));
-  tree.find((node) => node.type === 'Pressable').props.onPress();
-  assert.equal(closed, 1);
+  const closeButtons = tree.filter((node) => node.type === 'Pressable');
+  assert.equal(closeButtons.length, 2);
+  assert.equal(closeButtons[1].props.children.props.name, 'chevron-left');
+  for (const button of closeButtons) button.props.onPress();
+  assert.equal(closed, 2);
+  const locked = nodes(SheetHeader({ title: '제목', onClose: () => closed++, handleDisabled: true }));
+  assert(locked.filter((node) => node.type === 'Pressable').every((button) => button.props.disabled));
   assert(tree.includes(action));
   assert.equal(tree.find((node) => node.type === 'ScrollableName').props.children, '제목');
 });

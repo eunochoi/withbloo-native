@@ -1,6 +1,8 @@
 import { useI18n } from '../i18n/react';
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
+import { useAppTheme } from '../theme/AppThemeProvider';
+import { AppIcon } from './AppIcon';
 import { Text } from './Text';
 import { ScrollableName } from './ScrollableName';
 
@@ -22,8 +24,9 @@ export function SheetHeader({
   handleDisabled?: boolean;
 }) {
   const { t } = useI18n();
+  const { colors, iconSizes } = useAppTheme();
   return (
-    <View className="shrink-0 items-center ">
+    <View className="shrink-0 items-center">
       {onClose && (
         <Pressable
           accessibilityRole="button"
@@ -40,11 +43,22 @@ export function SheetHeader({
           />
         </Pressable>
       )}
-      {(title || menuAction || headerButton) && (
+      {(title || menuAction || headerButton || onClose) && (
         <View
-          className={`relative self-stretch flex-row items-center gap-2 py-1 ${headerButton ? 'px-20' : ''}`}
+          className={`relative min-h-11 self-stretch flex-row items-center py-1 ${headerButton ? 'px-20' : onClose || menuAction ? 'px-11' : ''}`}
         >
-          {menuAction && <View className="w-11 shrink-0" />}
+          {onClose && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('common.close')}
+              accessibilityState={{ disabled: handleDisabled }}
+              disabled={handleDisabled}
+              onPress={onClose}
+              className="absolute left-0 z-10 -ml-3.5 h-11 w-11 items-center justify-center active:opacity-70 disabled:opacity-40"
+            >
+              <AppIcon name="chevron-left" size={iconSizes.md} color={colors.accent} accessible={false} />
+            </Pressable>
+          )}
           <View className="flex-1 min-w-0 flex-row items-center justify-center gap-2">
             {scrollableTitle && title ? (
               <View className="min-w-0 flex-1">
@@ -64,8 +78,12 @@ export function SheetHeader({
               </Text>
             )}
           </View>
-          {menuAction && <View className="w-11 shrink-0 items-end">{menuAction}</View>}
-          {headerButton && <View className="absolute right-0 items-center">{headerButton}</View>}
+          {(menuAction || headerButton) && (
+            <View className="absolute right-0 flex-row items-center gap-2">
+              {menuAction}
+              {headerButton}
+            </View>
+          )}
         </View>
       )}
     </View>
