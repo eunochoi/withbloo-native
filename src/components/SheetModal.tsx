@@ -23,7 +23,8 @@ export function SheetModal({
   const { colors } = useAppTheme();
   const { height: windowHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const sheetHeight = windowHeight - Math.max(40, insets.top) - insets.bottom;
+  const minimumTopGap = fillHeight ? 40 : 80;
+  const sheetHeight = windowHeight - Math.max(minimumTopGap, insets.top) - insets.bottom;
 
   return (
     <BottomSheetModal

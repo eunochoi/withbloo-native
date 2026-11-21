@@ -37,7 +37,7 @@ export function HabitFilterPicker({
       onApply={() => onApply(draft)}
     >
       <View className="flex-row items-center justify-between gap-3">
-        <Text className="text-base font-semibold">{t('habit.completedOnly')}</Text>
+        <Text className="text-base font-semibold text-theme-text-secondary">{t('habit.completedOnly')}</Text>
         <Switch
           accessibilityLabel={t('habit.completedOnly')}
           value={draft.completedOnly}
@@ -48,7 +48,7 @@ export function HabitFilterPicker({
       </View>
       <View className="gap-3">
         <View className="flex-row items-baseline justify-between gap-3">
-          <Text className="text-base font-semibold">{t('habit.importance')}</Text>
+          <Text className="text-base font-semibold text-theme-text-secondary">{t('habit.importance')}</Text>
           <Text className="shrink text-sm text-theme-text-secondary">
             {selectionSummary(
               draft.priorities.map((priority) =>
@@ -99,7 +99,7 @@ export function HabitFilterPicker({
             </View>
           ))}
         </View>
-        <InfoNotice>
+        <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
           {t('habit.priorityHint')}
         </InfoNotice>
       </View>

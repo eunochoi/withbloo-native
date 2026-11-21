@@ -27,6 +27,8 @@ export const uiKo = {
   currentRecord: '현재 기록 %{value}',
   older: '과거',
   sort: '정렬',
+  sortCriteria: '정렬 기준',
+  filterConditions: '필터 조건',
   records: '기록',
   customDescription: '직접 정한 순서로 보여드려요.',
   recordsDescription: '%{value}현재 기록, 생성일 순으로 정렬해요.',

@@ -15,6 +15,7 @@ import { HeaderAction } from '../../components/HeaderAction';
 import { NoticeHost, useNotice } from '../../components/NoticeProvider';
 import { QueryState } from '../../components/QueryState';
 import { PickerOption } from '../../components/PickerOption';
+import { AppIcon } from '../../components/AppIcon';
 import { InfoNotice } from '../../components/InfoNotice';
 import { moveItem } from '../../components/sortable/order';
 import { Text } from '../../components/Text';
@@ -36,7 +37,7 @@ export function SoberSortPicker({
   const sheetFade = useScrollFade();
   const { t } = useI18n();
   const { showNotice } = useNotice();
-  const { colors } = useAppTheme();
+  const { colors, iconSizes } = useAppTheme();
   const scrollRef = useAnimatedRef<ScrollView>();
   const db = useSQLiteContext();
   const { settings, updateSettings } = useSettings();
@@ -164,75 +165,174 @@ export function SoberSortPicker({
           ref={scrollRef}
           scrollEnabled={!dragging}
         >
-          <View accessibilityRole="radiogroup" accessibilityLabel={t('sober.sort')}>
-            <View className="gap-8 pb-8">
-              <Pressable accessibilityRole="radio" accessibilityState={{ checked: sort !== 'CUSTOM' }} onPress={() => setSort(standardSort)} className="flex-row items-center gap-2">
-                <View className="h-5 w-5 items-center justify-center rounded-full border border-theme-accent">
-                  {sort !== 'CUSTOM' && <View className="h-3 w-3 rounded-full bg-theme-accent" />}
+          <View className="gap-12">
+            <View className="gap-10">
+              <View className="flex-row items-center gap-2">
+                <View className="h-5 w-5 shrink-0 items-center justify-center">
+                  <AppIcon
+                    name="sort"
+                    size={iconSizes.md}
+                    color={colors.accent}
+                    accessible={false}
+                  />
                 </View>
-                <Text className="text-lg font-semibold">{t('habit.criteriaSort')}</Text>
-              </Pressable>
-              <View className="gap-8" style={{ opacity: sort === 'CUSTOM' ? 0.4 : 1 }} pointerEvents={sort === 'CUSTOM' ? 'none' : 'auto'} accessibilityElementsHidden={sort === 'CUSTOM'} importantForAccessibility={sort === 'CUSTOM' ? 'no-hide-descendants' : 'auto'}>
-                <View className="flex-row items-center justify-between gap-3">
-                  <Text className="text-base font-semibold">{t('ui.priorityFirst')}</Text>
-                  <Switch accessibilityLabel={t('ui.priorityFirst')} value={priority} onValueChange={setPriority} ios_backgroundColor={colors.switchTrack} trackColor={{ false: colors.switchTrack, true: colors.accent }} thumbColor={colors.switchThumb} />
-                </View>
+                <Text className="min-w-0 flex-1 text-lg font-semibold">{t('habit.criteriaSort')}</Text>
+                <Switch
+                  accessibilityLabel={t('habit.criteriaSort')}
+                  disabled={saving || dragging}
+                  value={sort !== 'CUSTOM'}
+                  onValueChange={(checked) => setSort(checked ? standardSort : 'CUSTOM')}
+                  ios_backgroundColor={colors.switchTrack}
+                  trackColor={{ false: colors.switchTrack, true: colors.accent }}
+                  thumbColor={colors.switchThumb}
+                />
+              </View>
+              <View
+                className="gap-6 pl-7"
+                style={{ opacity: sort === 'CUSTOM' ? 0.4 : 1 }}
+                pointerEvents={sort === 'CUSTOM' ? 'none' : 'auto'}
+                accessibilityElementsHidden={sort === 'CUSTOM'}
+                importantForAccessibility={sort === 'CUSTOM' ? 'no-hide-descendants' : 'auto'}
+              >
+                <Pressable
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: priority }}
+                  onPress={() => setPriority((checked) => !checked)}
+                  className="min-h-7 flex-row items-center justify-between gap-3"
+                >
+                  <Text className="min-w-0 flex-1 text-base font-semibold text-theme-text-secondary">
+                    {t('ui.priorityFirst')}
+                  </Text>
+                  <View
+                    className="h-5 w-5 shrink-0 items-center justify-center ios:curve-continuous rounded-md border-[1px] bg-theme-surface"
+                    style={{
+                      borderColor: `${colors.accent}${priority ? 'BF' : '99'}`,
+                      backgroundColor: priority ? `${colors.accent}BF` : undefined,
+                    }}
+                  >
+                    {priority && (
+                      <AppIcon name="check" size={iconSizes.sm} color="white" accessible={false} />
+                    )}
+                  </View>
+                </Pressable>
                 <View className="gap-3">
-                  <Text className="text-base font-semibold">{t('sober.recordSort')}</Text>
+                  <Text className="text-base font-semibold text-theme-text-secondary">{t('sober.recordSort')}</Text>
                   <View className="flex-row gap-3">
                     {(['DESC', 'ASC'] as const).map((value) => (
                       <View key={value} className="flex-1">
-                        <PickerOption compact keepUncheckedBorder softUncheckedBorder selected={records === value} accessibilityLabel={t(value === 'DESC' ? 'ui.longest' : 'ui.shortest')} onPress={() => setRecords(value)}>
-                          <Text className={`text-base ${records === value ? 'text-theme-accent-deep' : ''}`}>{t(value === 'DESC' ? 'ui.longest' : 'ui.shortest')}</Text>
+                        <PickerOption
+                          compact
+                          keepUncheckedBorder
+                          softUncheckedBorder
+                          selected={records === value}
+                          accessibilityLabel={t(value === 'DESC' ? 'ui.longest' : 'ui.shortest')}
+                          onPress={() => setRecords(value)}
+                        >
+                          <Text
+                            className={`text-base ${records === value ? 'text-theme-accent-deep' : ''}`}
+                          >
+                            {t(value === 'DESC' ? 'ui.longest' : 'ui.shortest')}
+                          </Text>
                         </PickerOption>
                       </View>
                     ))}
                   </View>
                 </View>
                 <View className="gap-3">
-                  <Text className="text-base font-semibold">{t('ui.createdDateSort')}</Text>
+                  <Text className="text-base font-semibold text-theme-text-secondary">{t('ui.createdDateSort')}</Text>
                   <View className="flex-row gap-3">
                     {(['DESC', 'ASC'] as const).map((value) => (
                       <View key={value} className="flex-1">
-                        <PickerOption compact keepUncheckedBorder softUncheckedBorder selected={standardSort === value} accessibilityLabel={t(value === 'DESC' ? 'ui.newest' : 'ui.oldest')} onPress={() => { setStandardSort(value); setSort(value); }}>
-                          <Text className={`text-base ${standardSort === value ? 'text-theme-accent-deep' : ''}`}>{t(value === 'DESC' ? 'ui.newest' : 'ui.oldest')}</Text>
+                        <PickerOption
+                          compact
+                          keepUncheckedBorder
+                          softUncheckedBorder
+                          selected={standardSort === value}
+                          accessibilityLabel={t(value === 'DESC' ? 'ui.newest' : 'ui.oldest')}
+                          onPress={() => {
+                            setStandardSort(value);
+                            setSort(value);
+                          }}
+                        >
+                          <Text
+                            className={`text-base ${standardSort === value ? 'text-theme-accent-deep' : ''}`}
+                          >
+                            {t(value === 'DESC' ? 'ui.newest' : 'ui.oldest')}
+                          </Text>
                         </PickerOption>
                       </View>
                     ))}
                   </View>
                 </View>
-                <InfoNotice>{t('ui.recordsDescription', { value: priority ? t('ui.priorityPrefix') : '' })}</InfoNotice>
+                <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
+                  {t('ui.recordsDescription', { value: priority ? t('ui.priorityPrefix') : '' })}
+                </InfoNotice>
               </View>
             </View>
-            <View className="gap-8 border-t border-theme-border/30 pt-8">
-              <Pressable accessibilityRole="radio" accessibilityState={{ checked: sort === 'CUSTOM' }} onPress={() => { setSort('CUSTOM'); }} className="flex-row items-center gap-2">
-                <View className="h-5 w-5 items-center justify-center rounded-full border border-theme-accent">
-                  {sort === 'CUSTOM' && <View className="h-3 w-3 rounded-full bg-theme-accent" />}
+            <View className="gap-10">
+              <View className="flex-row items-center gap-2">
+                <View className="h-5 w-5 shrink-0 items-center justify-center">
+                  <AppIcon
+                    name="drag-indicator"
+                    size={iconSizes.md}
+                    color={colors.accent}
+                    accessible={false}
+                  />
                 </View>
-                <Text className="text-lg font-semibold">{t('habit.customSort')}</Text>
-              </Pressable>
-              <View className="gap-8" style={{ opacity: sort !== 'CUSTOM' ? 0.4 : 1 }} pointerEvents={sort !== 'CUSTOM' ? 'none' : 'auto'} accessibilityElementsHidden={sort !== 'CUSTOM'} importantForAccessibility={sort !== 'CUSTOM' ? 'no-hide-descendants' : 'auto'}>
+                <Text className="min-w-0 flex-1 text-lg font-semibold">{t('habit.customSort')}</Text>
+                <Switch
+                  accessibilityLabel={t('habit.customSort')}
+                  disabled={saving || dragging}
+                  value={sort === 'CUSTOM'}
+                  onValueChange={(checked) => setSort(checked ? 'CUSTOM' : standardSort)}
+                  ios_backgroundColor={colors.switchTrack}
+                  trackColor={{ false: colors.switchTrack, true: colors.accent }}
+                  thumbColor={colors.switchThumb}
+                />
+              </View>
+              <View
+                className="gap-4 pl-7"
+                style={{ opacity: sort !== 'CUSTOM' ? 0.4 : 1 }}
+                pointerEvents={sort !== 'CUSTOM' ? 'none' : 'auto'}
+                accessibilityElementsHidden={sort !== 'CUSTOM'}
+                importantForAccessibility={sort !== 'CUSTOM' ? 'no-hide-descendants' : 'auto'}
+              >
                 {sort === 'CUSTOM' && !query.data && <QueryState query={query} />}
-                {order && <SoberManualSortList items={items} scrollRef={scrollRef} disabled={sort !== 'CUSTOM'} saving={saving} dragging={dragging} onDraggingChange={setDragging} onOrderChange={setOrder} onMove={move} />}
-                <InfoNotice>{t('ui.customDescription')}</InfoNotice>
+                {order && (
+                  <SoberManualSortList
+                    items={items}
+                    scrollRef={scrollRef}
+                    disabled={sort !== 'CUSTOM'}
+                    saving={saving}
+                    dragging={dragging}
+                    onDraggingChange={setDragging}
+                    onOrderChange={setOrder}
+                    onMove={move}
+                  />
+                )}
+                {items.length > 1 && (
+                  <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
+                    {t('sober.orderHint')}
+                  </InfoNotice>
+                )}
               </View>
             </View>
-          <ContentBottomButton
-              label={t('ui.reset')}
-              accessibilityLabel={t('ui.resetSelection')}
-              disabled={saving || dragging || (sort === 'CUSTOM' && !order)}
-              onPress={() => {
-                if (sort === 'CUSTOM') {
-                  setOrder(defaults);
-                } else {
-                  setSort('DESC');
-                  setStandardSort('DESC');
-                  setPriority(false);
-                  setRecords('DESC');
-                }
-              }}
-            />
           </View>
+          <ContentBottomButton
+            label={t('ui.reset')}
+            accessibilityLabel={t('ui.resetSelection')}
+            disabled={saving || dragging || (sort === 'CUSTOM' && !order)}
+            onPress={() => {
+              if (sort === 'CUSTOM') {
+                setOrder(defaults);
+              } else {
+                setSort('DESC');
+                setStandardSort('DESC');
+                setPriority(false);
+                setRecords('DESC');
+              }
+            }}
+          />
         </AnimatedScrollView>
         <ScrollEdgeFade edge="top" visible={sheetFade.topVisible} />
         <ScrollEdgeFade

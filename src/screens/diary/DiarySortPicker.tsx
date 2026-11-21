@@ -3,6 +3,7 @@ import type { BottomSheetModal } from '@expo/ui/community/bottom-sheet';
 import { useEffect, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SheetHeader } from '../../components/SheetHeader';
+import { SheetSectionHeading } from '../../components/SheetSectionHeading';
 import { ContentBottomButton } from '../../components/ContentBottomButton';
 import { HeaderAction } from '../../components/HeaderAction';
 import { InfoNotice } from '../../components/InfoNotice';
@@ -51,35 +52,40 @@ export function DiarySortPicker({
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled
       >
-        <View className="gap-3">
-          <Text className="text-base font-semibold">{t('diary.dateSort')}</Text>
-          <View className="flex-row gap-3">
-            {(['DESC', 'ASC'] as const).map((value) => {
-              const label = t(value === 'DESC' ? 'ui.newest' : 'ui.oldest');
-              return (
-                <View key={value} className="flex-1">
-                  <PickerOption
-                    keepUncheckedBorder
-                    softUncheckedBorder
-                    compact
-                    selected={draftSort === value}
-                    accessibilityLabel={label}
-                    onPress={() => setDraftSort(value)}
-                  >
-                    <Text
-                      className={`text-base ${draftSort === value ? 'text-theme-accent-deep' : ''}`}
-                    >
-                      {label}
-                    </Text>
-                  </PickerOption>
-                </View>
-              );
-            })}
+        <View className="gap-10">
+          <SheetSectionHeading icon="sort" title={t('ui.sortCriteria')} />
+          <View className="gap-4 pl-7">
+            <View className="gap-3">
+              <Text className="text-base font-semibold text-theme-text-secondary">{t('diary.dateSort')}</Text>
+              <View className="flex-row gap-3">
+                {(['DESC', 'ASC'] as const).map((value) => {
+                  const label = t(value === 'DESC' ? 'ui.newest' : 'ui.oldest');
+                  return (
+                    <View key={value} className="flex-1">
+                      <PickerOption
+                        keepUncheckedBorder
+                        softUncheckedBorder
+                        compact
+                        selected={draftSort === value}
+                        accessibilityLabel={label}
+                        onPress={() => setDraftSort(value)}
+                      >
+                        <Text
+                          className={`text-base ${draftSort === value ? 'text-theme-accent-deep' : ''}`}
+                        >
+                          {label}
+                        </Text>
+                      </PickerOption>
+                    </View>
+                  );
+                })}
+              </View>
+            </View>
+            <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
+              {t('ui.sortDescription', { value: t('diary.dateSort').replace(/(?:순)? 정렬$/, '') })}
+            </InfoNotice>
           </View>
         </View>
-        <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
-          {t('ui.sortDescription', { value: t('diary.dateSort').replace(/(?:순)? 정렬$/, '') })}
-        </InfoNotice>
         <ContentBottomButton
           label={t('ui.reset')}
           accessibilityLabel={t('ui.resetSelection')}

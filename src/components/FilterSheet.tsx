@@ -2,6 +2,7 @@ import { ScrollEdgeFade } from './ScrollEdgeFade';
 import { useScrollFade } from '../hooks/useScrollFade';
 import { NoticeHost } from './NoticeProvider';
 import { SheetHeader } from './SheetHeader';
+import { SheetSectionHeading } from './SheetSectionHeading';
 import { useEffect, useRef } from 'react';
 import { useI18n } from '../i18n/react';
 import type { ReactNode } from 'react';
@@ -64,7 +65,10 @@ export function FilterSheet({
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
         >
-          <View className="gap-8">{children}</View>
+          <View className="gap-10">
+            <SheetSectionHeading icon="filter-list" title={t('ui.filterConditions')} />
+            <View className="gap-6 pl-7">{children}</View>
+          </View>
           <ContentBottomButton
             label={t('ui.reset')}
             accessibilityLabel={t('ui.resetSelection')}

@@ -1,5 +1,6 @@
 import { NoticeHost } from './NoticeProvider';
 import { SheetHeader } from './SheetHeader';
+import { SheetSectionHeading } from './SheetSectionHeading';
 import { useI18n } from '../i18n/react';
 import { InfoNotice } from './InfoNotice';
 import { useEffect, useRef, useState } from 'react';
@@ -51,7 +52,7 @@ export function RecordSortPicker({
   ] as { value: 'ASC' | 'DESC' | 'CUSTOM'; label: string }[];
   const prioritySection = priorityFirst !== undefined && (
     <View className="flex-row items-center justify-between gap-3">
-      <Text className="text-base font-semibold">{t('ui.priorityFirst')}</Text>
+      <Text className="text-base font-semibold text-theme-text-secondary">{t('ui.priorityFirst')}</Text>
       <Switch
         accessibilityLabel={t('ui.priorityFirst')}
         value={draftPriority}
@@ -98,75 +99,80 @@ export function RecordSortPicker({
         nestedScrollEnabled
         showsVerticalScrollIndicator={false}
       >
-        {prioritySection}
-        {recordSort && (
-          <View className="gap-3">
-            <Text className="text-base font-semibold">{t('ui.records')}</Text>
-            <View className="flex-row gap-3">
-              {(['DESC', 'ASC'] as const).map((value) => (
-                <View key={value} className="flex-1">
-                  <PickerOption
-                    keepUncheckedBorder
-                    softUncheckedBorder
-                    compact
-                    selected={draftRecordSort === value}
-                    accessibilityLabel={t('ui.currentRecord', {
-                      value: t(value === 'DESC' ? 'ui.longest' : 'ui.shortest'),
-                    })}
-                    onPress={() => setRecordSort(value)}
-                  >
-                    <Text
-                      className={`text-base ${draftRecordSort === value ? 'text-theme-accent-deep' : ''}`}
-                    >
-                      {t(value === 'DESC' ? 'ui.longest' : 'ui.shortest')}
-                    </Text>
-                  </PickerOption>
+        <View className="gap-10">
+          <SheetSectionHeading icon="sort" title={t('ui.sortCriteria')} />
+          <View className="gap-6 pl-7">
+            {prioritySection}
+            {recordSort && (
+              <View className="gap-3">
+                <Text className="text-base font-semibold text-theme-text-secondary">{t('ui.records')}</Text>
+                <View className="flex-row gap-3">
+                  {(['DESC', 'ASC'] as const).map((value) => (
+                    <View key={value} className="flex-1">
+                      <PickerOption
+                        keepUncheckedBorder
+                        softUncheckedBorder
+                        compact
+                        selected={draftRecordSort === value}
+                        accessibilityLabel={t('ui.currentRecord', {
+                          value: t(value === 'DESC' ? 'ui.longest' : 'ui.shortest'),
+                        })}
+                        onPress={() => setRecordSort(value)}
+                      >
+                        <Text
+                          className={`text-base ${draftRecordSort === value ? 'text-theme-accent-deep' : ''}`}
+                        >
+                          {t(value === 'DESC' ? 'ui.longest' : 'ui.shortest')}
+                        </Text>
+                      </PickerOption>
+                    </View>
+                  ))}
                 </View>
-              ))}
+              </View>
+            )}
+            <View className="gap-3">
+              <Text className="text-base font-semibold text-theme-text-secondary">
+                {sortLabel ?? t('ui.createdDateSort')}
+              </Text>
+              <View className="flex-row gap-3">
+                {options.map((option) => (
+                  <View key={option.value} className="flex-1">
+                    <PickerOption
+                      keepUncheckedBorder
+                      softUncheckedBorder
+                      compact
+                      selected={draftSort === option.value}
+                      accessibilityLabel={option.label}
+                      onPress={() => {
+                        setSort(option.value);
+                        if (option.value === 'CUSTOM') setPriority(false);
+                      }}
+                    >
+                      <Text
+                        className={`text-base ${draftSort === option.value ? 'text-theme-accent-deep' : ''}`}
+                      >
+                        {option.label}
+                      </Text>
+                    </PickerOption>
+                  </View>
+                ))}
+              </View>
+            </View>
+            <View className="gap-1">
+              <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
+                {draftSort === 'CUSTOM'
+                  ? t('ui.customDescription')
+                  : recordSort
+                    ? t('ui.recordsDescription', {
+                        value: draftPriority ? t('ui.priorityPrefix') : '',
+                      })
+                    : t('ui.sortDescription', {
+                        value: `${draftPriority ? t('ui.importantPrefix') : ''}${(sortLabel ?? t('ui.createdDateSort')).replace(/(?:순)? 정렬$/, '')}`,
+                      })}
+              </InfoNotice>
+              {allowCustom && <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>{t('ui.sortPriorityConflict')}</InfoNotice>}
             </View>
           </View>
-        )}
-        <View className="gap-3">
-          <Text className="text-base font-semibold">
-            {sortLabel ?? t('ui.createdDateSort')}
-          </Text>
-          <View className="flex-row gap-3">
-            {options.map((option) => (
-              <View key={option.value} className="flex-1">
-                <PickerOption
-                  keepUncheckedBorder
-                  softUncheckedBorder
-                  compact
-                  selected={draftSort === option.value}
-                  accessibilityLabel={option.label}
-                  onPress={() => {
-                    setSort(option.value);
-                    if (option.value === 'CUSTOM') setPriority(false);
-                  }}
-                >
-                  <Text
-                    className={`text-base ${draftSort === option.value ? 'text-theme-accent-deep' : ''}`}
-                  >
-                    {option.label}
-                  </Text>
-                </PickerOption>
-              </View>
-            ))}
-          </View>
-        </View>
-        <View className="gap-1">
-          <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
-            {draftSort === 'CUSTOM'
-              ? t('ui.customDescription')
-              : recordSort
-                ? t('ui.recordsDescription', {
-                    value: draftPriority ? t('ui.priorityPrefix') : '',
-                  })
-                : t('ui.sortDescription', {
-                    value: `${draftPriority ? t('ui.importantPrefix') : ''}${(sortLabel ?? t('ui.createdDateSort')).replace(/(?:순)? 정렬$/, '')}`,
-                  })}
-          </InfoNotice>
-          {allowCustom && <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>{t('ui.sortPriorityConflict')}</InfoNotice>}
         </View>
         <ContentBottomButton
           label={t('ui.reset')}

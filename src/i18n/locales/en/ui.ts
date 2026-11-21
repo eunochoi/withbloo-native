@@ -27,6 +27,8 @@ export const uiEn = {
   currentRecord: 'Streak %{value}',
   older: 'Oldest',
   sort: 'Sort',
+  sortCriteria: 'Sort criteria',
+  filterConditions: 'Filter criteria',
   records: 'Streak',
   customDescription: 'Shown in your chosen order.',
   recordsDescription: 'Sort by %{value}streak, then created date.',

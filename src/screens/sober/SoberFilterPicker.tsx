@@ -64,7 +64,7 @@ export function SoberFilterPicker({
     >
       <>
         <View className="flex-row items-center justify-between gap-3">
-          <Text className="text-base font-semibold">{t('sober.onlyImportant')}</Text>
+          <Text className="text-base font-semibold text-theme-text-secondary">{t('sober.onlyImportant')}</Text>
           <Switch
             accessibilityLabel={t('sober.onlyImportant')}
             value={draft.priorityOnly}
@@ -75,14 +75,14 @@ export function SoberFilterPicker({
           />
         </View>
         <View className="gap-3">
-          <Text className="text-base font-semibold">{t('sober.minimumPeriod')}</Text>
+          <Text className="text-base font-semibold text-theme-text-secondary">{t('sober.minimumPeriod')}</Text>
           <FormPickerRow
             label={recordFilters.find((option) => option.days === draft.minimumDays)!.label}
             accessibilityLabel={t('sober.minimumPeriodChoice')}
             disabled={false}
             onPress={() => setPeriodOpen(true)}
           />
-          <InfoNotice>
+          <InfoNotice numberOfLines={0} adjustsFontSizeToFit={false}>
             {t('sober.minimumPeriodHint')}
           </InfoNotice>
         </View>

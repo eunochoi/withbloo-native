@@ -457,7 +457,7 @@ test('diary filter opens at its content height and only caps the combined layout
   assert.equal(shell.props.enableDynamicSizing, true);
   assert.equal(shell.props.snapPoints, undefined);
   assert.equal(shell.props.backgroundStyle.borderRadius, 36);
-  assert.equal(shell.props.children.props.style.maxHeight, 900 - 40 - 24);
+  assert.equal(shell.props.children.props.style.maxHeight, 900 - 80 - 24);
   assert.equal(shell.props.children.props.style.height, undefined);
   const scroll = content.find((node) => node.type === 'ScrollView');
   assert.equal(scroll.props.style, undefined);
