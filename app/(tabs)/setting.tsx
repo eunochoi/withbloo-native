@@ -224,8 +224,8 @@ export default function SettingsScreen() {
             onPress={() => setOnboardingOpen(true)}
             className={`shrink-0 flex-row items-center justify-center gap-1.5 active:opacity-65 ${disabled ? 'opacity-40' : 'opacity-100'}`}
           >
-            <AppIcon name="info" size={appRem * 1.2} className="text-theme-accent" />
-            <Text className="text-sm leading-snug text-theme-text-secondary">
+            <AppIcon name="info" size={appRem * (4 / 3)} className="text-theme-accent" />
+            <Text className="text-base leading-snug text-theme-text-secondary">
               {t('settings.about')}
             </Text>
           </Pressable>
@@ -237,8 +237,8 @@ export default function SettingsScreen() {
             onPress={() => router.navigate('/privacy')}
             className={`shrink-0 flex-row items-center justify-center gap-1.5 active:opacity-65 ${disabled ? 'opacity-40' : 'opacity-100'}`}
           >
-            <AppIcon name="privacy-tip" size={appRem * 1.2} className="text-theme-accent" />
-            <Text className="text-sm leading-snug text-theme-text-secondary">
+            <AppIcon name="privacy-tip" size={appRem * (4 / 3)} className="text-theme-accent" />
+            <Text className="text-base leading-snug text-theme-text-secondary">
               {t('settings.privacy')}
             </Text>
           </Pressable>
@@ -258,7 +258,7 @@ export default function SettingsScreen() {
             }}
             className={`ml-auto shrink-0 flex-row items-center justify-center gap-1.5 active:opacity-65 ${disabled ? 'opacity-40' : 'opacity-100'}`}
           >
-            <AppIcon name="open-in-new" size={appRem * 1.2} className="text-theme-accent" />
+            <AppIcon name="open-in-new" size={appRem * (4 / 3)} className="text-theme-accent" />
           </Pressable>
         </Toolbar>
         <View className="gap-12" style={{ paddingHorizontal: '5%' }}>

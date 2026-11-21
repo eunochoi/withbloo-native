@@ -31,8 +31,8 @@ export function ToolbarButton({
         onLayout={(event) => setLeadingWidth(event.nativeEvent.layout.width)}
         className="shrink-0 flex-row items-center gap-1.5"
       >
-        <AppIcon name={icon} size={appRem * 1.2} className="shrink-0 text-theme-accent" />
-        <Text numberOfLines={1} className="shrink-0 text-sm leading-snug text-theme-text-secondary">
+        <AppIcon name={icon} size={appRem * (4 / 3)} className="shrink-0 text-theme-accent" />
+        <Text numberOfLines={1} className="shrink-0 text-base leading-snug text-theme-text-secondary">
           {first}
         </Text>
       </View>
@@ -40,7 +40,7 @@ export function ToolbarButton({
         <Text
           numberOfLines={1}
           ellipsizeMode="tail"
-          className="min-w-0 shrink text-sm leading-snug text-theme-text-secondary"
+          className="min-w-0 shrink text-base leading-snug text-theme-text-secondary"
         >
           {remaining.map((part, index) => (
             <Fragment key={index}> · {part}</Fragment>
