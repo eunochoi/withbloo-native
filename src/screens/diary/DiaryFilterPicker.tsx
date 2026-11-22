@@ -1,19 +1,17 @@
-import { ScrollEdgeFade } from '../../components/ScrollEdgeFade';
-import { useScrollFade } from '../../hooks/useScrollFade';
-import { useI18n } from '../../i18n/react';
-import { SheetModal } from '../../components/SheetModal';
 import type { BottomSheetModal } from '@expo/ui/community/bottom-sheet';
 import type { UseQueryResult } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { SheetHeader } from '../../components/SheetHeader';
-import { SheetSectionHeading } from '../../components/SheetSectionHeading';
 import { ContentBottomButton } from '../../components/ContentBottomButton';
 import { FormPickerRow } from '../../components/FormPickerRow';
 import { HeaderAction } from '../../components/HeaderAction';
 import { InfoNotice } from '../../components/InfoNotice';
 import { PickerOption } from '../../components/PickerOption';
 import { QueryState } from '../../components/QueryState';
+import { ScrollEdgeFade } from '../../components/ScrollEdgeFade';
+import { SheetHeader } from '../../components/SheetHeader';
+import { SheetModal } from '../../components/SheetModal';
+import { SheetSectionHeading } from '../../components/SheetSectionHeading';
 import { Text } from '../../components/Text';
 import {
   DIARY_EMOTION_GROUPS,
@@ -22,6 +20,8 @@ import {
   type DiarySeason,
 } from '../../domain/diaryFilters';
 import { selectionSummary } from '../../domain/selection';
+import { useScrollFade } from '../../hooks/useScrollFade';
+import { useI18n } from '../../i18n/react';
 
 export function DiaryFilterPicker({
   year,
@@ -58,9 +58,9 @@ export function DiaryFilterPicker({
   const [draftEmotionGroups, setEmotionGroups] = useState(emotionGroups);
   const selectedYear =
     draftYear !== null &&
-    yearsQuery.data !== undefined &&
-    !yearsQuery.isError &&
-    !yearsQuery.data.includes(draftYear)
+      yearsQuery.data !== undefined &&
+      !yearsQuery.isError &&
+      !yearsQuery.data.includes(draftYear)
       ? null
       : draftYear;
   return (
