@@ -1,6 +1,5 @@
 import { useI18n } from '../i18n/react';
 import type { ScrollView } from 'react-native';
-import { useState } from 'react';
 import { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortables';
 import { AnimatedScrollView } from './AnimatedScrollView';
@@ -81,6 +80,7 @@ export function ImageAttachments({
   images,
   busy,
   picking,
+  dragging,
   onPick,
   onRemove,
   onReorder,
@@ -89,6 +89,7 @@ export function ImageAttachments({
   images: DraftImage[];
   busy: boolean;
   picking: boolean;
+  dragging: boolean;
   onPick: () => void;
   onRemove: (file: string) => void;
   onReorder: (from: number, to: number) => void;
@@ -98,9 +99,14 @@ export function ImageAttachments({
 
   const { colors, rem: appRem } = useAppTheme();
   const scrollRef = useAnimatedRef<ScrollView>();
-  const [dragging, setDragging] = useState(false);
   return (
-    <AnimatedScrollView ref={scrollRef} horizontal showsHorizontalScrollIndicator={false}>
+    <AnimatedScrollView
+      ref={scrollRef}
+      horizontal
+      scrollEnabled={!dragging}
+      bounces={!dragging}
+      showsHorizontalScrollIndicator={false}
+    >
       <View className="flex-row gap-3">
         {images.length > 0 && (
           <Sortable.Grid
@@ -110,17 +116,17 @@ export function ImageAttachments({
             rowHeight={appRem * 7}
             columnGap={appRem * 0.75}
             customHandle
+            dragActivationDelay={0}
+            enableActiveItemSnap={false}
+            activeItemScale={1}
             overDrag="none"
-            sortEnabled={!busy}
+            sortEnabled={!busy && images.length > 1}
             scrollableRef={scrollRef}
             autoScrollDirection="horizontal"
-            onDragStart={() => {
-              setDragging(true);
-              onDragging(true);
-            }}
+            autoScrollMaxOverscroll={0}
+            onDragStart={() => onDragging(true)}
             onDragEnd={({ fromIndex, toIndex }) => {
-              onReorder(fromIndex, toIndex);
-              setDragging(false);
+              if (fromIndex !== toIndex) onReorder(fromIndex, toIndex);
               onDragging(false);
             }}
             renderItem={({ item: image, index }) => (

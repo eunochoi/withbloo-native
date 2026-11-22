@@ -16,6 +16,7 @@ import { Text } from '../../components/Text';
 import { InfoNotice } from '../../components/InfoNotice';
 import { ImageAttachments } from '../../components/ImageAttachments';
 import { ImageAttachmentsHeader } from '../../components/ImageAttachmentsHeader';
+import { moveItem } from '../../components/sortable/order';
 import type { ActivityRecord, RecordScope } from '../../db/records';
 import { dateTimeDraft, isDate, parseDateTime } from '../../domain/date';
 import { DIARY_IMAGE_MAX_COUNT } from '../../domain/limits';
@@ -159,6 +160,7 @@ export function ActivityRecordForm({
           onContentSizeChange={sheetFade.onContentSizeChange}
           className="flex-1"
           contentContainerClassName="gap-7 py-8 pb-12"
+          scrollEnabled={!dragging}
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
         >
@@ -230,6 +232,7 @@ export function ActivityRecordForm({
                 images={images}
                 busy={busy || picking}
                 picking={picking}
+                dragging={dragging}
                 onDragging={setDragging}
                 onPick={() => {
                   setPicking(true);
@@ -260,12 +263,7 @@ export function ActivityRecordForm({
                   })
                 }
                 onReorder={(from, to) =>
-                  setImages((current) => {
-                    const next = [...current];
-                    const [item] = next.splice(from, 1);
-                    next.splice(to, 0, item);
-                    return next;
-                  })
+                  setImages((current) => moveItem(current, from, to))
                 }
               />
             </View>

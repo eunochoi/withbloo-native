@@ -98,7 +98,8 @@
       "react-native-android-widget@0.22.1": "patches/react-native-android-widget@0.22.1.patch",
       "expo-constants@57.0.20": "patches/expo-constants@57.0.20.patch",
       "expo-updates@57.0.25": "patches/expo-updates@57.0.25.patch",
-      "@expo/ui@57.0.21": "patches/@expo__ui@57.0.21.patch"
+      "@expo/ui@57.0.21": "patches/@expo__ui@57.0.21.patch",
+      "react-native-sortables@1.10.1": "patches/react-native-sortables@1.10.1.patch"
     }
   }
 }

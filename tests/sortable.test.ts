@@ -114,6 +114,7 @@ test('photo grid keeps add tile outside draggable data and passes the drop order
       { file: 'b', uri: 'b' },
     ],
     busy: false,
+    dragging: false,
     onReorder: (from: number, to: number) => moves.push([from, to]),
     onDragging: (value: boolean) => dragging.push(value),
   };
@@ -121,9 +122,14 @@ test('photo grid keeps add tile outside draggable data and passes the drop order
   const grid = nodes(tree).find((node) => node.type === 'Grid');
   assert.equal(grid.props.data, props.images);
   assert.equal(grid.props.autoScrollDirection, 'horizontal');
+  assert.equal(grid.props.dragActivationDelay, 0);
+  assert.equal(grid.props.activeItemScale, 1);
+  assert.equal(grid.props.enableActiveItemSnap, false);
+  assert.equal(tree.props.scrollEnabled, true);
   assert.equal(grid.props.overDrag, 'none');
   grid.props.onDragStart();
-  tree = render('ImageAttachments', props);
+  tree = render('ImageAttachments', { ...props, dragging: true });
+  assert.equal(tree.props.scrollEnabled, false);
   assert.equal(
     nodes(tree).find((node) => node.props.accessibilityLabel === '이미지 추가').props.disabled,
     true,

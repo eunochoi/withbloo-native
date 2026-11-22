@@ -1,0 +1,63 @@
+diff --git a/src/providers/shared/DragProvider.ts b/src/providers/shared/DragProvider.ts
+--- a/src/providers/shared/DragProvider.ts
++++ b/src/providers/shared/DragProvider.ts
+@@ -341,14 +341,19 @@
+       // Use timeout to ensure that the callback is called after all animated
+       // reactions are computed in the library (e.g. for the portal and collapsible
+       // items case when the size of the active item must change after it is teleported)
+-      setAnimatedTimeout(() => {
++      const notifyDragStart = () => {
+         onDragStart({
+           fromIndex: ctx.dragStartIndex,
+           indexToKey: indexToKey.value,
+           key,
+           keyToIndex: keyToIndex.value
+         });
+-      });
++      };
++      if (dragActivationDelay.value === 0) {
++        notifyDragStart();
++      } else {
++        setAnimatedTimeout(notifyDragStart);
++      }
+     },
+     [
+       activationAnimationDuration,
+@@ -362,6 +367,7 @@
+       activeItemPosition,
+       context,
+       containerId,
++      dragActivationDelay,
+       haptics,
+       inactiveAnimationProgress,
+       inactiveItemOpacity,
+@@ -408,9 +414,7 @@
+ 
+       clearAnimatedTimeout(ctx.activationTimeoutId);
+ 
+-      // Start handling touch after a delay to prevent accidental activation
+-      // e.g. while scrolling the ScrollView
+-      ctx.activationTimeoutId = setAnimatedTimeout(() => {
++      const startDrag = () => {
+         if (!usesAbsoluteLayout.value) {
+           return;
+         }
+@@ -434,7 +438,17 @@
+           activationAnimationProgress
+         );
+         activate();
+-      }, dragActivationDelay.value);
++      };
++
++      // Explicit handles with zero delay must claim the gesture before scrolling.
++      if (dragActivationDelay.value === 0) {
++        startDrag();
++      } else {
++        ctx.activationTimeoutId = setAnimatedTimeout(
++          startDrag,
++          dragActivationDelay.value
++        );
++      }
+     },
+     [
+       activeItemKey,

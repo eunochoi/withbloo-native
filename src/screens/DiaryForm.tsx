@@ -36,6 +36,7 @@ import { DiaryDatePicker } from './diary/DiaryDatePicker';
 import { DiaryEmotionPicker } from './diary/DiaryEmotionPicker';
 import { ImageAttachments } from '../components/ImageAttachments';
 import { ImageAttachmentsHeader } from '../components/ImageAttachmentsHeader';
+import { moveItem } from '../components/sortable/order';
 
 export function DiaryForm({ id, initialDate }: { id?: number; initialDate?: string }) {
   const sheetFade = useScrollFade();
@@ -104,12 +105,7 @@ export function DiaryForm({ id, initialDate }: { id?: number; initialDate?: stri
     }),
   );
   const onReorder = useCallback((from: number, to: number) => {
-    setImages((previous) => {
-      const next = [...previous];
-      const [image] = next.splice(from, 1);
-      next.splice(to, 0, image);
-      return next;
-    });
+    setImages((previous) => moveItem(previous, from, to));
   }, []);
   const didClose = useRef(false);
   useEffect(() => {
@@ -315,6 +311,7 @@ export function DiaryForm({ id, initialDate }: { id?: number; initialDate?: stri
             images={images}
             busy={busy}
             picking={picking}
+            dragging={dragging}
             onDragging={setDragging}
             onReorder={onReorder}
             onRemove={(file) =>
