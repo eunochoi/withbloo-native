@@ -1103,7 +1103,7 @@ test('habit priority picker fills the sheet and switches between free and daily 
     options.map((node) => node.props.accessibilityLabel),
     ['없음 · 자유 기록', '낮음 · 매일 기록', '보통 · 매일 기록', '높음 · 매일 기록'],
   );
-  assert.equal(view.shell.props.children.props.style.height, 900 - 40 - 24);
+  assert.equal(view.shell.props.children.props.style.height, 900 - 30 - 24);
   const lists = view.content.filter(
     (node) => node.type === 'View' && node.props.className === 'gap-3 pl-7',
   );

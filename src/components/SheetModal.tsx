@@ -29,7 +29,7 @@ export function SheetModal({
   const { colors } = useAppTheme();
   const { height: windowHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const minimumTopGap = fillHeight ? 40 : 80;
+  const minimumTopGap = fillHeight ? 0 : 80;
   const sheetHeight = windowHeight - Math.max(minimumTopGap, insets.top) - insets.bottom;
   const Content = gestureHandlerEnabled ? SheetGestureRoot : View;
 
