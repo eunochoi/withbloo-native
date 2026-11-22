@@ -21,7 +21,9 @@ import { moveItem } from '../../components/sortable/order';
 import { Text } from '../../components/Text';
 import { sortHabits } from '../../db/habit';
 import { habitQueries } from '../../queries';
-import { HabitManualSortList } from './HabitManualSortList';
+import { ManualSortList } from '../../components/sortable/ManualSortList';
+import { HabitIcon } from '../../components/HabitIcon';
+import { HabitStars } from './HabitStars';
 import { useSettings } from '../../settings/SettingsProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 
@@ -29,7 +31,7 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
   const sheetFade = useScrollFade();
   const { t } = useI18n();
   const { showNotice } = useNotice();
-  const { colors, iconSizes } = useAppTheme();
+  const { colors, iconSizes, rem } = useAppTheme();
   const scrollRef = useAnimatedRef<ScrollView>();
   const db = useSQLiteContext();
   const { settings, updateSettings } = useSettings();
@@ -102,7 +104,7 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
       ref={sheet}
       onDismiss={onClose}
       enablePanDownToClose={!saving && !dragging}
-
+      gestureHandlerEnabled
     >
       <SheetHeader
         title={t('habit.sort')}
@@ -264,15 +266,19 @@ export function HabitSortPicker({ visible, onClose }: { visible: boolean; onClos
               >
                 {sort === 'CUSTOM' && !query.data && <QueryState query={query} />}
                 {order && (
-                  <HabitManualSortList
+                  <ManualSortList
                     items={items}
                     scrollRef={scrollRef}
-                    disabled={sort !== 'CUSTOM'}
-                    saving={saving}
+                    disabled={saving || sort !== 'CUSTOM'}
                     dragging={dragging}
                     onDraggingChange={setDragging}
-                    onOrderChange={setOrder}
                     onMove={move}
+                    renderIcon={(item) => (
+                      <HabitIcon name={item.icon_key} colorKey={item.icon_color} size={rem * 2} />
+                    )}
+                    renderPriority={(item) => <HabitStars priority={item.priority} size={rem * 0.8} />}
+                    getOrderLabel={(item) => t('habit.orderAction', { value: item.name })}
+                    orderHint={t('habit.orderHint')}
                   />
                 )}
                 {items.length > 1 && (

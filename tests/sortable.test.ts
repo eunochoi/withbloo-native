@@ -61,6 +61,7 @@ function renderer(path: string, states: any[], saved: any[] = [], active = { val
                 },
               ];
             },
+            useRef: () => ({ current: null }),
             useCallback: (fn: any) => fn,
             useEffect: () => {},
           };
@@ -77,7 +78,7 @@ function renderer(path: string, states: any[], saved: any[] = [], active = { val
         if (name === 'react-native-safe-area-context')
           return { useSafeAreaInsets: () => ({ bottom: 0 }) };
         if (name.endsWith('AppThemeProvider'))
-          return { useAppTheme: () => ({ rem: 15, colors: { accent: '#112233', accentDeep: '#334455' } }) };
+          return { useAppTheme: () => ({ rem: 15, iconSizes: { md: 20 }, colors: { accent: '#112233', accentDeep: '#334455' } }) };
         if (name.endsWith('SettingsProvider'))
           return {
             useSettings: () => ({
@@ -144,17 +145,29 @@ test('photo grid keeps add tile outside draggable data and passes the drop order
   );
 });
 
-test('habit drag styling highlights only the active row and keeps a visible handle', () => {
+test('manual sort highlights the active row and keeps a visible, accessible handle', () => {
   const active = { value: false };
-  const render = renderer('src/screens/habit/HabitManualSortItem.tsx', [], [], active);
-  const props = { habit: { id: 1, name: 'habit', priority: 1 }, index: 0, count: 1, disabled: false, onMove: () => {} };
-  const row = render('HabitManualSortItem', props);
+  const render = renderer('src/components/sortable/ManualSortList.tsx', [], [], active);
+  const items = [{ id: 1, name: 'habit' }, { id: 2, name: 'second' }];
+  const moves: number[][] = [];
+  const tree = render('ManualSortList', {
+    items,
+    getOrderLabel: (item: any) => item.name,
+    renderIcon: () => null,
+    renderPriority: () => null,
+    onMove: (from: number, to: number) => moves.push([from, to]),
+  });
+  const grid = nodes(tree).find((node) => node.type === 'Grid');
+  const item = grid.props.renderItem({ item: items[0], index: 0 });
+  const row = item.type(item.props);
   assert.equal(row.props.style.backgroundColor, 'transparent');
   const handle = nodes(row).find((node) => node.props.accessibilityRole === 'button');
   assert.match(handle.props.className, /h-12 w-12/);
   assert.equal(handle.props.children.props.size, 18.75);
+  handle.props.onAccessibilityAction({ nativeEvent: { actionName: 'increment' } });
+  assert.deepEqual(moves, [[0, 1]]);
   active.value = true;
-  assert.equal(render('HabitManualSortItem', props).props.style.backgroundColor, '#1122331A');
+  assert.equal(item.type(item.props).props.style.backgroundColor, '#1122331A');
 });
 
 test('habit grid uses modal scrolling and saves the returned order', async () => {
@@ -162,18 +175,21 @@ test('habit grid uses modal scrolling and saves the returned order', async () =>
   const picker = renderer('src/screens/habit/HabitSortPicker.tsx', [[3, 1, 2], 'CUSTOM', false, 'DESC', false, false, false], saved);
   const props = { visible: true, onClose: () => {} };
   const tree = picker('HabitSortPicker', props);
-  const sheet = nodes(tree).find((node) => node.type === 'BottomSheetModal');
-  const list = nodes(tree).find((node) => node.type === 'HabitManualSortList');
-  assert.equal(sheet.props.scrollFade, true);
-  assert.equal(sheet.props.scrollRef, list.props.scrollRef);
+  const sheet = nodes(tree).find((node) => node.type === 'SheetModal');
+  const scrollView = nodes(tree).find((node) => node.type === 'AnimatedScrollView');
+  const list = nodes(tree).find((node) => node.type === 'ManualSortList');
+  assert.equal(sheet.props.gestureHandlerEnabled, true);
+  assert.equal(scrollView.props.ref, list.props.scrollRef);
   assert.equal(list.props.disabled, false);
-  const renderList = renderer('src/screens/habit/HabitManualSortList.tsx', []);
-  const grid = nodes(renderList('HabitManualSortList', list.props)).find((node) => node.type === 'Grid');
-  assert.equal(grid.props.scrollableRef, sheet.props.scrollRef);
+  const renderList = renderer('src/components/sortable/ManualSortList.tsx', []);
+  const grid = nodes(renderList('ManualSortList', list.props)).find((node) => node.type === 'Grid');
+  assert.equal(grid.props.scrollableRef, scrollView.props.ref);
+  assert.equal(grid.props.dragActivationDelay, 0);
   grid.props.onDragStart();
-  assert.equal(nodes(picker('HabitSortPicker', props)).find((node) => node.type === 'BottomSheetModal').props.scrollEnabled, false);
-  grid.props.onDragEnd({ data: [{ id: 3 }, { id: 2 }, { id: 1 }] });
-  const button = nodes(picker('HabitSortPicker', props)).find((node) => node.type === 'BottomSheetModal').props.headerButton;
+  assert.equal(nodes(picker('HabitSortPicker', props)).find((node) => node.type === 'AnimatedScrollView').props.scrollEnabled, false);
+  grid.props.onDragEnd({ fromIndex: 1, toIndex: 2 });
+  assert.equal(nodes(picker('HabitSortPicker', props)).find((node) => node.type === 'AnimatedScrollView').props.scrollEnabled, true);
+  const button = nodes(picker('HabitSortPicker', props)).find((node) => node.type === 'SheetHeader').props.headerButton;
   assert.equal(button.props.disabled, false);
   button.props.onPress();
   await Promise.resolve();
@@ -191,8 +207,7 @@ test('automatic habit sorting remains usable while manual order is loading or ha
     const props = { visible: true, onClose: () => {} };
     let tree = render('HabitSortPicker', props);
     assert.equal(nodes(tree).some((node) => node.type === 'QueryState'), false);
-    const sheet = nodes(tree).find((node) => node.type === 'BottomSheetModal');
-    assert.equal(sheet.props.scrollFade, true);
+    const sheet = nodes(tree).find((node) => node.type === 'SheetHeader');
     assert.equal(sheet.props.headerButton.props.disabled, false);
     sheet.props.headerButton.props.onPress();
     await Promise.resolve();
@@ -201,41 +216,39 @@ test('automatic habit sorting remains usable while manual order is loading or ha
     states[4] = false;
     tree = render('HabitSortPicker', props);
     assert.equal(nodes(tree).some((node) => node.type === 'QueryState'), true);
-    assert.equal(nodes(tree).find((node) => node.type === 'BottomSheetModal').props.headerButton.props.disabled, true);
+    assert.equal(nodes(tree).find((node) => node.type === 'SheetHeader').props.headerButton.props.disabled, true);
   }
 });
 
 
-test('habit sort radio choices select one mode and retain the standard choice', () => {
+test('habit custom sort switch retains the most recent standard choice', () => {
   const states: any[] = [[1, 2, 3], 'CUSTOM', false, 'ASC', false, false, false];
   const render = renderer('src/screens/habit/HabitSortPicker.tsx', states);
   const props = { visible: true, onClose: () => {} };
-  let tree = render('HabitSortPicker', props);
-  let radios = nodes(tree).filter((node) => node.props.accessibilityRole === 'radio');
-  assert.equal(radios.length, 2);
-  assert.equal(radios[0].props.accessibilityState.checked, false);
-  assert.equal(radios[1].props.accessibilityState.checked, true);
-  radios[0].props.onPress();
+  const controls = () => nodes(render('HabitSortPicker', props));
+  const customSwitch = () => controls().filter((node) => node.type === 'Switch')[1];
+  const dateOptions = () => controls().filter((node) => node.type === 'PickerOption');
+  assert.equal(customSwitch().props.value, true);
+  assert.deepEqual(dateOptions().map((node) => node.props.selected), [false, true]);
+  customSwitch().props.onValueChange(false);
   assert.equal(states[1], 'ASC');
-  tree = render('HabitSortPicker', props);
-  radios = nodes(tree).filter((node) => node.props.accessibilityRole === 'radio');
-  assert.equal(radios[0].props.accessibilityState.checked, true);
-  assert.equal(radios[1].props.accessibilityState.checked, false);
-  radios[1].props.onPress();
+  dateOptions()[0].props.onPress();
+  assert.equal(states[1], 'DESC');
+  customSwitch().props.onValueChange(true);
   assert.equal(states[1], 'CUSTOM');
+  customSwitch().props.onValueChange(false);
+  assert.equal(states[1], 'DESC');
 });
 
 test('custom order can be applied without changes', () => {
-  const states: any[] = [[1, 2, 3], 'CUSTOM', false, 'DESC', false, false, false, false];
+  const states: any[] = [[1, 2, 3], 'DESC', false, 'DESC', false, false];
   const render = renderer('src/screens/habit/HabitSortPicker.tsx', states);
   const props = { visible: true, onClose: () => {} };
-  let tree = render('HabitSortPicker', props);
-  assert.equal(nodes(tree).find((node) => node.type === 'BottomSheetModal').props.headerButton.props.disabled, false);
-  nodes(tree).filter((node) => node.props.accessibilityRole === 'radio')[1].props.onPress();
-  tree = render('HabitSortPicker', props);
-  assert.equal(nodes(tree).find((node) => node.type === 'BottomSheetModal').props.headerButton.props.disabled, false);
+  const tree = render('HabitSortPicker', props);
+  nodes(tree).filter((node) => node.type === 'Switch')[1].props.onValueChange(true);
+  const header = nodes(render('HabitSortPicker', props)).find((node) => node.type === 'SheetHeader');
+  assert.equal(header.props.headerButton.props.disabled, false);
 });
-
 
 test('sober custom order saves dragged IDs and blocks apply during drag', async () => {
   const saved: any[] = [];
@@ -243,12 +256,12 @@ test('sober custom order saves dragged IDs and blocks apply during drag', async 
   const render = renderer('src/screens/sober/SoberSortPicker.tsx', states, saved);
   const props = { visible: true, onClose: () => {} };
   const tree = render('SoberSortPicker', props);
-  const list = nodes(tree).find((node) => node.type === 'SoberManualSortList');
+  const list = nodes(tree).find((node) => node.type === 'ManualSortList');
   list.props.onDraggingChange(true);
-  assert.equal(nodes(render('SoberSortPicker', props)).find((node) => node.type === 'BottomSheetModal').props.headerButton.props.disabled, true);
-  list.props.onOrderChange([3, 2, 1]);
+  assert.equal(nodes(render('SoberSortPicker', props)).find((node) => node.type === 'SheetHeader').props.headerButton.props.disabled, true);
+  list.props.onMove(1, 2);
   list.props.onDraggingChange(false);
-  const button = nodes(render('SoberSortPicker', props)).find((node) => node.type === 'BottomSheetModal').props.headerButton;
+  const button = nodes(render('SoberSortPicker', props)).find((node) => node.type === 'SheetHeader').props.headerButton;
   assert.equal(button.props.disabled, false);
   button.props.onPress();
   await Promise.resolve();

@@ -21,7 +21,9 @@ import { moveItem } from '../../components/sortable/order';
 import { Text } from '../../components/Text';
 import { sortSobers } from '../../db/sober';
 import { soberQueries } from '../../queries';
-import { SoberManualSortList } from './SoberManualSortList';
+import { ManualSortList } from '../../components/sortable/ManualSortList';
+import { SoberIcon } from '../../components/SoberIcon';
+import { StarIcon } from '../../components/StarIcon';
 import { useSettings } from '../../settings/SettingsProvider';
 import { useAppTheme } from '../../theme/AppThemeProvider';
 
@@ -37,7 +39,7 @@ export function SoberSortPicker({
   const sheetFade = useScrollFade();
   const { t } = useI18n();
   const { showNotice } = useNotice();
-  const { colors, iconSizes } = useAppTheme();
+  const { colors, iconSizes, rem } = useAppTheme();
   const scrollRef = useAnimatedRef<ScrollView>();
   const db = useSQLiteContext();
   const { settings, updateSettings } = useSettings();
@@ -112,7 +114,7 @@ export function SoberSortPicker({
       ref={sheet}
       onDismiss={onClose}
       enablePanDownToClose={!saving && !dragging}
-
+      gestureHandlerEnabled
     >
       <SheetHeader
         title={t('sober.sort')}
@@ -299,15 +301,21 @@ export function SoberSortPicker({
               >
                 {sort === 'CUSTOM' && !query.data && <QueryState query={query} />}
                 {order && (
-                  <SoberManualSortList
+                  <ManualSortList
                     items={items}
                     scrollRef={scrollRef}
-                    disabled={sort !== 'CUSTOM'}
-                    saving={saving}
+                    disabled={saving || sort !== 'CUSTOM'}
                     dragging={dragging}
                     onDraggingChange={setDragging}
-                    onOrderChange={setOrder}
                     onMove={move}
+                    renderIcon={(item) => (
+                      <SoberIcon name={item.icon_key} colorKey={item.icon_color} size={rem * 2} />
+                    )}
+                    renderPriority={(item) =>
+                      item.is_priority ? <StarIcon size={rem} color={colors.accent} /> : null
+                    }
+                    getOrderLabel={(item) => t('sober.orderAction', { value: item.name })}
+                    orderHint={t('sober.orderHint')}
                   />
                 )}
                 {items.length > 1 && (

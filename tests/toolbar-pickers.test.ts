@@ -81,6 +81,9 @@ function picker(path: string, name: string, initial: Record<string, unknown>) {
           if (dependency.endsWith('theme/tokens.json')) return require('../src/theme/tokens.json');
           if (dependency.endsWith('domain/selection')) return require('../src/domain/selection');
           if (dependency === 'react/jsx-runtime') return { jsx, jsxs: jsx, Fragment: 'Fragment' };
+          if (dependency === 'nativewind') return { cssInterop: (component: unknown) => component };
+          if (dependency === 'react-native-gesture-handler')
+            return { GestureHandlerRootView: 'GestureHandlerRootView' };
           if (dependency === '@expo/ui/community/bottom-sheet')
             return { BottomSheetModal: 'ExpoDynamicBottomSheet' };
           if (dependency === 'react-native-safe-area-context')
